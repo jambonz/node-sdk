@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/answer",
+  "title": "Answer",
+  "description": "Answers an incoming call (sends a 200 OK to the SIP INVITE). Most verbs implicitly answer the call, so this verb is only needed when you want to explicitly control when the call is answered — for example, to play early media before answering.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "answer" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." }
+  },
+  "examples": [{ "verb": "answer" }]
+}

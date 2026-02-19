@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/gather",
+  "title": "Gather",
+  "description": "Collects user input via speech (STT) and/or DTMF digits. Optionally plays a prompt (using nested 'say' or 'play') while listening. When input is received, the result is sent to the actionHook which should return the next set of verbs. This is the primary verb for building interactive voice menus and conversational flows.",
+  "type": "object",
+  "properties": {
+    "verb": {
+      "const": "gather",
+      "description": "The verb name."
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
+    "actionHook": {
+      "$ref": "../components/actionHook",
+      "description": "The webhook to invoke when input is collected. Receives the transcribed speech and/or DTMF digits. Must return a new array of verbs."
+    },
+    "input": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["speech", "digits"]
+      },
+      "description": "The types of input to accept. Can include 'speech' (STT), 'digits' (DTMF), or both.",
+      "default": ["digits"],
+      "examples": [["speech", "digits"], ["speech"], ["digits"]]
+    },
+    "finishOnKey": {
+      "type": "string",
+      "description": "A DTMF key that signals the end of digit input. The key itself is not included in the collected digits.",
+      "examples": ["#", "*"]
+    },
+    "numDigits": {
+      "type": "number",
+      "description": "Exact number of DTMF digits to collect. Gather completes automatically when this many digits are received."
+    },
+    "minDigits": {
+      "type": "number",
+      "description": "Minimum number of DTMF digits required."
+    },
+    "maxDigits": {
+      "type": "number",
+      "description": "Maximum number of DTMF digits to collect."
+    },
+    "interDigitTimeout": {
+      "type": "number",
+      "description": "Time in seconds to wait between DTMF digits before considering input complete.",
+      "examples": [5]
+    },
+    "speechTimeout": {
+      "type": "number",
+      "description": "Time in seconds of silence after speech before considering the utterance complete.",
+      "examples": [2, 3]
+    },
+    "timeout": {
+      "type": "number",
+      "description": "Overall timeout in seconds. If no input is received within this time, the gather completes with no input and the actionHook is invoked.",
+      "examples": [10, 30]
+    },
+    "partialResultHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook to invoke with interim (partial) speech recognition results. Useful for providing real-time feedback or early processing."
+    },
+    "listenDuringPrompt": {
+      "type": "boolean",
+      "description": "If true, listen for input while the prompt is playing. If false, only start listening after the prompt finishes.",
+      "default": true
+    },
+    "dtmfBargein": {
+      "type": "boolean",
+      "description": "If true, DTMF input interrupts (barges in on) any playing prompt."
+    },
+    "bargein": {
+      "type": "boolean",
+      "description": "If true, speech input interrupts (barges in on) any playing prompt."
+    },
+    "minBargeinWordCount": {
+      "type": "number",
+      "description": "Minimum number of words that must be recognized before barge-in is triggered. Prevents brief noises from interrupting prompts.",
+      "examples": [1, 2]
+    },
+    "recognizer": {
+      "$ref": "../components/recognizer",
+      "description": "Override the session-level STT configuration for this gather."
+    },
+    "say": {
+      "$ref": "say",
+      "description": "A nested 'say' verb to use as the prompt. Played to the caller while listening for input."
+    },
+    "play": {
+      "$ref": "play",
+      "description": "A nested 'play' verb to use as the prompt. Played to the caller while listening for input."
+    },
+    "fillerNoise": {
+      "$ref": "../components/fillerNoise",
+      "description": "Filler noise configuration while waiting for the actionHook to respond."
+    },
+    "actionHookDelayAction": {
+      "$ref": "../components/actionHookDelayAction",
+      "description": "Configuration for interim actions while the actionHook is processing."
+    }
+  },
+  "examples": [
+    {
+      "verb": "gather",
+      "input": ["speech", "digits"],
+      "actionHook": "/gather-result",
+      "timeout": 15,
+      "say": {
+        "text": "Please say or enter your account number."
+      }
+    },
+    {
+      "verb": "gather",
+      "input": ["digits"],
+      "actionHook": "/menu-selection",
+      "numDigits": 1,
+      "say": {
+        "text": "Press 1 for sales, 2 for support, or 3 for billing."
+      }
+    },
+    {
+      "verb": "gather",
+      "input": ["speech"],
+      "actionHook": "/process-speech",
+      "timeout": 20,
+      "bargein": true,
+      "recognizer": {
+        "vendor": "deepgram",
+        "language": "en-US",
+        "hints": ["account", "balance", "transfer", "payment"]
+      },
+      "say": {
+        "text": "How can I help you today?"
+      },
+      "fillerNoise": {
+        "enable": true,
+        "url": "https://example.com/sounds/typing.wav",
+        "startDelaySecs": 2
+      }
+    }
+  ]
+}

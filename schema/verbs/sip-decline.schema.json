@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/sip:decline",
+  "title": "SIP Decline",
+  "description": "Rejects an incoming call with a SIP error response. Used to decline calls with a specific status code and reason (e.g. 486 Busy Here, 603 Decline).",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "sip:decline" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "status": {
+      "type": "number",
+      "description": "The SIP response status code to send.",
+      "examples": [486, 603, 404, 480]
+    },
+    "reason": {
+      "type": "string",
+      "description": "The SIP reason phrase to include in the response.",
+      "examples": ["Busy Here", "Decline", "Not Found"]
+    },
+    "headers": {
+      "type": "object",
+      "description": "Custom SIP headers to include in the response.",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "required": ["status"],
+  "examples": [
+    { "verb": "sip:decline", "status": 486, "reason": "Busy Here" },
+    { "verb": "sip:decline", "status": 603, "reason": "Decline" }
+  ]
+}

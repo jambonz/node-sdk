@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/pipeline",
+  "title": "Pipeline",
+  "description": "Configures a complete STT → LLM → TTS voice AI pipeline with integrated turn detection. Provides a higher-level abstraction than manually orchestrating the individual components. Optimized for building voice AI agents with proper turn-taking behavior.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "pipeline" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "stt": {
+      "$ref": "../components/recognizer",
+      "description": "Speech-to-text configuration for the pipeline."
+    },
+    "tts": {
+      "$ref": "../components/synthesizer",
+      "description": "Text-to-speech configuration for the pipeline."
+    },
+    "vad": {
+      "$ref": "../components/vad",
+      "description": "Voice activity detection configuration for the pipeline."
+    },
+    "turnDetection": {
+      "type": "object",
+      "description": "Turn detection configuration. Determines when the user has finished speaking and it's the AI's turn to respond.",
+      "properties": {
+        "vendor": { "type": "string", "enum": ["krisp"], "description": "The turn detection vendor." },
+        "threshold": { "type": "number", "description": "Confidence threshold for turn detection." },
+        "eagerEotThreshold": { "type": "number", "description": "Threshold for eager end-of-turn detection. Lower values cause earlier turn transitions." }
+      },
+      "required": ["vendor"]
+    },
+    "llm": {
+      "type": "object",
+      "description": "LLM configuration for the pipeline. See the 'llm' verb schema for details.",
+      "additionalProperties": true
+    },
+    "preflightLlm": {
+      "type": "boolean",
+      "description": "If true, establish the LLM connection before the call starts to reduce latency on the first interaction."
+    },
+    "actionHook": { "$ref": "../components/actionHook", "description": "A webhook invoked when the pipeline ends." },
+    "eventHook": { "$ref": "../components/actionHook", "description": "A webhook invoked for pipeline events." }
+  },
+  "required": ["stt", "llm", "tts"],
+  "examples": [
+    {
+      "verb": "pipeline",
+      "stt": { "vendor": "deepgram", "language": "en-US" },
+      "tts": { "vendor": "cartesia", "voice": "sonic-english" },
+      "llm": {
+        "vendor": "openai",
+        "model": "gpt-4o",
+        "llmOptions": {
+          "messages": [{ "role": "system", "content": "You are a helpful voice assistant." }]
+        }
+      },
+      "turnDetection": { "vendor": "krisp", "threshold": 0.5 },
+      "actionHook": "/pipeline-complete"
+    }
+  ]
+}

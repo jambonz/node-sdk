@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/leave",
+  "title": "Leave",
+  "description": "Removes the caller from a conference or queue that they are currently in. Execution continues with the next verb in the application.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "leave" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." }
+  },
+  "examples": [{ "verb": "leave" }]
+}

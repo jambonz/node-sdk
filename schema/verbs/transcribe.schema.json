@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/transcribe",
+  "title": "Transcribe",
+  "description": "Enables real-time transcription of the call audio. Transcription results are sent to the transcriptionHook as they are produced. Runs as a background process — subsequent verbs execute immediately while transcription continues.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "transcribe" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "transcriptionHook": {
+      "type": "string",
+      "format": "uri",
+      "description": "The webhook URL to receive transcription results."
+    },
+    "translationHook": {
+      "type": "string",
+      "format": "uri",
+      "description": "The webhook URL to receive translated transcription results."
+    },
+    "recognizer": {
+      "$ref": "../components/recognizer",
+      "description": "STT configuration for the transcription."
+    },
+    "earlyMedia": {
+      "type": "boolean",
+      "description": "If true, begin transcribing before the call is answered."
+    },
+    "channel": {
+      "type": "number",
+      "description": "Specific audio channel to transcribe."
+    }
+  },
+  "examples": [
+    {
+      "verb": "transcribe",
+      "transcriptionHook": "https://myapp.example.com/transcription",
+      "recognizer": {
+        "vendor": "deepgram",
+        "language": "en-US",
+        "deepgramOptions": { "model": "nova-2", "smartFormatting": true }
+      }
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/llm",
+  "title": "LLM",
+  "description": "Connects the caller to a large language model for a real-time voice conversation. Handles the complete STT → LLM → TTS pipeline, including turn detection, interruption handling, and tool/function calling. The caller speaks naturally and the LLM responds via synthesized speech. This is the primary verb for building AI voice agents on jambonz.",
+  "type": "object",
+  "properties": {
+    "verb": {
+      "const": "llm",
+      "description": "The verb name."
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
+    "vendor": {
+      "type": "string",
+      "description": "The LLM vendor to use.",
+      "examples": ["openai", "anthropic", "google", "groq", "deepseek", "custom"]
+    },
+    "model": {
+      "type": "string",
+      "description": "The specific model to use from the vendor.",
+      "examples": ["gpt-4o", "claude-sonnet-4-20250514", "gemini-2.0-flash"]
+    },
+    "auth": {
+      "type": "object",
+      "description": "Authentication credentials for the LLM vendor API.",
+      "properties": {
+        "apiKey": {
+          "type": "string",
+          "description": "The API key for the LLM vendor."
+        }
+      },
+      "additionalProperties": true
+    },
+    "connectOptions": {
+      "type": "object",
+      "description": "Additional connection options for the LLM vendor, such as custom base URLs or API versions.",
+      "additionalProperties": true
+    },
+    "llmOptions": {
+      "type": "object",
+      "description": "Configuration passed to the LLM including the system prompt, temperature, tools/functions, and other model parameters. The structure varies by vendor but typically includes 'messages' (conversation history), 'temperature', 'tools' (function definitions), and 'maxTokens'.",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "messages": [
+            { "role": "system", "content": "You are a helpful customer service agent for Acme Corp." }
+          ],
+          "temperature": 0.7,
+          "tools": [
+            {
+              "type": "function",
+              "function": {
+                "name": "lookupOrder",
+                "description": "Look up an order by order number",
+                "parameters": {
+                  "type": "object",
+                  "properties": {
+                    "orderNumber": { "type": "string" }
+                  },
+                  "required": ["orderNumber"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "mcpServers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL of the MCP server."
+          },
+          "auth": {
+            "type": "object",
+            "description": "Authentication for the MCP server.",
+            "additionalProperties": true
+          },
+          "roots": {
+            "type": "array",
+            "items": { "type": "object" },
+            "description": "MCP root definitions."
+          }
+        },
+        "required": ["url"]
+      },
+      "description": "Model Context Protocol servers to connect to. MCP servers provide tools that the LLM can invoke during the conversation."
+    },
+    "actionHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when the LLM conversation ends. Receives conversation details and should return the next verbs to execute."
+    },
+    "eventHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked for real-time events during the LLM conversation (e.g. tool calls, transcription events)."
+    },
+    "toolHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when the LLM calls a tool/function. Receives the tool name and arguments, and should return the tool result."
+    },
+    "events": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of event types to receive via the eventHook."
+    }
+  },
+  "required": ["vendor", "llmOptions"],
+  "examples": [
+    {
+      "verb": "llm",
+      "vendor": "openai",
+      "model": "gpt-4o",
+      "auth": { "apiKey": "sk-..." },
+      "llmOptions": {
+        "messages": [
+          { "role": "system", "content": "You are a helpful customer service agent. Be concise and friendly." }
+        ],
+        "temperature": 0.7
+      },
+      "actionHook": "/llm-complete",
+      "toolHook": "/llm-tool-call"
+    }
+  ]
+}

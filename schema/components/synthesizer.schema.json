@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/synthesizer",
+  "title": "Synthesizer",
+  "description": "Configuration for text-to-speech synthesis. Specifies the TTS vendor, voice, language, and vendor-specific options. Can be set at the session level via the 'config' verb or overridden per-verb (e.g. on 'say').",
+  "type": "object",
+  "properties": {
+    "vendor": {
+      "type": "string",
+      "description": "The TTS vendor to use. Must match a vendor configured in the jambonz platform.",
+      "examples": ["google", "aws", "microsoft", "elevenlabs", "cartesia", "deepgram", "ibm", "nuance", "nvidia", "wellsaid", "whisper", "verbio", "custom"]
+    },
+    "label": {
+      "type": "string",
+      "description": "An optional label identifying a specific credential set for this vendor. Used when multiple credentials are configured for the same vendor on the jambonz platform."
+    },
+    "language": {
+      "type": "string",
+      "description": "The language code for speech synthesis, in BCP-47 format.",
+      "examples": ["en-US", "en-GB", "es-ES", "fr-FR", "de-DE"]
+    },
+    "voice": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object", "additionalProperties": true }
+      ],
+      "description": "The voice to use for synthesis. Typically a string voice name (e.g. 'en-US-Wavenet-D' for Google, 'Joanna' for AWS Polly). Some vendors accept an object for more complex voice configuration.",
+      "examples": ["en-US-Wavenet-D", "Joanna", "Rachel"]
+    },
+    "fallbackVendor": {
+      "type": "string",
+      "description": "A backup TTS vendor to use if the primary vendor fails or is unavailable."
+    },
+    "fallbackLabel": {
+      "type": "string",
+      "description": "Credential label for the fallback vendor."
+    },
+    "fallbackLanguage": {
+      "type": "string",
+      "description": "Language code to use with the fallback vendor."
+    },
+    "fallbackVoice": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object", "additionalProperties": true }
+      ],
+      "description": "Voice to use with the fallback vendor."
+    },
+    "engine": {
+      "type": "string",
+      "description": "The synthesis engine tier to use. Availability depends on the vendor.",
+      "enum": ["standard", "neural", "generative", "long-form"]
+    },
+    "gender": {
+      "type": "string",
+      "description": "Preferred voice gender. Used by some vendors (e.g. Google) when a specific voice is not specified.",
+      "enum": ["MALE", "FEMALE", "NEUTRAL"]
+    },
+    "options": {
+      "type": "object",
+      "description": "Vendor-specific options passed through to the TTS provider. The structure depends on the vendor being used.",
+      "additionalProperties": true
+    }
+  },
+  "required": ["vendor"],
+  "examples": [
+    {
+      "vendor": "google",
+      "language": "en-US",
+      "voice": "en-US-Wavenet-D"
+    },
+    {
+      "vendor": "elevenlabs",
+      "voice": "Rachel",
+      "options": {
+        "model_id": "eleven_turbo_v2",
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/hangup",
+  "title": "Hangup",
+  "description": "Terminates the call. Optionally includes custom SIP headers on the BYE request.",
+  "type": "object",
+  "properties": {
+    "verb": {
+      "const": "hangup",
+      "description": "The verb name."
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
+    "headers": {
+      "type": "object",
+      "description": "Custom SIP headers to include on the BYE request.",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "examples": [
+    { "verb": "hangup" },
+    {
+      "verb": "hangup",
+      "headers": { "X-Reason": "call-complete" }
+    }
+  ]
+}

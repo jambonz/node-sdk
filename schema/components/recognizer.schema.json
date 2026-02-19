@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer",
+  "title": "Recognizer",
+  "description": "Configuration for speech-to-text recognition. Specifies the STT vendor, language, and vendor-specific options. Can be set at the session level via the 'config' verb or overridden per-verb (e.g. on 'gather').",
+  "type": "object",
+  "properties": {
+    "vendor": {
+      "type": "string",
+      "description": "The STT vendor to use. Must match a vendor configured in the jambonz platform.",
+      "examples": ["google", "aws", "microsoft", "deepgram", "nuance", "ibm", "nvidia", "soniox", "cobalt", "assemblyai", "speechmatics", "openai", "houndify", "gladia", "elevenlabs", "verbio", "custom"]
+    },
+    "label": {
+      "type": "string",
+      "description": "An optional label identifying a specific credential set for this vendor. Used when multiple credentials are configured for the same vendor."
+    },
+    "language": {
+      "type": "string",
+      "description": "The language code for speech recognition, in BCP-47 format.",
+      "examples": ["en-US", "en-GB", "es-ES", "fr-FR"]
+    },
+    "fallbackVendor": {
+      "type": "string",
+      "description": "A backup STT vendor to use if the primary vendor fails or is unavailable."
+    },
+    "fallbackLabel": {
+      "type": "string",
+      "description": "Credential label for the fallback vendor."
+    },
+    "fallbackLanguage": {
+      "type": "string",
+      "description": "Language code to use with the fallback vendor."
+    },
+    "vad": {
+      "$ref": "vad",
+      "description": "Voice activity detection settings for this recognizer."
+    },
+    "hints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "An array of words or phrases that the recognizer should favor. Use this to improve accuracy for domain-specific terminology, product names, or proper nouns.",
+      "examples": [["jambonz", "drachtio", "SIP", "WebRTC"]]
+    },
+    "hintsBoost": {
+      "type": "number",
+      "description": "A boost factor for hint words. Higher values increase the likelihood of recognizing hinted words. Vendor-specific range."
+    },
+    "altLanguages": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Additional languages the recognizer should listen for simultaneously. Enables multilingual recognition.",
+      "examples": [["es-ES", "fr-FR"]]
+    },
+    "profanityFilter": {
+      "type": "boolean",
+      "description": "If true, the vendor will attempt to filter profanity from transcription results."
+    },
+    "interim": {
+      "type": "boolean",
+      "description": "If true, return interim (partial) transcription results as they become available, before the utterance is complete."
+    },
+    "singleUtterance": {
+      "type": "boolean",
+      "description": "If true, recognition stops after the first complete utterance is detected."
+    },
+    "dualChannel": {
+      "type": "boolean",
+      "description": "If true, send separate audio channels for each call leg (caller and callee) to the recognizer."
+    },
+    "separateRecognitionPerChannel": {
+      "type": "boolean",
+      "description": "If true, perform independent recognition on each audio channel. Requires dualChannel."
+    },
+    "punctuation": {
+      "type": "boolean",
+      "description": "If true, enable automatic punctuation in transcription results."
+    },
+    "enhancedModel": {
+      "type": "boolean",
+      "description": "If true, use an enhanced (premium) recognition model if available from the vendor."
+    },
+    "words": {
+      "type": "boolean",
+      "description": "If true, include word-level timing information in transcription results."
+    },
+    "diarization": {
+      "type": "boolean",
+      "description": "If true, enable speaker diarization to identify different speakers in the audio."
+    },
+    "diarizationMinSpeakers": {
+      "type": "number",
+      "description": "Minimum number of speakers expected. Used to guide the diarization algorithm."
+    },
+    "diarizationMaxSpeakers": {
+      "type": "number",
+      "description": "Maximum number of speakers expected. Used to guide the diarization algorithm."
+    },
+    "interactionType": {
+      "type": "string",
+      "description": "A hint to the recognizer about the type of interaction, which can improve accuracy.",
+      "enum": ["unspecified", "discussion", "presentation", "phone_call", "voicemail", "voice_search", "voice_command", "dictation"]
+    },
+    "naicsCode": {
+      "type": "number",
+      "description": "North American Industry Classification System code. Some vendors use this to improve domain-specific accuracy."
+    },
+    "identifyChannels": {
+      "type": "boolean",
+      "description": "If true, identify and label which channel each transcription segment came from."
+    },
+    "vocabularyName": {
+      "type": "string",
+      "description": "Name of a custom vocabulary resource configured at the vendor for improved recognition of specialized terms."
+    },
+    "vocabularyFilterName": {
+      "type": "string",
+      "description": "Name of a vocabulary filter configured at the vendor for masking or removing specific words."
+    },
+    "filterMethod": {
+      "type": "string",
+      "description": "How filtered vocabulary words should be handled in the transcript.",
+      "enum": ["remove", "mask", "tag"]
+    },
+    "model": {
+      "type": "string",
+      "description": "The specific recognition model to use. Model names are vendor-specific.",
+      "examples": ["latest_long", "phone_call", "nova-2", "chirp"]
+    },
+    "outputFormat": {
+      "type": "string",
+      "description": "The level of detail in recognition results.",
+      "enum": ["simple", "detailed"]
+    },
+    "profanityOption": {
+      "type": "string",
+      "description": "How profanity should be handled in results.",
+      "enum": ["masked", "removed", "raw"]
+    },
+    "requestSnr": {
+      "type": "boolean",
+      "description": "If true, request signal-to-noise ratio information in results."
+    },
+    "initialSpeechTimeoutMs": {
+      "type": "number",
+      "description": "Time in milliseconds to wait for initial speech before timing out.",
+      "examples": [5000]
+    },
+    "azureServiceEndpoint": {
+      "type": "string",
+      "description": "Custom Azure Speech Services endpoint URL. Only applies when vendor is 'microsoft'."
+    },
+    "azureSttEndpointId": {
+      "type": "string",
+      "description": "Azure custom speech endpoint ID for using a custom-trained model. Only applies when vendor is 'microsoft'."
+    },
+    "asrDtmfTerminationDigit": {
+      "type": "string",
+      "description": "A DTMF digit that terminates speech recognition when pressed.",
+      "examples": ["#"]
+    },
+    "asrTimeout": {
+      "type": "number",
+      "description": "Maximum time in seconds to wait for a complete recognition result."
+    },
+    "fastRecognitionTimeout": {
+      "type": "number",
+      "description": "Timeout in seconds for fast recognition mode. Shorter timeout for quick responses."
+    },
+    "minConfidence": {
+      "type": "number",
+      "description": "Minimum confidence score (0-1) required to accept a recognition result. Results below this threshold are discarded.",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "deepgramOptions": {
+      "type": "object",
+      "description": "Deepgram-specific recognition options. Only applies when vendor is 'deepgram'. See Deepgram API documentation for available options.",
+      "additionalProperties": true
+    },
+    "googleOptions": {
+      "type": "object",
+      "description": "Google Speech-to-Text specific options. Only applies when vendor is 'google'.",
+      "additionalProperties": true
+    },
+    "awsOptions": {
+      "type": "object",
+      "description": "AWS Transcribe specific options. Only applies when vendor is 'aws'.",
+      "additionalProperties": true
+    },
+    "azureOptions": {
+      "type": "object",
+      "description": "Azure Speech Services specific options. Only applies when vendor is 'microsoft'.",
+      "additionalProperties": true
+    },
+    "nuanceOptions": {
+      "type": "object",
+      "description": "Nuance-specific recognition options. Only applies when vendor is 'nuance'.",
+      "additionalProperties": true
+    },
+    "ibmOptions": {
+      "type": "object",
+      "description": "IBM Watson Speech-to-Text specific options. Only applies when vendor is 'ibm'.",
+      "additionalProperties": true
+    },
+    "nvidiaOptions": {
+      "type": "object",
+      "description": "NVIDIA Riva specific options. Only applies when vendor is 'nvidia'.",
+      "additionalProperties": true
+    },
+    "sonioxOptions": {
+      "type": "object",
+      "description": "Soniox-specific recognition options. Only applies when vendor is 'soniox'.",
+      "additionalProperties": true
+    },
+    "cobaltOptions": {
+      "type": "object",
+      "description": "Cobalt-specific recognition options. Only applies when vendor is 'cobalt'.",
+      "additionalProperties": true
+    },
+    "assemblyAiOptions": {
+      "type": "object",
+      "description": "AssemblyAI-specific recognition options. Only applies when vendor is 'assemblyai'.",
+      "additionalProperties": true
+    },
+    "speechmaticsOptions": {
+      "type": "object",
+      "description": "Speechmatics-specific recognition options. Only applies when vendor is 'speechmatics'.",
+      "additionalProperties": true
+    },
+    "openaiOptions": {
+      "type": "object",
+      "description": "OpenAI Whisper/Realtime specific options. Only applies when vendor is 'openai'.",
+      "additionalProperties": true
+    },
+    "houndifyOptions": {
+      "type": "object",
+      "description": "Houndify-specific recognition options. Only applies when vendor is 'houndify'.",
+      "additionalProperties": true
+    },
+    "gladiaOptions": {
+      "type": "object",
+      "description": "Gladia-specific recognition options. Only applies when vendor is 'gladia'.",
+      "additionalProperties": true
+    },
+    "elevenlabsOptions": {
+      "type": "object",
+      "description": "ElevenLabs-specific recognition options. Only applies when vendor is 'elevenlabs'.",
+      "additionalProperties": true
+    },
+    "verbioOptions": {
+      "type": "object",
+      "description": "Verbio-specific recognition options. Only applies when vendor is 'verbio'.",
+      "additionalProperties": true
+    },
+    "customOptions": {
+      "type": "object",
+      "description": "Options for custom STT vendors. Only applies when vendor is 'custom'.",
+      "additionalProperties": true
+    }
+  },
+  "required": ["vendor"],
+  "examples": [
+    {
+      "vendor": "deepgram",
+      "language": "en-US",
+      "deepgramOptions": {
+        "model": "nova-2",
+        "smartFormatting": true,
+        "endpointing": 500
+      }
+    },
+    {
+      "vendor": "google",
+      "language": "en-US",
+      "hints": ["jambonz", "drachtio"],
+      "punctuation": true,
+      "enhancedModel": true
+    }
+  ]
+}

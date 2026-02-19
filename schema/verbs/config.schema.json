@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/config",
+  "title": "Config",
+  "description": "Sets session-level defaults for the call. Configures default TTS, STT, VAD, recording, streaming, and other session-wide settings. These defaults apply to all subsequent verbs unless overridden at the verb level. Typically the first verb in an application. Can be used multiple times during a call to change settings.",
+  "type": "object",
+  "properties": {
+    "verb": {
+      "const": "config",
+      "description": "The verb name."
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
+    "synthesizer": {
+      "$ref": "../components/synthesizer",
+      "description": "Default TTS configuration for the session."
+    },
+    "recognizer": {
+      "$ref": "../components/recognizer",
+      "description": "Default STT configuration for the session."
+    },
+    "bargeIn": {
+      "type": "object",
+      "description": "Default barge-in configuration. When enabled, callers can interrupt playing prompts with speech or DTMF.",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "sticky": {
+          "type": "boolean",
+          "description": "If true, barge-in settings persist across verbs rather than resetting after each verb."
+        },
+        "actionHook": { "$ref": "../components/actionHook" },
+        "input": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["speech", "digits"] }
+        },
+        "minBargeinWordCount": { "type": "number" }
+      }
+    },
+    "ttsStream": {
+      "type": "object",
+      "description": "Default TTS streaming configuration for the session.",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "synthesizer": { "$ref": "../components/synthesizer" }
+      }
+    },
+    "record": {
+      "type": "object",
+      "description": "Session-level call recording configuration.",
+      "additionalProperties": true
+    },
+    "listen": {
+      "type": "object",
+      "description": "Session-level audio streaming (listen/stream) configuration.",
+      "additionalProperties": true
+    },
+    "stream": {
+      "type": "object",
+      "description": "Session-level audio streaming configuration. Alias for 'listen'.",
+      "additionalProperties": true
+    },
+    "transcribe": {
+      "type": "object",
+      "description": "Session-level real-time transcription configuration.",
+      "additionalProperties": true
+    },
+    "amd": {
+      "type": "object",
+      "description": "Session-level answering machine detection configuration.",
+      "additionalProperties": true
+    },
+    "fillerNoise": {
+      "$ref": "../components/fillerNoise",
+      "description": "Default filler noise configuration for the session."
+    },
+    "vad": {
+      "$ref": "../components/vad",
+      "description": "Default voice activity detection configuration for the session."
+    },
+    "notifyEvents": {
+      "type": "boolean",
+      "description": "If true, send call events (e.g. DTMF, call status changes) to the application via the status webhook."
+    },
+    "notifySttLatency": {
+      "type": "boolean",
+      "description": "If true, include STT latency measurements in webhook payloads."
+    },
+    "reset": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Reset specific session-level settings to their defaults. Pass a setting name or array of setting names to reset."
+    },
+    "onHoldMusic": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of an audio file to play when the call is placed on hold."
+    },
+    "actionHookDelayAction": {
+      "$ref": "../components/actionHookDelayAction",
+      "description": "Default configuration for handling slow webhook responses."
+    },
+    "sipRequestWithinDialogHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook to invoke when a SIP request (e.g. INFO, NOTIFY) is received within the dialog."
+    },
+    "boostAudioSignal": {
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string" }
+      ],
+      "description": "Boost (or attenuate) the audio signal in dB for the session."
+    },
+    "referHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook to invoke when a SIP REFER request is received."
+    },
+    "earlyMedia": {
+      "type": "boolean",
+      "description": "If true, allow early media (audio before call answer) for the session."
+    },
+    "autoStreamTts": {
+      "type": "boolean",
+      "description": "If true, automatically use streaming TTS for all 'say' verbs in the session."
+    },
+    "disableTtsCache": {
+      "type": "boolean",
+      "description": "If true, disable TTS caching for the session."
+    },
+    "noiseIsolation": {
+      "type": "object",
+      "description": "Noise isolation configuration to reduce background noise on the caller's audio.",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "vendor": { "type": "string" },
+        "level": { "type": "number" },
+        "model": { "type": "string" }
+      }
+    },
+    "turnTaking": {
+      "type": "object",
+      "description": "Turn-taking detection configuration for conversational AI applications.",
+      "properties": {
+        "enable": { "type": "boolean" },
+        "vendor": { "type": "string" },
+        "threshold": { "type": "number" },
+        "model": { "type": "string" }
+      }
+    }
+  },
+  "required": [],
+  "examples": [
+    {
+      "verb": "config",
+      "synthesizer": {
+        "vendor": "elevenlabs",
+        "voice": "Rachel",
+        "language": "en-US"
+      },
+      "recognizer": {
+        "vendor": "deepgram",
+        "language": "en-US"
+      },
+      "fillerNoise": {
+        "enable": true,
+        "url": "https://example.com/sounds/typing.wav",
+        "startDelaySecs": 2
+      }
+    }
+  ]
+}

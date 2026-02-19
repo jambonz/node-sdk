@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/sip:refer",
+  "title": "SIP Refer",
+  "description": "Sends a SIP REFER request to transfer the call to another party. Initiates an attended or unattended (blind) transfer.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "sip:refer" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "referTo": {
+      "type": "string",
+      "description": "The SIP URI or phone number to transfer the call to.",
+      "examples": ["sip:alice@example.com", "+15085551212"]
+    },
+    "referredBy": {
+      "type": "string",
+      "description": "The SIP URI to use in the Referred-By header."
+    },
+    "referredByDisplayName": {
+      "type": "string",
+      "description": "The display name to use in the Referred-By header."
+    },
+    "headers": {
+      "type": "object",
+      "description": "Custom SIP headers to include in the REFER request.",
+      "additionalProperties": { "type": "string" }
+    },
+    "actionHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when the REFER completes (or fails)."
+    },
+    "eventHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked for NOTIFY events during the REFER process, providing transfer progress updates."
+    }
+  },
+  "required": ["referTo"],
+  "examples": [
+    { "verb": "sip:refer", "referTo": "sip:alice@example.com", "actionHook": "/refer-complete" }
+  ]
+}

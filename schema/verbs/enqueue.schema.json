@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/enqueue",
+  "title": "Enqueue",
+  "description": "Places the caller into a named call queue. While in the queue, the caller hears content returned by the waitHook (typically hold music or position announcements). The caller remains in the queue until dequeued by another call or process.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "enqueue" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "name": {
+      "type": "string",
+      "description": "The name of the queue to place the caller in. Queues are created implicitly when first referenced.",
+      "examples": ["support", "sales"]
+    },
+    "actionHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when the caller leaves the queue (either dequeued or hung up). Should return the next verbs to execute."
+    },
+    "waitHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked immediately when the caller enters the queue and periodically while waiting. Should return verbs to play to the caller (e.g. hold music, queue position announcements)."
+    },
+    "priority": {
+      "type": "number",
+      "description": "The priority of this caller in the queue. Lower numbers are higher priority and are dequeued first.",
+      "examples": [1, 5, 10]
+    }
+  },
+  "required": ["name"],
+  "examples": [
+    {
+      "verb": "enqueue",
+      "name": "support",
+      "waitHook": "/queue-wait",
+      "actionHook": "/queue-exit"
+    }
+  ]
+}

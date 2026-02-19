@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/conference",
+  "title": "Conference",
+  "description": "Places the caller into a multi-party conference room. Multiple callers in the same named conference can speak to each other. Supports features like muting, recording, waiting rooms, and participant limits.",
+  "type": "object",
+  "properties": {
+    "verb": { "const": "conference" },
+    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "name": {
+      "type": "string",
+      "description": "The name of the conference room. All callers joining the same named conference are connected together.",
+      "examples": ["team-standup", "customer-call-12345"]
+    },
+    "beep": { "type": "boolean", "description": "If true, play a beep when participants join or leave." },
+    "memberTag": { "type": "string", "description": "A tag to identify this participant. Can be used to target specific members for actions like muting or whispering." },
+    "speakOnlyTo": { "type": "string", "description": "If set, this participant's audio is only heard by the member with the specified memberTag. Creates a private whisper channel." },
+    "startConferenceOnEnter": { "type": "boolean", "description": "If true (default), the conference starts when this participant joins. If false, this participant waits silently until a participant with startConferenceOnEnter=true joins." },
+    "endConferenceOnExit": { "type": "boolean", "description": "If true, the conference ends for all participants when this participant leaves." },
+    "endConferenceDuration": { "type": "number", "description": "Maximum duration of the conference in seconds." },
+    "maxParticipants": { "type": "number", "description": "Maximum number of participants allowed in the conference." },
+    "joinMuted": { "type": "boolean", "description": "If true, this participant joins the conference muted." },
+    "actionHook": { "$ref": "../components/actionHook", "description": "A webhook invoked when this participant leaves the conference." },
+    "waitHook": { "$ref": "../components/actionHook", "description": "A webhook invoked while this participant is waiting for the conference to start. Should return verbs to play (e.g. hold music)." },
+    "statusEvents": { "type": "array", "items": { "type": "string" }, "description": "List of conference events to receive via the statusHook." },
+    "statusHook": { "$ref": "../components/actionHook", "description": "A webhook to receive conference status events (joins, leaves, etc.)." },
+    "enterHook": { "$ref": "../components/actionHook", "description": "A webhook invoked when this participant first enters the conference." },
+    "record": { "type": "object", "description": "Recording configuration for the conference.", "additionalProperties": true },
+    "listen": { "type": "object", "description": "Audio streaming configuration for the conference.", "additionalProperties": true },
+    "distributeDtmf": { "type": "boolean", "description": "If true, DTMF events from this participant are distributed to all other participants." }
+  },
+  "required": ["name"],
+  "examples": [
+    {
+      "verb": "conference",
+      "name": "team-standup",
+      "beep": true,
+      "startConferenceOnEnter": true,
+      "endConferenceOnExit": false,
+      "statusHook": "/conference-events"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/target",
+  "title": "Target",
+  "description": "A call target for the 'dial' verb. Specifies who or what to connect the call to: a phone number (PSTN), a SIP endpoint, a registered user, or a Microsoft Teams user.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "The type of target to dial.",
+      "enum": ["phone", "sip", "user", "teams"]
+    },
+    "number": {
+      "type": "string",
+      "description": "The phone number to dial. Required when type is 'phone'. Use E.164 format.",
+      "examples": ["+15085551212"]
+    },
+    "sipUri": {
+      "type": "string",
+      "description": "The SIP URI to dial. Required when type is 'sip'.",
+      "examples": ["sip:alice@example.com"]
+    },
+    "name": {
+      "type": "string",
+      "description": "The registered user name to dial. Required when type is 'user'. Also used as the display name for SIP targets."
+    },
+    "tenant": {
+      "type": "string",
+      "description": "The Microsoft Teams tenant ID. Required when type is 'teams'."
+    },
+    "trunk": {
+      "type": "string",
+      "description": "The SIP trunk to use for the outbound call. When specified, overrides the default carrier routing."
+    },
+    "confirmHook": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "actionHook" }
+      ],
+      "description": "A webhook to invoke when the target answers, before connecting the call. Use this to screen calls, play a whisper prompt, or require the target to press a key to accept."
+    },
+    "method": {
+      "type": "string",
+      "description": "The HTTP method to use when invoking the confirmHook.",
+      "enum": ["GET", "POST"],
+      "default": "POST"
+    },
+    "headers": {
+      "type": "object",
+      "description": "Custom SIP headers to include on the outbound INVITE. Keys are header names, values are header values.",
+      "additionalProperties": { "type": "string" }
+    },
+    "from": {
+      "type": "object",
+      "description": "Override the From header on the outbound SIP INVITE.",
+      "properties": {
+        "user": {
+          "type": "string",
+          "description": "The user part of the SIP From URI."
+        },
+        "host": {
+          "type": "string",
+          "description": "The host part of the SIP From URI."
+        }
+      }
+    },
+    "auth": {
+      "$ref": "auth",
+      "description": "SIP authentication credentials for the outbound call, if the far end requires digest auth."
+    },
+    "vmail": {
+      "type": "boolean",
+      "description": "If true, follow the call into voicemail if the target does not answer."
+    },
+    "overrideTo": {
+      "type": "string",
+      "description": "Override the Request-URI on the outbound SIP INVITE. Useful when the Request-URI needs to differ from the To header."
+    },
+    "proxy": {
+      "type": "string",
+      "description": "A SIP proxy to route the outbound call through, specified as a SIP URI.",
+      "examples": ["sip:proxy.example.com"]
+    }
+  },
+  "required": ["type"],
+  "examples": [
+    {
+      "type": "phone",
+      "number": "+15085551212"
+    },
+    {
+      "type": "sip",
+      "sipUri": "sip:alice@example.com"
+    },
+    {
+      "type": "user",
+      "name": "bob"
+    },
+    {
+      "type": "teams",
+      "number": "+15085551212",
+      "tenant": "a]b]c]d]e"
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/dial",
+  "title": "Dial",
+  "description": "Initiates an outbound call to one or more targets and bridges the caller to the first target that answers. Targets can be phone numbers (PSTN), SIP endpoints, registered users, or Microsoft Teams users. Supports simultaneous ringing, call screening, recording, and DTMF capture during the bridged call.",
+  "type": "object",
+  "properties": {
+    "verb": {
+      "const": "dial",
+      "description": "The verb name."
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
+    "target": {
+      "type": "array",
+      "items": { "$ref": "../components/target" },
+      "description": "One or more call targets to dial. If multiple targets are specified, they are rung simultaneously and the first to answer is connected. The rest are canceled.",
+      "minItems": 1
+    },
+    "actionHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when the dialed call ends. Receives call disposition details (duration, who hung up, etc.) and should return the next verbs to execute."
+    },
+    "onHoldHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when the call is placed on hold. Should return verbs to execute (e.g. play hold music) while the caller is holding."
+    },
+    "answerOnBridge": {
+      "type": "boolean",
+      "description": "If true, delay answering the inbound call until the outbound leg is answered. This allows the caller to hear ringing until the target picks up, and avoids billing the caller for unanswered outbound attempts."
+    },
+    "callerId": {
+      "type": "string",
+      "description": "The caller ID (phone number) to present on the outbound call. Overrides the default caller ID.",
+      "examples": ["+15085551212"]
+    },
+    "callerName": {
+      "type": "string",
+      "description": "The caller display name to present on the outbound call."
+    },
+    "confirmHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when a target answers, before the call is bridged. Used for call screening — the webhook can return verbs (e.g. a 'say' prompt and 'gather') to confirm the callee wants to accept the call."
+    },
+    "referHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when a SIP REFER is received on the bridged call. Allows handling call transfers initiated by the far end."
+    },
+    "dialMusic": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of an audio file to play to the caller while the outbound call is ringing. Replaces the default ringback tone."
+    },
+    "dtmfCapture": {
+      "type": "object",
+      "description": "Configuration for capturing DTMF digits during the bridged call. Keys are DTMF patterns to capture, values are configuration for each.",
+      "additionalProperties": true
+    },
+    "dtmfHook": {
+      "$ref": "../components/actionHook",
+      "description": "A webhook invoked when a captured DTMF pattern is detected during the bridged call."
+    },
+    "headers": {
+      "type": "object",
+      "description": "Custom SIP headers to include on the outbound INVITE.",
+      "additionalProperties": { "type": "string" }
+    },
+    "anchorMedia": {
+      "type": "boolean",
+      "description": "If true, keep media anchored through the jambonz media server even if a direct media path is possible. Required for features like recording, listen, and DTMF capture during bridged calls."
+    },
+    "exitMediaPath": {
+      "type": "boolean",
+      "description": "If true, remove jambonz from the media path after the call is bridged. Reduces latency but disables mid-call features like recording and DTMF capture."
+    },
+    "boostAudioSignal": {
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string" }
+      ],
+      "description": "Boost (or attenuate) the audio signal in dB. Positive values increase volume, negative values decrease it.",
+      "examples": [6, -3]
+    },
+    "listen": {
+      "type": "object",
+      "description": "Configuration for streaming audio of the bridged call to a websocket endpoint.",
+      "additionalProperties": true
+    },
+    "stream": {
+      "type": "object",
+      "description": "Configuration for streaming audio of the bridged call. Alias for 'listen'.",
+      "additionalProperties": true
+    },
+    "transcribe": {
+      "type": "object",
+      "description": "Configuration for real-time transcription of the bridged call.",
+      "additionalProperties": true
+    },
+    "timeLimit": {
+      "type": "number",
+      "description": "Maximum duration in seconds for the bridged call. The call is automatically hung up when this limit is reached.",
+      "examples": [3600]
+    },
+    "timeout": {
+      "type": "number",
+      "description": "Time in seconds to wait for the target to answer before giving up.",
+      "examples": [30, 60]
+    },
+    "proxy": {
+      "type": "string",
+      "description": "A SIP proxy to route the outbound call through.",
+      "examples": ["sip:proxy.example.com"]
+    },
+    "amd": {
+      "type": "object",
+      "description": "Answering machine detection configuration. When enabled, jambonz attempts to determine whether the call was answered by a human or a machine.",
+      "additionalProperties": true
+    },
+    "dub": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Audio dubbing configuration for mixing additional audio tracks into the bridged call."
+    },
+    "tag": {
+      "type": "object",
+      "description": "Arbitrary metadata to attach to this call leg. Included in subsequent webhook invocations and CDRs.",
+      "additionalProperties": true
+    },
+    "forwardPAI": {
+      "type": "boolean",
+      "description": "If true, forward the P-Asserted-Identity header from the inbound call to the outbound call."
+    }
+  },
+  "required": ["target"],
+  "examples": [
+    {
+      "verb": "dial",
+      "target": [
+        { "type": "phone", "number": "+15085551212" }
+      ],
+      "answerOnBridge": true,
+      "timeout": 30,
+      "actionHook": "/dial-complete"
+    },
+    {
+      "verb": "dial",
+      "target": [
+        { "type": "sip", "sipUri": "sip:alice@example.com" },
+        { "type": "sip", "sipUri": "sip:bob@example.com" }
+      ],
+      "confirmHook": "/screen-call",
+      "timeLimit": 3600
+    }
+  ]
+}
