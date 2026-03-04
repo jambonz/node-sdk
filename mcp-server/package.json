@@ -1,6 +1,6 @@
 {
   "name": "@jambonz/mcp-schema-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server that provides jambonz verb schemas and documentation as resources",
   "author": "Dave Horton",
   "license": "MIT",
@@ -10,7 +10,14 @@
     "directory": "mcp-server"
   },
   "homepage": "https://github.com/jambonz/node-sdk#readme",
-  "keywords": ["jambonz", "mcp", "model-context-protocol", "schema", "voip", "ai-agent"],
+  "keywords": [
+    "jambonz",
+    "mcp",
+    "model-context-protocol",
+    "schema",
+    "voip",
+    "ai-agent"
+  ],
   "type": "module",
   "bin": {
     "jambonz-mcp": "./dist/index.js"
