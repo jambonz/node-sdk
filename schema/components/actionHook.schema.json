@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/components/actionHook",
   "title": "ActionHook",
-  "description": "A webhook or websocket callback that jambonz invokes during call processing. Most jambonz verbs use actionHooks to report results (e.g. speech recognition results from 'gather') and to receive the next set of verbs to execute. Can be specified as a simple URL string or as an object with additional options.",
+  "description": "A webhook or websocket callback that jambonz invokes when a verb completes. Reports verb results (e.g. speech recognition from 'gather', dial outcome) and receives the next verbs to execute. In webhook mode: jambonz POSTs to this URL and the HTTP response body is the next verb array. In WebSocket mode: this value becomes an event name emitted on the session — bind session.on('/hookName', (evt) => {...}) and respond with session.reply() (NOT session.send()). The callback payload always includes 'reason' plus verb-specific fields (e.g. 'speech', 'digits' for gather). Can be a simple URL/path string or an object with additional options.",
   "oneOf": [
     {
       "type": "string",

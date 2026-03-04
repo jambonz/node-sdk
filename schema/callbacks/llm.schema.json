@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/llm",
+  "title": "LLM ActionHook Payload",
+  "description": "Payload sent to the llm verb's actionHook when the LLM session ends. Applies to all LLM providers (OpenAI, Google, ElevenLabs, Ultravox, and generic voice agents).",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "completion_reason": {
+      "type": "string",
+      "enum": [
+        "normal conversation end",
+        "connection failure",
+        "disconnect from remote end",
+        "server failure",
+        "server error",
+        "client error calling function",
+        "client error calling mcp function"
+      ],
+      "description": "Reason the LLM session ended."
+    },
+    "error": {
+      "description": "Error details, present when completion_reason indicates a failure."
+    }
+  },
+  "required": ["completion_reason"],
+  "additionalProperties": true
+}

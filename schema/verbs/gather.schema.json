@@ -15,7 +15,7 @@
     },
     "actionHook": {
       "$ref": "../components/actionHook",
-      "description": "The webhook to invoke when input is collected. Receives the transcribed speech and/or DTMF digits. Must return a new array of verbs."
+      "description": "Invoked when the gather completes. The payload includes 'reason' ('speechDetected', 'dtmfDetected', or 'timeout'), 'speech' (object with alternatives[].transcript and alternatives[].confidence when reason is speechDetected), and 'digits' (string when reason is dtmfDetected). In webhook mode this is a URL that receives an HTTP POST. In WebSocket mode this is an event name — use session.on('/hookName', (evt) => {...}) and respond with session.reply()."
     },
     "input": {
       "type": "array",

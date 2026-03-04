@@ -7,6 +7,10 @@
   "properties": {
     "verb": { "const": "transcribe" },
     "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "enable": {
+      "type": "boolean",
+      "description": "Enable or disable transcription. Used when transcribe is nested inside a config or dial verb to start or stop background transcription."
+    },
     "transcriptionHook": {
       "type": "string",
       "format": "uri",

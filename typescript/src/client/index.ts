@@ -1,1 +1,1 @@
-export { JambonzClient, CallsResource, MessagesResource, type ClientOptions } from './api.js';
+export { JambonzClient, CallsResource, ConferencesResource, QueuesResource, type ClientOptions } from './api.js';

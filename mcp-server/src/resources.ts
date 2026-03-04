@@ -9,7 +9,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 /** Locate the schema directory. Checks:
  *  1. Bundled in npm package: mcp-server/schema/ (copied by prepack)
- *  2. Development: sibling to mcp-server/ at agent-toolkit/schema/
+ *  2. Development: sibling to mcp-server/ at node-sdk/schema/
  */
 function findSchemaDir(): string {
   const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -31,7 +31,7 @@ function findSchemaDir(): string {
 
 /** Locate AGENTS.md. Checks:
  *  1. Bundled in npm package: mcp-server/AGENTS.md (copied by prepack)
- *  2. Development: sibling to mcp-server/ at agent-toolkit/AGENTS.md
+ *  2. Development: sibling to mcp-server/ at node-sdk/AGENTS.md
  */
 function findAgentsMd(): string {
   const __dirname = dirname(fileURLToPath(import.meta.url));

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-gladiaOptions",
+  "title": "Gladia Recognizer Options",
+  "description": "Gladia-specific STT options. Only applies when recognizer vendor is 'gladia'. See Gladia API documentation for available options.",
+  "type": "object",
+  "additionalProperties": true
+}

@@ -74,9 +74,8 @@
       "description": "Time in seconds to wait for audio activity before ending the listen session."
     },
     "transcribe": {
-      "type": "object",
-      "description": "Configuration for simultaneous real-time transcription of the audio being streamed.",
-      "additionalProperties": true
+      "$ref": "transcribe",
+      "description": "Nested transcribe verb — enables simultaneous real-time transcription of the audio being streamed."
     },
     "earlyMedia": {
       "type": "boolean",

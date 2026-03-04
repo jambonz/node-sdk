@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/call-status",
+  "title": "Call Status Webhook Payload",
+  "description": "Payload sent to the call status webhook URL whenever the call state changes (e.g. trying, in-progress, completed). The status webhook is configured at the application level in jambonz. Multiple status events are sent over the life of a call. The final event (completed or failed) includes additional fields like duration and termination cause.",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "call_termination_by": {
+      "type": "string",
+      "enum": ["caller", "jambonz"],
+      "description": "Who terminated the call. 'caller' if the remote party hung up, 'jambonz' if the call was ended by the application (e.g. hangup verb, REST API). Present only on the final status event (completed/failed)."
+    },
+    "duration": {
+      "type": "integer",
+      "description": "Call duration in seconds. Present only on the final status event (completed/failed)."
+    }
+  },
+  "additionalProperties": true
+}

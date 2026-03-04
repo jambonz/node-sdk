@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-sonioxOptions",
+  "title": "Soniox Recognizer Options",
+  "description": "Soniox-specific STT options. Only applies when recognizer vendor is 'soniox'.",
+  "type": "object",
+  "properties": {
+    "apiKey": {
+      "type": "string",
+      "description": "Soniox API key."
+    },
+    "model": {
+      "type": "string",
+      "description": "Soniox recognition model."
+    },
+    "endpointDetection": {
+      "type": "boolean",
+      "description": "Enable endpoint detection."
+    },
+    "profanityFilter": {
+      "type": "boolean",
+      "description": "Filter profanity from results."
+    },
+    "speechContext": {
+      "type": "string",
+      "description": "Speech context for improved recognition."
+    },
+    "clientRequestReference": {
+      "type": "string",
+      "description": "Client request reference for tracking."
+    },
+    "storage": {
+      "type": "object",
+      "description": "Soniox storage configuration for persisting transcripts.",
+      "properties": {
+        "id": { "type": "string", "description": "Storage ID." },
+        "title": { "type": "string", "description": "Storage title." },
+        "disableStoreAudio": { "type": "boolean", "description": "Disable audio storage." },
+        "disableStoreTranscript": { "type": "boolean", "description": "Disable transcript storage." },
+        "disableSearch": { "type": "boolean", "description": "Disable search indexing." },
+        "metadata": { "type": "object", "description": "Custom metadata.", "additionalProperties": true }
+      }
+    }
+  },
+  "additionalProperties": true
+}

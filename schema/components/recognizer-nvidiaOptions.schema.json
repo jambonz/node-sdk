@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-nvidiaOptions",
+  "title": "NVIDIA Recognizer Options",
+  "description": "NVIDIA Riva specific options. Only applies when recognizer vendor is 'nvidia'.",
+  "type": "object",
+  "properties": {
+    "rivaUri": {
+      "type": "string",
+      "description": "NVIDIA Riva server URI."
+    },
+    "maxAlternatives": {
+      "type": "number",
+      "description": "Maximum number of alternative transcripts."
+    },
+    "profanityFilter": {
+      "type": "boolean",
+      "description": "Filter profanity from results."
+    },
+    "punctuation": {
+      "type": "boolean",
+      "description": "Enable automatic punctuation."
+    },
+    "wordTimeOffsets": {
+      "type": "boolean",
+      "description": "Include word-level timestamps."
+    },
+    "verbatimTranscripts": {
+      "type": "boolean",
+      "description": "Return verbatim (unformatted) transcripts."
+    },
+    "customConfiguration": {
+      "type": "object",
+      "description": "Custom Riva configuration parameters.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

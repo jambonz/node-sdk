@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/session-new",
+  "title": "Session:new Payload",
+  "description": "Payload delivered when a new call arrives. For webhook apps this is the initial POST body; for WebSocket apps it is the `data` property of the first `session:new` message. In the @jambonz/sdk WebSocket transport, this data is available as `session.data`.",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "caller_name": {
+      "type": "string",
+      "description": "Caller display name from the SIP From header."
+    },
+    "caller_id": {
+      "type": "string",
+      "description": "Caller ID value (phone number or SIP user)."
+    },
+    "service_provider_sid": {
+      "type": "string",
+      "description": "Service provider identifier, if applicable."
+    },
+    "parent_call_sid": {
+      "type": "string",
+      "description": "Call SID of the parent call, present when this session was created via the REST API dial (adulting) or when an outbound call leg is promoted to its own session."
+    },
+    "fs_sip_address": {
+      "type": "string",
+      "description": "Internal SIP address of the FreeSWITCH media server handling this call."
+    },
+    "fs_public_ip": {
+      "type": "string",
+      "description": "Public IP address of the FreeSWITCH media server, if available."
+    },
+    "sip": {
+      "type": "object",
+      "description": "The raw SIP INVITE message (drachtio SipRequest object, serialized). Only present for WebSocket and HTTP POST transports (not for HTTP GET). See https://drachtio.org/api#sip-request for the full drachtio SipRequest API.",
+      "properties": {
+        "headers": {
+          "type": "object",
+          "description": "SIP headers from the INVITE as key-value pairs. Custom headers (X-* headers) from the originating carrier or SIP client are included here. Standard SIP headers like From, To, Contact, Call-ID, Via, etc. are also present.",
+          "additionalProperties": { "type": "string" },
+          "examples": [
+            {
+              "X-Authenticated-User": "retell@sip.example.com",
+              "X-Override-Number": "+15551234567",
+              "From": "<sip:+15083084809@10.0.0.1>;tag=abc123",
+              "To": "<sip:+15083728299@jambonz.cloud>",
+              "Call-ID": "abc123@10.0.0.1"
+            }
+          ]
+        },
+        "body": {
+          "type": "string",
+          "description": "SIP message body (typically SDP for INVITE)."
+        },
+        "method": {
+          "type": "string",
+          "description": "SIP method (always 'INVITE' for session:new)."
+        },
+        "uri": {
+          "type": "string",
+          "description": "Request-URI from the SIP INVITE."
+        },
+        "calledNumber": {
+          "type": "string",
+          "description": "Phone number extracted from the Request-URI."
+        },
+        "callingNumber": {
+          "type": "string",
+          "description": "Calling phone number extracted from P-Asserted-Identity or From header."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["request"],
+          "description": "Always 'request' for an incoming INVITE."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["network", "application"],
+          "description": "Origin of the SIP message."
+        },
+        "source_address": {
+          "type": "string",
+          "description": "IP address of the sender."
+        },
+        "source_port": {
+          "type": ["string", "integer"],
+          "description": "Port of the sender."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Transport protocol (e.g. 'udp', 'tcp', 'tls', 'wss')."
+        },
+        "payload": {
+          "type": "array",
+          "description": "Message body organized into parts; useful for multipart content."
+        }
+      }
+    },
+    "env_vars": {
+      "type": "object",
+      "description": "Application environment variables configured in the jambonz portal. These are the key-value pairs defined in the application's environment variable schema. In the @jambonz/sdk, access via `session.data.env_vars`.",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "RETELL_TRUNK_NAME": "retell-hosted",
+          "PSTN_TRUNK_NAME": "my-carrier",
+          "DEFAULT_COUNTRY": "US"
+        }
+      ]
+    },
+    "defaults": {
+      "type": "object",
+      "description": "Default speech settings for the account (synthesizer and recognizer defaults).",
+      "properties": {
+        "synthesizer": {
+          "type": "object",
+          "description": "Default TTS settings.",
+          "properties": {
+            "vendor": { "type": "string" },
+            "language": { "type": "string" },
+            "voice": { "type": "string" }
+          }
+        },
+        "recognizer": {
+          "type": "object",
+          "description": "Default STT settings.",
+          "properties": {
+            "vendor": { "type": "string" },
+            "language": { "type": "string" }
+          }
+        }
+      }
+    },
+    "customerData": {
+      "type": "object",
+      "description": "Custom data attached to the call via the REST API when creating an outbound call. Preserved as-is (not snake-cased).",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

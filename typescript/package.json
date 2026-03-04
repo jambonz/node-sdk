@@ -6,11 +6,20 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jambonz/agent-toolkit.git",
+    "url": "https://github.com/jambonz/node-sdk.git",
     "directory": "typescript"
   },
-  "homepage": "https://github.com/jambonz/agent-toolkit#readme",
-  "keywords": ["jambonz", "voip", "telephony", "voice", "sip", "cpaas", "sdk", "ai-agent"],
+  "homepage": "https://github.com/jambonz/node-sdk#readme",
+  "keywords": [
+    "jambonz",
+    "voip",
+    "telephony",
+    "voice",
+    "sip",
+    "cpaas",
+    "sdk",
+    "ai-agent"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -68,15 +77,17 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "schema"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp -r ../schema ./schema",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
+    "docs": "typedoc",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -86,7 +97,9 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/ws": "^8.5.0",
+    "@vitest/coverage-v8": "2.1",
     "tsup": "^8.3.0",
+    "typedoc": "^0.28.17",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
   },

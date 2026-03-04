@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-nuanceOptions",
+  "title": "Nuance Recognizer Options",
+  "description": "Nuance Mix specific options. Only applies when recognizer vendor is 'nuance'.",
+  "type": "object",
+  "properties": {
+    "clientId": {
+      "type": "string",
+      "description": "Nuance Mix client ID."
+    },
+    "secret": {
+      "type": "string",
+      "description": "Nuance Mix client secret."
+    },
+    "kryptonEndpoint": {
+      "type": "string",
+      "description": "Custom Nuance Krypton endpoint URL."
+    },
+    "topic": {
+      "type": "string",
+      "description": "Recognition topic (domain)."
+    },
+    "utteranceDetectionMode": {
+      "type": "string",
+      "enum": ["single", "multiple", "disabled"],
+      "description": "How utterance boundaries are detected."
+    },
+    "punctuation": {
+      "type": "boolean",
+      "description": "Enable automatic punctuation."
+    },
+    "profanityFilter": {
+      "type": "boolean",
+      "description": "Filter profanity from results."
+    },
+    "includeTokenization": {
+      "type": "boolean",
+      "description": "Include tokenization data in results."
+    },
+    "discardSpeakerAdaptation": {
+      "type": "boolean",
+      "description": "Discard speaker adaptation data."
+    },
+    "suppressCallRecording": {
+      "type": "boolean",
+      "description": "Suppress call recording on the Nuance side."
+    },
+    "maskLoadFailures": {
+      "type": "boolean",
+      "description": "Mask resource load failures."
+    },
+    "suppressInitialCapitalization": {
+      "type": "boolean",
+      "description": "Suppress initial capitalization of results."
+    },
+    "allowZeroBaseLmWeight": {
+      "type": "boolean",
+      "description": "Allow zero base language model weight."
+    },
+    "filterWakeupWord": {
+      "type": "boolean",
+      "description": "Filter wakeup words from results."
+    },
+    "resultType": {
+      "type": "string",
+      "enum": ["final", "partial", "immutable_partial"],
+      "description": "Type of results to return."
+    },
+    "noInputTimeoutMs": {
+      "type": "number",
+      "description": "Timeout in milliseconds before no-input event."
+    },
+    "recognitionTimeoutMs": {
+      "type": "number",
+      "description": "Maximum recognition duration in milliseconds."
+    },
+    "utteranceEndSilenceMs": {
+      "type": "number",
+      "description": "Silence duration in milliseconds to detect end of utterance."
+    },
+    "maxHypotheses": {
+      "type": "number",
+      "description": "Maximum number of recognition hypotheses to return."
+    },
+    "speechDomain": {
+      "type": "string",
+      "description": "Speech domain for optimized recognition."
+    },
+    "formatting": {
+      "type": "object",
+      "description": "Formatting options for recognition results.",
+      "properties": {
+        "scheme": { "type": "string", "description": "Formatting scheme name." },
+        "options": { "type": "object", "description": "Scheme-specific formatting options." }
+      },
+      "required": ["scheme", "options"]
+    },
+    "clientData": {
+      "type": "object",
+      "description": "Custom client data to pass to Nuance.",
+      "additionalProperties": true
+    },
+    "userId": {
+      "type": "string",
+      "description": "User ID for speaker adaptation."
+    },
+    "speechDetectionSensitivity": {
+      "type": "number",
+      "description": "Speech detection sensitivity (0-1)."
+    },
+    "resources": {
+      "type": "array",
+      "description": "Array of Nuance recognition resources (grammars, wordsets, etc.).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "externalReference": {
+            "type": "object",
+            "description": "External resource reference.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["undefined_resource_type", "wordset", "compiled_wordset", "domain_lm", "speaker_profile", "grammar", "settings"]
+              },
+              "uri": { "type": "string" },
+              "maxLoadFailures": { "type": "boolean" },
+              "requestTimeoutMs": { "type": "number" },
+              "headers": { "type": "object" }
+            }
+          },
+          "inlineWordset": { "type": "string", "description": "Inline wordset JSON string." },
+          "builtin": { "type": "string", "description": "Built-in grammar name." },
+          "inlineGrammar": { "type": "string", "description": "Inline SRGS grammar." },
+          "wakeupWord": { "type": "array", "items": { "type": "string" }, "description": "Wakeup words." },
+          "weightName": {
+            "type": "string",
+            "enum": ["defaultWeight", "lowest", "low", "medium", "high", "highest"]
+          },
+          "weightValue": { "type": "number" },
+          "reuse": {
+            "type": "string",
+            "enum": ["undefined_reuse", "low_reuse", "high_reuse"]
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

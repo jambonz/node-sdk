@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-googleOptions",
+  "title": "Google Recognizer Options",
+  "description": "Google Speech-to-Text specific options. Only applies when recognizer vendor is 'google'.",
+  "type": "object",
+  "properties": {
+    "serviceVersion": {
+      "type": "string",
+      "enum": ["v1", "v2"],
+      "description": "Google Speech-to-Text API version."
+    },
+    "recognizerId": {
+      "type": "string",
+      "description": "ID of a Google Speech recognizer resource (v2 only)."
+    },
+    "speechStartTimeoutMs": {
+      "type": "number",
+      "description": "Timeout in milliseconds to wait for speech to start."
+    },
+    "speechEndTimeoutMs": {
+      "type": "number",
+      "description": "Timeout in milliseconds to detect end of speech."
+    },
+    "enableVoiceActivityEvents": {
+      "type": "boolean",
+      "description": "Enable voice activity detection events."
+    },
+    "transcriptNormalization": {
+      "type": "array",
+      "description": "Array of transcript normalization rules."
+    }
+  },
+  "additionalProperties": true
+}

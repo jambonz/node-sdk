@@ -233,3 +233,29 @@ export interface ActionHookDelayAction {
   /** Verbs to execute if webhook never responds. */
   giveUpActions?: Record<string, unknown>[];
 }
+
+/** Answering machine detection timer settings. */
+export interface AmdTimers {
+  /** Milliseconds to wait for any speech before returning amd_no_speech_detected. Default: 5000. */
+  noSpeechTimeoutMs?: number;
+  /** Milliseconds before returning amd_decision_timeout. Default: 15000. */
+  decisionTimeoutMs?: number;
+  /** Milliseconds to wait for beep/tone detection. Default: 20000. */
+  toneTimeoutMs?: number;
+  /** Milliseconds of silence after speech before greeting is considered complete. Default: 2000. */
+  greetingCompletionTimeoutMs?: number;
+}
+
+/** Answering machine detection configuration. */
+export interface Amd {
+  /** Webhook to receive AMD events. */
+  actionHook: ActionHook;
+  /** Spoken word count that triggers machine detection. Default: 9. */
+  thresholdWordCount?: number;
+  /** Digit count in greeting to trigger detection. 0 disables. Default: 0. */
+  digitCount?: number;
+  /** Timer settings for detection windows. */
+  timers?: AmdTimers;
+  /** Override STT recognizer for AMD. Uses session default with enhancedModel if omitted. */
+  recognizer?: Recognizer;
+}

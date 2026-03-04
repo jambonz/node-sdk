@@ -25,9 +25,34 @@ export interface SessionOptions extends VerbBuilderOptions {
   logger: Logger;
 }
 
+/**
+ * Represents a single call over a persistent WebSocket connection.
+ *
+ * Provides verb building (chainable methods), send/reply for verb delivery,
+ * TTS token streaming with backpressure, inject commands for mid-call control,
+ * and LLM tool output. Emits events for actionHooks, call status, and TTS lifecycle.
+ *
+ * Created automatically by the SDK when a new call arrives — you receive it
+ * via the `session:new` event on a {@link WsClient}.
+ */
 export class Session extends EventEmitter {
+  /** Unique call identifier. */
   readonly callSid: string;
+  /** Caller phone number or SIP URI. */
+  readonly from: string;
+  /** Called phone number or SIP URI. */
+  readonly to: string;
+  /** Call direction. */
+  readonly direction: 'inbound' | 'outbound';
+  /** Account identifier. */
+  readonly accountSid: string;
+  /** Application identifier. */
+  readonly applicationSid: string;
+  /** SIP Call-ID. */
+  readonly callId: string;
+  /** Distributed trace header (B3 format), if present. */
   readonly b3: string | undefined;
+  /** Full call session data from jambonz (includes env_vars, SIP headers, etc.). */
   readonly data: CallSession;
   /** Application-specific storage that persists for the session. */
   locals: Record<string, unknown> = {};
@@ -41,15 +66,22 @@ export class Session extends EventEmitter {
   private ttsCounter = 0;
   private ttsPaused = false;
 
+  /** @internal */
   constructor(opts: SessionOptions) {
     super();
 
     this.ws = opts.ws;
     this.logger = opts.logger;
     this.msgid = opts.msg.msgid;
-    this.callSid = opts.msg.data?.call_sid as string ?? opts.msg.call_sid ?? '';
-    this.b3 = opts.msg.b3;
     this.data = (opts.msg.data ?? {}) as CallSession;
+    this.callSid = this.data.call_sid ?? opts.msg.call_sid ?? '';
+    this.from = this.data.from ?? '';
+    this.to = this.data.to ?? '';
+    this.direction = this.data.direction ?? 'inbound';
+    this.accountSid = this.data.account_sid ?? '';
+    this.applicationSid = this.data.application_sid ?? '';
+    this.callId = this.data.call_id ?? '';
+    this.b3 = opts.msg.b3;
 
     this.builder = new VerbBuilder({
       validate: opts.validate,
@@ -74,31 +106,57 @@ export class Session extends EventEmitter {
   // Verb builder delegation — same API as VerbBuilder
   // ---------------------------------------------------------------------------
 
+  /** Speak text using TTS. Supports SSML, multiple voices, and streaming. */
   say(opts: Parameters<VerbBuilder['say']>[0]): this { this.builder.say(opts); return this; }
+  /** Play an audio file from a URL. */
   play(opts: Parameters<VerbBuilder['play']>[0]): this { this.builder.play(opts); return this; }
+  /** Collect speech (STT) and/or DTMF input from the caller. */
   gather(opts: Parameters<VerbBuilder['gather']>[0]): this { this.builder.gather(opts); return this; }
+  /** Connect the caller to an LLM for real-time voice conversation. */
   llm(opts: Parameters<VerbBuilder['llm']>[0]): this { this.builder.llm(opts); return this; }
+  /** Voice AI pipeline with integrated turn detection. */
   pipeline(opts: Parameters<VerbBuilder['pipeline']>[0]): this { this.builder.pipeline(opts); return this; }
+  /** Stream real-time call audio to a WebSocket endpoint. Supports bidirectional audio. */
   listen(opts: Parameters<VerbBuilder['listen']>[0]): this { this.builder.listen(opts); return this; }
+  /** Stream real-time call audio to a WebSocket endpoint. Synonym for {@link listen}. */
   stream(opts: Parameters<VerbBuilder['stream']>[0]): this { this.builder.stream(opts); return this; }
+  /** Real-time call transcription sent to a webhook. */
   transcribe(opts: Parameters<VerbBuilder['transcribe']>[0]): this { this.builder.transcribe(opts); return this; }
+  /** Place an outbound call and bridge it to the current caller. */
   dial(opts: Parameters<VerbBuilder['dial']>[0]): this { this.builder.dial(opts); return this; }
+  /** Join or create a multi-party conference room. */
   conference(opts: Parameters<VerbBuilder['conference']>[0]): this { this.builder.conference(opts); return this; }
+  /** Place the caller into a named queue. */
   enqueue(opts: Parameters<VerbBuilder['enqueue']>[0]): this { this.builder.enqueue(opts); return this; }
+  /** Remove a caller from a queue and bridge them. */
   dequeue(opts: Parameters<VerbBuilder['dequeue']>[0]): this { this.builder.dequeue(opts); return this; }
+  /** End the call. */
   hangup(opts?: Parameters<VerbBuilder['hangup']>[0]): this { this.builder.hangup(opts); return this; }
+  /** Transfer control to a different webhook URL. */
   redirect(opts: Parameters<VerbBuilder['redirect']>[0]): this { this.builder.redirect(opts); return this; }
+  /** Wait for a specified duration before continuing. */
   pause(opts: Parameters<VerbBuilder['pause']>[0]): this { this.builder.pause(opts); return this; }
+  /** Leave a conference or queue. */
   leave(opts?: Parameters<VerbBuilder['leave']>[0]): this { this.builder.leave(opts); return this; }
+  /** Reject an incoming call with a SIP error response. */
   sipDecline(opts: Parameters<VerbBuilder['sipDecline']>[0]): this { this.builder.sipDecline(opts); return this; }
+  /** Send a SIP INFO or other request within the dialog. */
   sipRequest(opts: Parameters<VerbBuilder['sipRequest']>[0]): this { this.builder.sipRequest(opts); return this; }
+  /** Transfer the call via SIP REFER. */
   sipRefer(opts: Parameters<VerbBuilder['sipRefer']>[0]): this { this.builder.sipRefer(opts); return this; }
+  /** Set session-level defaults (TTS vendor/voice, STT vendor, VAD, etc.). */
   config(opts: Parameters<VerbBuilder['config']>[0]): this { this.builder.config(opts); return this; }
+  /** Explicitly answer the call (sends a 200 OK). */
   answer(opts?: Parameters<VerbBuilder['answer']>[0]): this { this.builder.answer(opts); return this; }
+  /** Send a SIP 180 Ringing with optional Alert-Info header. */
   alert(opts: Parameters<VerbBuilder['alert']>[0]): this { this.builder.alert(opts); return this; }
+  /** Attach metadata to the call for tracking or routing. */
   tag(opts: Parameters<VerbBuilder['tag']>[0]): this { this.builder.tag(opts); return this; }
+  /** Send DTMF tones into the call. */
   dtmf(opts: Parameters<VerbBuilder['dtmf']>[0]): this { this.builder.dtmf(opts); return this; }
+  /** Mix an auxiliary audio track into the call. */
   dub(opts: Parameters<VerbBuilder['dub']>[0]): this { this.builder.dub(opts); return this; }
+  /** Send an SMS or MMS message. */
   message(opts: Parameters<VerbBuilder['message']>[0]): this { this.builder.message(opts); return this; }
 
   /** Add raw JSON verbs (primary AI agent path). */
@@ -159,6 +217,23 @@ export class Session extends EventEmitter {
   }
 
   // ---------------------------------------------------------------------------
+  // Verb status events
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Enable real-time verb status events for this session.
+   * Once enabled, the session emits 'verb:status' events for verb lifecycle
+   * changes (starting, finished, start-playback, stop-playback, etc.).
+   *
+   * This is a convenience for `.config({ notifyEvents: true })` — it can be
+   * chained into the initial verb sequence or called at any time.
+   */
+  notifyEvents(enabled = true): this {
+    this.builder.config({ notifyEvents: enabled });
+    return this;
+  }
+
+  // ---------------------------------------------------------------------------
   // Inject commands (immediate execution, bypass verb queue)
   // ---------------------------------------------------------------------------
 
@@ -166,12 +241,9 @@ export class Session extends EventEmitter {
   injectCommand(command: string, data?: unknown, callSid?: string): void {
     this.wsSend({
       type: 'command',
-      command: 'inject',
-      data: {
-        command,
-        ...(typeof data === 'object' && data !== null ? data : {}),
-        ...(callSid ? { call_sid: callSid } : {}),
-      },
+      command,
+      ...(callSid ? { callSid } : {}),
+      data: typeof data === 'object' && data !== null ? data : {},
     });
   }
 
@@ -182,7 +254,8 @@ export class Session extends EventEmitter {
 
   /** Inject a whisper verb (say/play) to one party on the call. */
   injectWhisper(verb: Verb | Verb[], callSid?: string): void {
-    this.injectCommand('whisper', Array.isArray(verb) ? verb : [verb], callSid);
+    const whisper = Array.isArray(verb) ? verb : [verb];
+    this.injectCommand('whisper', { whisper }, callSid);
   }
 
   /** Mute or unmute the call. */
@@ -389,6 +462,11 @@ export class Session extends EventEmitter {
           } else if (data?.event_type === 'user_interruption') {
             this.handleUserInterruption();
           }
+          // Emit specific named event (e.g. 'tts:stream_open', 'tts:stream_closed')
+          if (data?.event_type) {
+            this.emit(`tts:${data.event_type}`, data);
+          }
+          // Keep generic event for catch-all usage
           this.emit('tts:streaming-event', data);
           break;
 

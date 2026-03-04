@@ -20,7 +20,7 @@
     "disableBidirectionalAudio": { "type": "boolean", "description": "Disable receiving audio from the websocket." },
     "bidirectionalAudio": { "$ref": "../components/bidirectionalAudio", "description": "Bidirectional audio configuration." },
     "timeout": { "type": "number", "description": "Inactivity timeout in seconds." },
-    "transcribe": { "type": "object", "description": "Simultaneous transcription configuration.", "additionalProperties": true },
+    "transcribe": { "$ref": "transcribe", "description": "Nested transcribe verb — enables simultaneous real-time transcription of the streamed audio." },
     "earlyMedia": { "type": "boolean", "description": "Stream audio before the call is answered." }
   },
   "required": ["url"],

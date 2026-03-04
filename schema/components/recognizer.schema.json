@@ -172,91 +172,23 @@
       "minimum": 0,
       "maximum": 1
     },
-    "deepgramOptions": {
-      "type": "object",
-      "description": "Deepgram-specific recognition options. Only applies when vendor is 'deepgram'. See Deepgram API documentation for available options.",
-      "additionalProperties": true
-    },
-    "googleOptions": {
-      "type": "object",
-      "description": "Google Speech-to-Text specific options. Only applies when vendor is 'google'.",
-      "additionalProperties": true
-    },
-    "awsOptions": {
-      "type": "object",
-      "description": "AWS Transcribe specific options. Only applies when vendor is 'aws'.",
-      "additionalProperties": true
-    },
-    "azureOptions": {
-      "type": "object",
-      "description": "Azure Speech Services specific options. Only applies when vendor is 'microsoft'.",
-      "additionalProperties": true
-    },
-    "nuanceOptions": {
-      "type": "object",
-      "description": "Nuance-specific recognition options. Only applies when vendor is 'nuance'.",
-      "additionalProperties": true
-    },
-    "ibmOptions": {
-      "type": "object",
-      "description": "IBM Watson Speech-to-Text specific options. Only applies when vendor is 'ibm'.",
-      "additionalProperties": true
-    },
-    "nvidiaOptions": {
-      "type": "object",
-      "description": "NVIDIA Riva specific options. Only applies when vendor is 'nvidia'.",
-      "additionalProperties": true
-    },
-    "sonioxOptions": {
-      "type": "object",
-      "description": "Soniox-specific recognition options. Only applies when vendor is 'soniox'.",
-      "additionalProperties": true
-    },
-    "cobaltOptions": {
-      "type": "object",
-      "description": "Cobalt-specific recognition options. Only applies when vendor is 'cobalt'.",
-      "additionalProperties": true
-    },
-    "assemblyAiOptions": {
-      "type": "object",
-      "description": "AssemblyAI-specific recognition options. Only applies when vendor is 'assemblyai'.",
-      "additionalProperties": true
-    },
-    "speechmaticsOptions": {
-      "type": "object",
-      "description": "Speechmatics-specific recognition options. Only applies when vendor is 'speechmatics'.",
-      "additionalProperties": true
-    },
-    "openaiOptions": {
-      "type": "object",
-      "description": "OpenAI Whisper/Realtime specific options. Only applies when vendor is 'openai'.",
-      "additionalProperties": true
-    },
-    "houndifyOptions": {
-      "type": "object",
-      "description": "Houndify-specific recognition options. Only applies when vendor is 'houndify'.",
-      "additionalProperties": true
-    },
-    "gladiaOptions": {
-      "type": "object",
-      "description": "Gladia-specific recognition options. Only applies when vendor is 'gladia'.",
-      "additionalProperties": true
-    },
-    "elevenlabsOptions": {
-      "type": "object",
-      "description": "ElevenLabs-specific recognition options. Only applies when vendor is 'elevenlabs'.",
-      "additionalProperties": true
-    },
-    "verbioOptions": {
-      "type": "object",
-      "description": "Verbio-specific recognition options. Only applies when vendor is 'verbio'.",
-      "additionalProperties": true
-    },
-    "customOptions": {
-      "type": "object",
-      "description": "Options for custom STT vendors. Only applies when vendor is 'custom'.",
-      "additionalProperties": true
-    }
+    "deepgramOptions": { "$ref": "recognizer-deepgramOptions" },
+    "googleOptions": { "$ref": "recognizer-googleOptions" },
+    "awsOptions": { "$ref": "recognizer-awsOptions" },
+    "azureOptions": { "$ref": "recognizer-azureOptions" },
+    "nuanceOptions": { "$ref": "recognizer-nuanceOptions" },
+    "ibmOptions": { "$ref": "recognizer-ibmOptions" },
+    "nvidiaOptions": { "$ref": "recognizer-nvidiaOptions" },
+    "sonioxOptions": { "$ref": "recognizer-sonioxOptions" },
+    "cobaltOptions": { "$ref": "recognizer-cobaltOptions" },
+    "assemblyAiOptions": { "$ref": "recognizer-assemblyAiOptions" },
+    "speechmaticsOptions": { "$ref": "recognizer-speechmaticsOptions" },
+    "openaiOptions": { "$ref": "recognizer-openaiOptions" },
+    "houndifyOptions": { "$ref": "recognizer-houndifyOptions" },
+    "gladiaOptions": { "$ref": "recognizer-gladiaOptions" },
+    "elevenlabsOptions": { "$ref": "recognizer-elevenlabsOptions" },
+    "verbioOptions": { "$ref": "recognizer-verbioOptions" },
+    "customOptions": { "$ref": "recognizer-customOptions" }
   },
   "required": ["vendor"],
   "examples": [

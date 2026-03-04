@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'mcp-v*'
+  workflow_dispatch:
 
 jobs:
   publish:

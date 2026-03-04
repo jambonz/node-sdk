@@ -5,10 +5,11 @@
 
 import type {
   CallInfo,
+  CallCount,
   CreateCallRequest,
   UpdateCallRequest,
-  SendMessageRequest,
-  MessageInfo,
+  ListCallsFilter,
+  QueueInfo,
 } from '../types/rest.js';
 import type { ActionHook } from '../types/components.js';
 import type { Verb } from '../types/verbs.js';
@@ -34,12 +35,18 @@ class HttpClient {
     };
   }
 
+  private async throwError(method: string, path: string, res: Response): Promise<never> {
+    let detail = '';
+    try { detail = `: ${await res.text()}`; } catch { /* ignore */ }
+    throw new Error(`${method} ${path} failed: ${res.status} ${res.statusText}${detail}`);
+  }
+
   async get<T>(path: string): Promise<T> {
     const res = await fetch(`${this.baseUrl}${path}`, {
       method: 'GET',
       headers: this.headers,
     });
-    if (!res.ok) throw new Error(`GET ${path} failed: ${res.status} ${res.statusText}`);
+    if (!res.ok) await this.throwError('GET', path, res);
     return res.json() as Promise<T>;
   }
 
@@ -49,7 +56,7 @@ class HttpClient {
       headers: this.headers,
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(`POST ${path} failed: ${res.status} ${res.statusText}`);
+    if (!res.ok) await this.throwError('POST', path, res);
     return res.json() as Promise<T>;
   }
 
@@ -59,7 +66,7 @@ class HttpClient {
       headers: this.headers,
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(`PUT ${path} failed: ${res.status} ${res.statusText}`);
+    if (!res.ok) await this.throwError('PUT', path, res);
   }
 
   async del(path: string): Promise<void> {
@@ -67,7 +74,7 @@ class HttpClient {
       method: 'DELETE',
       headers: this.headers,
     });
-    if (!res.ok) throw new Error(`DELETE ${path} failed: ${res.status} ${res.statusText}`);
+    if (!res.ok) await this.throwError('DELETE', path, res);
   }
 }
 
@@ -83,10 +90,30 @@ export class CallsResource {
     return result.sid;
   }
 
+  /** List active calls, optionally filtered. */
+  async list(filter?: ListCallsFilter): Promise<CallInfo[]> {
+    const params = new URLSearchParams();
+    if (filter?.direction) params.set('direction', filter.direction);
+    if (filter?.from) params.set('from', filter.from);
+    if (filter?.to) params.set('to', filter.to);
+    if (filter?.callStatus) params.set('callStatus', filter.callStatus);
+    const qs = params.toString();
+    return this.http.get<CallInfo[]>(
+      `/Accounts/${this.accountSid}/Calls${qs ? `?${qs}` : ''}`
+    );
+  }
+
   /** Get info about an active call. */
   async get(callSid: string): Promise<CallInfo> {
     return this.http.get<CallInfo>(
       `/Accounts/${this.accountSid}/Calls/${callSid}`
+    );
+  }
+
+  /** Get count of active inbound and outbound calls. */
+  async count(): Promise<CallCount> {
+    return this.http.get<CallCount>(
+      `/Accounts/${this.accountSid}/CallCount`
     );
   }
 
@@ -121,25 +148,54 @@ export class CallsResource {
   }
 }
 
-export class MessagesResource {
+export class ConferencesResource {
   constructor(private http: HttpClient, private accountSid: string) {}
 
-  /** Send an SMS/MMS message. */
-  async create(opts: SendMessageRequest): Promise<MessageInfo> {
-    return this.http.post<MessageInfo>(
-      `/Accounts/${this.accountSid}/Messages`,
-      opts
+  /** List active conferences. */
+  async list(): Promise<string[]> {
+    return this.http.get<string[]>(
+      `/Accounts/${this.accountSid}/Conferences`
     );
   }
 }
 
-export class JambonzClient {
-  readonly calls: CallsResource;
-  readonly messages: MessagesResource;
+export class QueuesResource {
+  constructor(private http: HttpClient, private accountSid: string) {}
 
+  /** List active queues. */
+  async list(search?: string): Promise<QueueInfo[]> {
+    const qs = search ? `?search=${encodeURIComponent(search)}` : '';
+    return this.http.get<QueueInfo[]>(
+      `/Accounts/${this.accountSid}/Queues${qs}`
+    );
+  }
+}
+
+/**
+ * REST API client for the jambonz platform.
+ * Provides typed methods for creating and managing calls, conferences, and queues.
+ *
+ * @example
+ * ```typescript
+ * const client = new JambonzClient({ baseUrl: 'https://api.jambonz.us', accountSid, apiKey });
+ * const callSid = await client.calls.create({ from: '+15085551212', to: { type: 'phone', number: '+15085551213' } });
+ * ```
+ */
+export class JambonzClient {
+  /** Active call management (create, list, update, redirect, mute, whisper, hangup). */
+  readonly calls: CallsResource;
+  /** Active conference listing. */
+  readonly conferences: ConferencesResource;
+  /** Active queue listing. */
+  readonly queues: QueuesResource;
+
+  /**
+   * @param opts - API connection options (baseUrl, accountSid, apiKey).
+   */
   constructor(opts: ClientOptions) {
     const http = new HttpClient(opts);
     this.calls = new CallsResource(http, opts.accountSid);
-    this.messages = new MessagesResource(http, opts.accountSid);
+    this.conferences = new ConferencesResource(http, opts.accountSid);
+    this.queues = new QueuesResource(http, opts.accountSid);
   }
 }

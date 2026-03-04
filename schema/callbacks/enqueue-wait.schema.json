@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/enqueue-wait",
+  "title": "Enqueue WaitHook Payload",
+  "description": "Payload sent to the enqueue waitHook while a caller is waiting in the queue. The response should contain an array of say, play, pause, and/or leave verbs. Note: this payload is sparse — it contains queue-specific fields plus call_sid and call_id, but NOT the full base payload fields.",
+  "type": "object",
+  "properties": {
+    "queue_sid": { "type": "string", "description": "Queue identifier in the format 'queue:{account_sid}:{queue_name}'." },
+    "queue_time": { "type": "integer", "description": "Time in seconds the caller has been waiting in the queue." },
+    "queue_size": { "type": "integer", "description": "Total number of callers currently in the queue." },
+    "queue_position": { "type": "integer", "description": "Caller's current position in the queue (0-based)." },
+    "call_sid": { "type": "string", "description": "Unique identifier for this call." },
+    "call_id": { "type": "string", "description": "SIP Call-ID." }
+  },
+  "required": ["queue_sid", "queue_time"],
+  "additionalProperties": true
+}

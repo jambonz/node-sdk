@@ -52,24 +52,20 @@
       "additionalProperties": true
     },
     "listen": {
-      "type": "object",
-      "description": "Session-level audio streaming (listen/stream) configuration.",
-      "additionalProperties": true
+      "$ref": "listen",
+      "description": "Nested listen verb — session-level audio streaming configuration."
     },
     "stream": {
-      "type": "object",
-      "description": "Session-level audio streaming configuration. Alias for 'listen'.",
-      "additionalProperties": true
+      "$ref": "stream",
+      "description": "Nested stream verb — session-level audio streaming configuration. Alias for 'listen'."
     },
     "transcribe": {
-      "type": "object",
-      "description": "Session-level real-time transcription configuration.",
-      "additionalProperties": true
+      "$ref": "transcribe",
+      "description": "Nested transcribe verb — session-level real-time transcription configuration."
     },
     "amd": {
-      "type": "object",
-      "description": "Session-level answering machine detection configuration.",
-      "additionalProperties": true
+      "$ref": "../components/amd",
+      "description": "Session-level answering machine detection configuration."
     },
     "fillerNoise": {
       "$ref": "../components/fillerNoise",

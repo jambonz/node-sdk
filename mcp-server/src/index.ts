@@ -14,6 +14,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { registerResources } from './resources.js';
+import { registerTools } from './tools.js';
 
 const server = new McpServer({
   name: 'jambonz-schema-server',
@@ -21,6 +22,7 @@ const server = new McpServer({
 });
 
 registerResources(server);
+registerTools(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-azureOptions",
+  "title": "Azure Recognizer Options",
+  "description": "Azure Speech Services specific options. Only applies when recognizer vendor is 'microsoft'.",
+  "type": "object",
+  "properties": {
+    "speechSegmentationSilenceTimeoutMs": {
+      "type": "number",
+      "description": "Silence timeout in milliseconds for speech segmentation."
+    },
+    "postProcessing": {
+      "type": "string",
+      "description": "Post-processing mode for transcription results."
+    },
+    "audioLogging": {
+      "type": "boolean",
+      "description": "Enable audio logging for diagnostics."
+    },
+    "languageIdMode": {
+      "type": "string",
+      "enum": ["AtStart", "Continuous"],
+      "description": "Language identification mode when using multiple languages."
+    },
+    "speechRecognitionMode": {
+      "type": "string",
+      "enum": ["CONVERSATION", "DICTATION", "INTERACTIVE"],
+      "description": "Speech recognition mode optimized for the interaction type."
+    }
+  },
+  "additionalProperties": true
+}

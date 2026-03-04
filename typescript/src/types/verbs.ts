@@ -7,6 +7,7 @@
 import type {
   ActionHook,
   ActionHookDelayAction,
+  Amd,
   Auth,
   BidirectionalAudio,
   FillerNoise,
@@ -191,7 +192,7 @@ export interface ListenVerb {
   /** Inactivity timeout in seconds. */
   timeout?: number;
   /** Simultaneous transcription config. */
-  transcribe?: Record<string, unknown>;
+  transcribe?: Omit<TranscribeVerb, 'verb'>;
   /** Stream before call is answered. */
   earlyMedia?: boolean;
   /** Specific audio channel to stream. */
@@ -228,7 +229,7 @@ export interface StreamVerb {
   /** Inactivity timeout in seconds. */
   timeout?: number;
   /** Simultaneous transcription config. */
-  transcribe?: Record<string, unknown>;
+  transcribe?: Omit<TranscribeVerb, 'verb'>;
   /** Stream before call is answered. */
   earlyMedia?: boolean;
 }
@@ -236,6 +237,8 @@ export interface StreamVerb {
 export interface TranscribeVerb {
   verb: 'transcribe';
   id?: string;
+  /** Enable or disable transcription (used in nested config/dial context). */
+  enable?: boolean;
   /** Webhook for transcription results. */
   transcriptionHook?: string;
   /** Webhook for translated results. */
@@ -286,11 +289,11 @@ export interface DialVerb {
   /** Audio signal boost/attenuation in dB. */
   boostAudioSignal?: number | string;
   /** Audio streaming config for bridged call. */
-  listen?: Record<string, unknown>;
+  listen?: Omit<ListenVerb, 'verb'>;
   /** Audio streaming config (alias for listen). */
-  stream?: Record<string, unknown>;
+  stream?: Omit<StreamVerb, 'verb'>;
   /** Transcription config for bridged call. */
-  transcribe?: Record<string, unknown>;
+  transcribe?: Omit<TranscribeVerb, 'verb'>;
   /** Max bridged call duration in seconds. */
   timeLimit?: number;
   /** Seconds to wait for answer. */
@@ -298,9 +301,9 @@ export interface DialVerb {
   /** SIP proxy for outbound call. */
   proxy?: string;
   /** Answering machine detection config. */
-  amd?: Record<string, unknown>;
+  amd?: Amd;
   /** Audio dubbing tracks. */
-  dub?: Record<string, unknown>[];
+  dub?: Omit<DubVerb, 'verb'>[];
   /** Metadata for this call leg. */
   tag?: Record<string, unknown>;
   /** Forward P-Asserted-Identity header. */
@@ -341,7 +344,7 @@ export interface ConferenceVerb {
   /** Conference recording config. */
   record?: Record<string, unknown>;
   /** Audio streaming config. */
-  listen?: Record<string, unknown>;
+  listen?: Omit<ListenVerb, 'verb'>;
   /** Distribute DTMF to all participants. */
   distributeDtmf?: boolean;
 }
@@ -474,13 +477,13 @@ export interface ConfigVerb {
   /** Session-level recording config. */
   record?: Record<string, unknown>;
   /** Session-level audio streaming config. */
-  listen?: Record<string, unknown>;
+  listen?: Omit<ListenVerb, 'verb'>;
   /** Session-level audio streaming (alias). */
-  stream?: Record<string, unknown>;
+  stream?: Omit<StreamVerb, 'verb'>;
   /** Session-level transcription config. */
-  transcribe?: Record<string, unknown>;
+  transcribe?: Omit<TranscribeVerb, 'verb'>;
   /** Answering machine detection config. */
-  amd?: Record<string, unknown>;
+  amd?: Amd;
   /** Default filler noise config. */
   fillerNoise?: FillerNoise;
   /** Default VAD config. */
@@ -561,7 +564,7 @@ export interface DubVerb {
   /** Audio URL for playOnTrack. */
   play?: string;
   /** Text or config for sayOnTrack. */
-  say?: string | Record<string, unknown>;
+  say?: string | Omit<SayVerb, 'verb'>;
   /** Loop audio continuously. */
   loop?: boolean;
   /** Track gain in dB. */

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/transcribe",
+  "title": "Transcribe TranscriptionHook Payload",
+  "description": "Payload sent to the transcriptionHook when a transcription result is received from the STT engine.",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "speech": {
+      "type": "object",
+      "description": "Speech recognition results, present when the STT engine returns alternatives.",
+      "properties": {
+        "language_code": { "type": "string", "description": "Language code used for recognition (e.g. 'en-US')." },
+        "channel_tag": { "type": "integer", "description": "Audio channel number." },
+        "is_final": { "type": "boolean", "description": "Whether this is a final (not interim) recognition result." },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "transcript": { "type": "string", "description": "The recognized transcript." },
+              "confidence": { "type": "number", "description": "Confidence score between 0 and 1." }
+            }
+          },
+          "description": "Array of recognition alternatives, ordered by confidence."
+        }
+      }
+    },
+    "speech_event": {
+      "type": "object",
+      "description": "Speech event data, present when the STT engine returns a typed event (e.g. end of utterance).",
+      "properties": {
+        "type": { "type": "string", "description": "Event type from the STT vendor." }
+      },
+      "additionalProperties": true
+    },
+    "stt_latency_ms": { "type": "string", "description": "STT latency in milliseconds." },
+    "stt_talkspurts": { "type": "string", "description": "JSON-encoded array of talkspurt timing data." },
+    "stt_start_time": { "type": "string", "description": "STT recognition start time." },
+    "stt_stop_time": { "type": "string", "description": "STT recognition stop time." },
+    "stt_usage": { "description": "STT usage data from the vendor." }
+  },
+  "additionalProperties": true
+}

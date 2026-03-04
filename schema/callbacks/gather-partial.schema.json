@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/gather-partial",
+  "title": "Gather Partial Transcript Payload",
+  "description": "Payload sent to the partialResultHook during a gather verb with speech input. Delivers interim (partial) speech recognition results as they arrive, before the gather completes. This hook is informational — the response is ignored and does not replace the verb stack. Note: the base fields use slightly different names than the actionHook payload (e.g. local_sip_address instead of fs_sip_address).",
+  "type": "object",
+  "properties": {
+    "call_sid": { "type": "string", "description": "Unique identifier for this call." },
+    "account_sid": { "type": "string", "description": "Account identifier." },
+    "application_sid": { "type": "string", "description": "Application identifier." },
+    "direction": { "type": "string", "enum": ["inbound", "outbound"], "description": "Call direction." },
+    "from": { "type": "string", "description": "Caller phone number or SIP URI." },
+    "to": { "type": "string", "description": "Called phone number or SIP URI." },
+    "call_id": { "type": "string", "description": "SIP Call-ID." },
+    "sbc_callid": { "type": "string", "description": "SBC-level Call-ID." },
+    "call_status": { "type": "string", "description": "Current call state." },
+    "sip_status": { "type": "integer", "description": "SIP response code." },
+    "sip_reason": { "type": "string", "description": "SIP reason phrase." },
+    "trace_id": { "type": "string", "description": "Distributed tracing identifier." },
+    "b3": { "type": "string", "description": "B3 trace propagation header." },
+    "caller_name": { "type": "string", "description": "Caller display name from SIP, if available." },
+    "originating_sip_ip": { "type": "string", "description": "IP address of the originating SIP trunk." },
+    "originating_sip_trunk_name": { "type": "string", "description": "Name of the originating SIP trunk." },
+    "speech": {
+      "type": "object",
+      "description": "Interim speech recognition results.",
+      "properties": {
+        "language_code": { "type": "string", "description": "Language code used for recognition (e.g. 'en-US')." },
+        "channel_tag": { "type": "integer", "description": "Audio channel number." },
+        "is_final": { "type": "boolean", "description": "Always false for partial results." },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "transcript": { "type": "string", "description": "The partial transcript recognized so far." },
+              "confidence": { "type": "number", "description": "Confidence score between 0 and 1." }
+            }
+          },
+          "description": "Array of recognition alternatives, ordered by confidence."
+        },
+        "vendor": {
+          "type": "object",
+          "description": "Vendor-specific STT data. Structure varies by provider.",
+          "properties": {
+            "name": { "type": "string", "description": "STT vendor name (e.g. 'deepgram', 'google', 'aws')." },
+            "evt": { "type": "object", "description": "Raw vendor-specific event payload.", "additionalProperties": true }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

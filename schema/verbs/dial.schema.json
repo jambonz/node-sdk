@@ -84,19 +84,16 @@
       "examples": [6, -3]
     },
     "listen": {
-      "type": "object",
-      "description": "Configuration for streaming audio of the bridged call to a websocket endpoint.",
-      "additionalProperties": true
+      "$ref": "listen",
+      "description": "Nested listen verb — streams audio of the bridged call to a websocket endpoint."
     },
     "stream": {
-      "type": "object",
-      "description": "Configuration for streaming audio of the bridged call. Alias for 'listen'.",
-      "additionalProperties": true
+      "$ref": "stream",
+      "description": "Nested stream verb — streams audio of the bridged call. Alias for 'listen'."
     },
     "transcribe": {
-      "type": "object",
-      "description": "Configuration for real-time transcription of the bridged call.",
-      "additionalProperties": true
+      "$ref": "transcribe",
+      "description": "Nested transcribe verb — enables real-time transcription of the bridged call."
     },
     "timeLimit": {
       "type": "number",
@@ -114,14 +111,13 @@
       "examples": ["sip:proxy.example.com"]
     },
     "amd": {
-      "type": "object",
-      "description": "Answering machine detection configuration. When enabled, jambonz attempts to determine whether the call was answered by a human or a machine.",
-      "additionalProperties": true
+      "$ref": "../components/amd",
+      "description": "Answering machine detection configuration. When enabled, jambonz attempts to determine whether the call was answered by a human or a machine."
     },
     "dub": {
       "type": "array",
-      "items": { "type": "object" },
-      "description": "Audio dubbing configuration for mixing additional audio tracks into the bridged call."
+      "items": { "$ref": "dub" },
+      "description": "Nested dub verbs — audio dubbing configuration for mixing additional audio tracks into the bridged call."
     },
     "tag": {
       "type": "object",

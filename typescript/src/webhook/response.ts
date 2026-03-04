@@ -8,7 +8,21 @@ import { VerbBuilder, type VerbBuilderOptions } from '../verb-builder.js';
 import type { JambonzApp } from '../types/verbs.js';
 import type { IncomingMessage, ServerResponse } from 'http';
 
+/**
+ * Verb builder for HTTP webhook applications.
+ * Construct one per request, chain verb methods, and pass to `res.json()`.
+ *
+ * @example
+ * ```typescript
+ * app.post('/incoming', (req, res) => {
+ *   const jambonz = new WebhookResponse();
+ *   jambonz.say({ text: 'Hello!' }).hangup();
+ *   res.json(jambonz);
+ * });
+ * ```
+ */
 export class WebhookResponse extends VerbBuilder {
+  /** @param opts - Options for validation and schema directory. */
   constructor(opts?: VerbBuilderOptions) {
     super(opts);
   }

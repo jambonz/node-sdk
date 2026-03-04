@@ -7,6 +7,8 @@ export type {
   ActionHook,
   ActionHookDelayAction,
   ActionHookObject,
+  Amd,
+  AmdTimers,
   Auth,
   BidirectionalAudio,
   FillerNoise,
@@ -53,19 +55,22 @@ export type {
 // Session
 export type {
   CallSession,
+  TtsStreamingEvent,
+  TtsStreamingEventType,
   WsMessage,
   WsMessageType,
   WsResponse,
 } from './session.js';
 
 // Common
-export type { Logger } from './common.js';
+export type { Logger, EnvVarDef, EnvVarSchema } from './common.js';
 
 // REST
 export type {
+  CallCount,
   CallInfo,
   CreateCallRequest,
-  MessageInfo,
-  SendMessageRequest,
+  ListCallsFilter,
+  QueueInfo,
   UpdateCallRequest,
 } from './rest.js';

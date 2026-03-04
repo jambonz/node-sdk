@@ -16,7 +16,7 @@
     "vendor": {
       "type": "string",
       "description": "The LLM vendor to use.",
-      "examples": ["openai", "anthropic", "google", "groq", "deepseek", "custom"]
+      "examples": ["openai", "anthropic", "google", "groq", "deepseek", "deepgram", "ultravox", "custom"]
     },
     "model": {
       "type": "string",

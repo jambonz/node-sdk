@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/amd",
+  "title": "Answering Machine Detection",
+  "description": "Configuration for answering machine detection (AMD). Detects whether an outbound or inbound call was answered by a human or a machine. Used as a nested property on the 'config' or 'dial' verb.",
+  "type": "object",
+  "properties": {
+    "actionHook": {
+      "$ref": "actionHook",
+      "description": "Webhook to receive AMD events (amd_human_detected, amd_machine_detected, amd_no_speech_detected, amd_decision_timeout, amd_machine_stopped_speaking, amd_tone_detected, amd_error, amd_stopped)."
+    },
+    "thresholdWordCount": {
+      "type": "number",
+      "description": "Number of spoken words in a greeting that triggers an amd_machine_detected result.",
+      "default": 9
+    },
+    "digitCount": {
+      "type": "number",
+      "description": "Number of digits in a greeting to trigger detection. 0 disables digit-based detection.",
+      "default": 0
+    },
+    "timers": {
+      "type": "object",
+      "description": "Timer settings controlling AMD detection windows.",
+      "properties": {
+        "noSpeechTimeoutMs": {
+          "type": "number",
+          "description": "Milliseconds to wait for any speech before returning amd_no_speech_detected.",
+          "default": 5000
+        },
+        "decisionTimeoutMs": {
+          "type": "number",
+          "description": "Milliseconds before returning amd_decision_timeout if no determination is made.",
+          "default": 15000
+        },
+        "toneTimeoutMs": {
+          "type": "number",
+          "description": "Milliseconds to wait for beep/tone detection.",
+          "default": 20000
+        },
+        "greetingCompletionTimeoutMs": {
+          "type": "number",
+          "description": "Milliseconds of silence after speech before determining the machine greeting is complete. Automatically reduced to 1000ms if a beep is detected.",
+          "default": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "recognizer": {
+      "$ref": "recognizer",
+      "description": "Override the STT recognizer used for AMD speech detection. When omitted, AMD uses the session default recognizer with enhancedModel enabled."
+    }
+  },
+  "required": ["actionHook"],
+  "examples": [
+    {
+      "actionHook": "/amd-events"
+    },
+    {
+      "actionHook": "/amd-events",
+      "thresholdWordCount": 6,
+      "timers": {
+        "noSpeechTimeoutMs": 3000,
+        "decisionTimeoutMs": 10000
+      }
+    }
+  ]
+}

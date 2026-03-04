@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/dial-dtmf",
+  "title": "Dial DtmfHook Payload",
+  "description": "Payload sent to the dial dtmfHook when DTMF digits matching the configured pattern are detected during a dial.",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "dtmf": {
+      "type": "string",
+      "description": "The DTMF digit sequence that matched the configured dtmfCapture pattern."
+    }
+  },
+  "required": ["dtmf"],
+  "additionalProperties": true
+}

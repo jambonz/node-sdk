@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/dequeue",
+  "title": "Dequeue ActionHook Payload",
+  "description": "Payload sent to the dequeue verb's actionHook when the dequeue operation completes.",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "dequeue_result": {
+      "type": "string",
+      "enum": ["complete", "timeout", "hangup"],
+      "description": "Outcome of the dequeue. 'complete' — successfully dequeued and bridged; 'timeout' — no queued caller found; 'hangup' — call hung up during bridge."
+    }
+  },
+  "required": ["dequeue_result"],
+  "additionalProperties": true
+}

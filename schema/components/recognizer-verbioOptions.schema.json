@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-verbioOptions",
+  "title": "Verbio Recognizer Options",
+  "description": "Verbio-specific STT options. Only applies when recognizer vendor is 'verbio'.",
+  "type": "object",
+  "properties": {
+    "enable_formatting": {
+      "type": "boolean",
+      "description": "Enable text formatting of results."
+    },
+    "enable_diarization": {
+      "type": "boolean",
+      "description": "Enable speaker diarization."
+    },
+    "topic": {
+      "type": "number",
+      "description": "Topic ID for domain-specific recognition."
+    },
+    "inline_grammar": {
+      "type": "string",
+      "description": "Inline SRGS grammar for constrained recognition."
+    },
+    "grammar_uri": {
+      "type": "string",
+      "description": "URI of an external grammar resource."
+    },
+    "label": {
+      "type": "string",
+      "description": "Label for the recognition session."
+    },
+    "recognition_timeout": {
+      "type": "number",
+      "description": "Maximum recognition duration in seconds."
+    },
+    "speech_complete_timeout": {
+      "type": "number",
+      "description": "Silence duration in seconds after complete speech."
+    },
+    "speech_incomplete_timeout": {
+      "type": "number",
+      "description": "Silence duration in seconds after incomplete speech."
+    }
+  },
+  "additionalProperties": true
+}

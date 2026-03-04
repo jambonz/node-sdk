@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/webhook/index.ts",
+    "src/websocket/index.ts",
+    "src/client/index.ts"
+  ],
+  "out": "docs",
+  "name": "@jambonz/sdk",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "sort": ["source-order"],
+  "categoryOrder": ["Audio & Speech", "AI & Real-time", "Call Control", "SIP", "Utility", "*"],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  }
+}

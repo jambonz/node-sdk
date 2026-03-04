@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-ibmOptions",
+  "title": "IBM Recognizer Options",
+  "description": "IBM Watson Speech-to-Text specific options. Only applies when recognizer vendor is 'ibm'.",
+  "type": "object",
+  "properties": {
+    "sttApiKey": {
+      "type": "string",
+      "description": "IBM STT API key. Overrides credentials configured in jambonz."
+    },
+    "sttRegion": {
+      "type": "string",
+      "description": "IBM STT region."
+    },
+    "ttsApiKey": {
+      "type": "string",
+      "description": "IBM TTS API key."
+    },
+    "ttsRegion": {
+      "type": "string",
+      "description": "IBM TTS region."
+    },
+    "instanceId": {
+      "type": "string",
+      "description": "IBM Watson instance ID."
+    },
+    "model": {
+      "type": "string",
+      "description": "Recognition model name."
+    },
+    "languageCustomizationId": {
+      "type": "string",
+      "description": "ID of a custom language model."
+    },
+    "acousticCustomizationId": {
+      "type": "string",
+      "description": "ID of a custom acoustic model."
+    },
+    "baseModelVersion": {
+      "type": "string",
+      "description": "Base model version to use."
+    },
+    "watsonMetadata": {
+      "type": "string",
+      "description": "Customer ID metadata for data labeling."
+    },
+    "watsonLearningOptOut": {
+      "type": "boolean",
+      "description": "Opt out of IBM data collection for service improvements."
+    }
+  },
+  "additionalProperties": true
+}

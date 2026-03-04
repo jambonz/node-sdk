@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/components/recognizer-elevenlabsOptions",
+  "title": "ElevenLabs Recognizer Options",
+  "description": "ElevenLabs-specific STT options. Only applies when recognizer vendor is 'elevenlabs'.",
+  "type": "object",
+  "properties": {
+    "includeTimestamps": {
+      "type": "boolean",
+      "description": "Include word-level timestamps in results."
+    },
+    "commitStrategy": {
+      "type": "string",
+      "enum": ["manual", "vad"],
+      "description": "How audio chunks are committed. 'manual' for explicit commits, 'vad' for voice activity detection."
+    },
+    "vadSilenceThresholdSecs": {
+      "type": "number",
+      "description": "Silence duration in seconds to trigger VAD commit."
+    },
+    "vadThreshold": {
+      "type": "number",
+      "description": "VAD activation threshold."
+    },
+    "minSpeechDurationMs": {
+      "type": "number",
+      "description": "Minimum speech duration in milliseconds to accept."
+    },
+    "minSilenceDurationMs": {
+      "type": "number",
+      "description": "Minimum silence duration in milliseconds to trigger end of speech."
+    },
+    "enableLogging": {
+      "type": "boolean",
+      "description": "Enable server-side logging."
+    }
+  },
+  "additionalProperties": true
+}

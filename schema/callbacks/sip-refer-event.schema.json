@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/sip-refer-event",
+  "title": "SIP Refer EventHook Payload",
+  "description": "Payload sent to the sip-refer eventHook when a SIP NOTIFY is received with transfer status updates.",
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "string",
+      "const": "transfer-status",
+      "description": "Event type — always 'transfer-status' for REFER notifications."
+    },
+    "call_status": {
+      "type": "integer",
+      "description": "SIP status code from the NOTIFY sipfrag body (e.g. 100 for trying, 180 for ringing, 200 for success)."
+    }
+  },
+  "required": ["event", "call_status"],
+  "additionalProperties": true
+}

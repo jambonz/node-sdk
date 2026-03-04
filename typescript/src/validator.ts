@@ -1,6 +1,6 @@
 /**
  * Schema-based validation using AJV.
- * Loads all 36 JSON schemas from schema/ and validates verb arrays and individual verbs.
+ * Loads all JSON schemas from schema/ and validates verb arrays and individual verbs.
  */
 
 import Ajv, { type ValidateFunction, type ErrorObject } from 'ajv';
@@ -22,13 +22,31 @@ export interface ValidationError {
 const COMPONENT_SCHEMAS = [
   'auth',
   'actionHook',
-  'synthesizer',
-  'recognizer',
-  'target',
-  'vad',
+  'actionHookDelayAction',
+  'amd',
   'bidirectionalAudio',
   'fillerNoise',
-  'actionHookDelayAction',
+  'recognizer',
+  'recognizer-assemblyAiOptions',
+  'recognizer-awsOptions',
+  'recognizer-azureOptions',
+  'recognizer-cobaltOptions',
+  'recognizer-customOptions',
+  'recognizer-deepgramOptions',
+  'recognizer-elevenlabsOptions',
+  'recognizer-gladiaOptions',
+  'recognizer-googleOptions',
+  'recognizer-houndifyOptions',
+  'recognizer-ibmOptions',
+  'recognizer-nuanceOptions',
+  'recognizer-nvidiaOptions',
+  'recognizer-openaiOptions',
+  'recognizer-sonioxOptions',
+  'recognizer-speechmaticsOptions',
+  'recognizer-verbioOptions',
+  'synthesizer',
+  'target',
+  'vad',
 ] as const;
 
 const VERB_SCHEMAS = [
@@ -68,15 +86,15 @@ function loadSchema(schemaDir: string, relativePath: string): Record<string, unk
 function findSchemaDir(): string {
   // Walk up from this file to find the schema/ directory
   // In development: typescript/src/validator.ts -> ../../schema
-  // In dist: typescript/dist/validator.js -> ../../schema
+  // In dist: dist/index.js -> ../schema (tsup bundles to package-root/dist/)
   const currentDir = typeof __dirname !== 'undefined'
     ? __dirname
     : dirname(fileURLToPath(import.meta.url));
 
   // Try relative paths from both src and dist locations
   const candidates = [
-    resolve(currentDir, '../../schema'),      // from src/
-    resolve(currentDir, '../../../schema'),    // from dist/
+    resolve(currentDir, '../../schema'),      // from typescript/src/
+    resolve(currentDir, '../schema'),          // from dist/ (tsup bundles to package-root/dist/)
   ];
 
   for (const candidate of candidates) {

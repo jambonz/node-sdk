@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/dial-refer",
+  "title": "Dial ReferHook Payload",
+  "description": "Payload sent to the dial referHook when a SIP REFER is received during an active dial. The response can contain new verbs to execute.",
+  "allOf": [
+    { "$ref": "base" }
+  ],
+  "type": "object",
+  "properties": {
+    "refer_details": {
+      "type": "object",
+      "description": "Details of the SIP REFER request. Any custom X-* headers on the REFER are also included as snake_cased properties (e.g. X-Override-Number becomes x_override_number).",
+      "properties": {
+        "sip_refer_to": { "type": "string", "description": "Full SIP Refer-To header value." },
+        "refer_to_user": { "type": "string", "description": "User part of the Refer-To URI (phone number or SIP user)." },
+        "sip_referred_by": { "type": "string", "description": "SIP Referred-By header value, if present." },
+        "referred_by_user": { "type": "string", "description": "User part of the Referred-By URI, if present." },
+        "sip_user_agent": { "type": "string", "description": "User-Agent header from the REFER request." },
+        "referring_call_sid": { "type": "string", "description": "Call SID of the leg that sent the REFER." },
+        "referred_call_sid": { "type": "string", "description": "Call SID of the leg being referred." }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["refer_details"],
+  "additionalProperties": true
+}

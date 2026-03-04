@@ -3,3 +3,10 @@ dist/
 *.tsbuildinfo
 .DS_Store
 .claude/
+.mcp.json
+.vscode/
+typescript/schema/
+mcp-server/schema/
+mcp-server/docs/
+mcp-server/AGENTS.md
+typescript/docs/
