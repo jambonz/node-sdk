@@ -1,6 +1,6 @@
 {
   "name": "@jambonz/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "jambonz SDK for building voice applications — optimized for AI agents",
   "author": "Dave Horton",
   "license": "MIT",
