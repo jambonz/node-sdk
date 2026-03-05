@@ -27,6 +27,10 @@ export interface EnvVarDef {
   enum?: (string | number | boolean)[];
   /** Mask the value in the portal UI (for secrets/API keys). */
   obscure?: boolean;
+  /** UI rendering hint: 'input' (default), 'textarea' (multi-line), or 'filepicker' (file upload). */
+  uiHint?: 'input' | 'textarea' | 'filepicker';
+  /** Populate a dropdown from jambonz account data. Currently supports 'carriers'. */
+  jambonzResource?: 'carriers';
 }
 
 /** Schema declaring all application environment variables. */

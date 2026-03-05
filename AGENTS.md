@@ -71,17 +71,34 @@ Individual verb schemas are in `schema/verbs/`. Shared component types (synthesi
 - **answer** — Explicitly answer the call.
 - **leave** — Leave a conference or queue.
 
+### Verb synonyms
+- **listen** and **stream** are synonyms - but use "stream" always when generating application code.
 ## Using the @jambonz/sdk
 
 **IMPORTANT**: Always use the `@jambonz/sdk` package (version 0.1.x+) to build jambonz applications. The older packages `@jambonz/node-client-ws` and `@jambonz/node-client` are **deprecated and replaced** by `@jambonz/sdk`. Do NOT use those old packages. Do NOT build apps with raw JSON verb arrays and plain Express/WS — use `@jambonz/sdk`.
 
+**IMPORTANT — App Environment Variables vs process.env**: jambonz applications should NEVER use `process.env` for application-configurable values (phone numbers, API keys, language preferences, greeting text, etc.). Instead, use **jambonz application environment variables** — a two-step pattern:
+1. **Declare** the variables so the jambonz portal can discover them (via `envVars` option for WebSocket, or `envVarsMiddleware` for webhook).
+2. **Read** the values at runtime from the call payload (`session.data.env_vars` for WebSocket, `req.body.env_vars` for webhook).
+
+Both steps are required. Declaring without reading means values are ignored. Reading without declaring means the portal won't know about them and won't send them. See the [Application Environment Variables](#application-environment-variables) section for full details.
+
 Install: `npm install @jambonz/sdk`
+
+**Dependencies**: Webhook apps also require `express` (`npm install express`). WebSocket apps have no additional dependencies — the SDK includes `ws` internally. When generating a `package.json`, always include all required dependencies.
 
 ### Webhook Application (HTTP)
 
 Import `WebhookResponse` from `@jambonz/sdk/webhook`. Create an Express server, construct a `WebhookResponse` for each request, chain verb methods, and return it via `res.json()`.
 
-**Important**: Every webhook app must include a `POST /call-status` handler. jambonz sends call status change notifications (ringing, in-progress, completed, etc.) to this endpoint. The handler should log the event and return 200.
+**Best practice**: Always include a `POST /call-status` handler. jambonz sends call status change notifications (ringing, in-progress, completed, etc.) to this endpoint. The handler should log the event and return 200. The path `/call-status` is conventional but the user may choose a different path:
+
+```typescript
+app.post('/call-status', (req, res) => {
+  console.log(`Call ${req.body.call_sid} status: ${req.body.call_status}`);
+  res.sendStatus(200);
+});
+```
 
 ```typescript
 import express from 'express';
@@ -348,11 +365,16 @@ When a verb completes, jambonz invokes the `actionHook` URL (webhook) or sends a
 
 ## Application Environment Variables
 
-Applications can declare configurable parameters that the jambonz portal discovers via an HTTP `OPTIONS` request. The portal renders a UI form from the schema, and configured values are delivered as `env_vars` in the initial call payload.
+jambonz has a built-in mechanism for application configuration that is **always preferred over `process.env`**. It works in two required steps:
 
-**When to suggest env vars**: If the user describes an application that includes values likely to change between deployments or users — such as phone numbers to dial, API keys, language preferences, greeting text, queue names, or timeout values — proactively ask whether they'd like to make those configurable via environment variables rather than hardcoding them. Many users won't think of this but will benefit from the flexibility.
+1. **Declare** — Your app declares its configurable parameters with a schema. The jambonz portal discovers these via an HTTP `OPTIONS` request and renders a configuration form for administrators.
+2. **Receive** — When a call arrives, jambonz delivers the configured values in the call payload as `env_vars`. Your app reads them from there.
 
-### Declaring Environment Variables
+**IMPORTANT**: Both steps are required. If you only declare without reading, the values are ignored. If you only read without declaring, the portal won't discover the parameters and won't send them. NEVER use `process.env` for values that should be configurable per-application in the jambonz portal.
+
+**When to use env vars**: Phone numbers to dial, API keys, language/voice preferences, greeting text, queue names, timeout values, feature flags, or any value that might change between deployments or users. If in doubt, make it an env var.
+
+### Step 1: Define the Schema
 
 Define a schema object where each key is a parameter name and the value describes its type and UI behavior:
 
@@ -361,46 +383,81 @@ const envVars = {
   API_KEY: { type: 'string', description: 'Your API key', required: true, obscure: true },
   LANGUAGE: { type: 'string', description: 'TTS language', default: 'en-US', enum: ['en-US', 'es-ES', 'fr-FR'] },
   MAX_RETRIES: { type: 'number', description: 'Max retry attempts', default: 3 },
+  CARRIER: { type: 'string', description: 'Outbound carrier', jambonzResource: 'carriers' },
+  SYSTEM_PROMPT: { type: 'string', description: 'LLM system prompt', uiHint: 'textarea' },
+  TLS_CERT: { type: 'string', description: 'TLS certificate', uiHint: 'filepicker' },
 };
 ```
 
-Each parameter supports: `type` (required: `'string'` | `'number'` | `'boolean'`), `description` (required), `required`, `default`, `enum`, and `obscure` (masks value in portal UI for secrets).
+Each parameter supports:
 
-### WebSocket Apps
+| Property | Required | Description |
+|----------|----------|-------------|
+| `type` | Yes | `'string'` \| `'number'` \| `'boolean'` |
+| `description` | Yes | Human-readable label shown in the portal |
+| `required` | No | Whether the user must provide a value |
+| `default` | No | Pre-filled default value |
+| `enum` | No | Array of allowed values — renders as a dropdown |
+| `obscure` | No | Masks the value in the portal UI (for secrets/API keys) |
+| `uiHint` | No | `'input'` (default single-line), `'textarea'` (multi-line), or `'filepicker'` (file upload with textarea) |
+| `jambonzResource` | No | Populate a dropdown from jambonz account data. Currently supports `'carriers'` (lists VoIP carriers on the account) |
 
-Pass `envVars` to `createEndpoint`. The SDK auto-responds to OPTIONS requests:
+**Notes on `jambonzResource`**: When set to `'carriers'`, the portal fetches the VoIP carriers configured for the account and renders them as a dropdown. The stored value is the carrier name. This is preferred over hardcoding carrier names or using `enum` with static values.
+
+### Step 2: Register and Read — WebSocket Apps
+
+Pass `envVars` to `createEndpoint` to register the declaration (the SDK auto-responds to OPTIONS requests), then read values from `session.data.env_vars`:
 
 ```typescript
-const makeService = createEndpoint({ server, port: 3000, envVars });
-```
+import http from 'http';
+import { createEndpoint } from '@jambonz/sdk/websocket';
 
-Access values at runtime via `session.data`:
+const envVars = {
+  GREETING: { type: 'string', description: 'Greeting message', default: 'Hello!' },
+  LANGUAGE: { type: 'string', description: 'TTS language', default: 'en-US' },
+};
 
-```typescript
+const server = http.createServer();
+const makeService = createEndpoint({ server, port: 3000, envVars });  // Step 1: declare
+
+const svc = makeService({ path: '/' });
+
 svc.on('session:new', (session) => {
-  const apiKey = session.data.env_vars?.API_KEY;
+  const greeting = session.data.env_vars?.GREETING || 'Hello!';       // Step 2: read
+  const language = session.data.env_vars?.LANGUAGE || 'en-US';
+
+  session.say({ text: greeting, language }).hangup().send();
 });
 ```
 
-### Webhook Apps
+### Step 2: Register and Read — Webhook Apps
 
-Use the `envVarsMiddleware` to auto-respond to OPTIONS requests:
+Use `envVarsMiddleware` to register the declaration (auto-responds to OPTIONS requests), then read values from `req.body.env_vars`:
 
 ```typescript
+import express from 'express';
 import { WebhookResponse, envVarsMiddleware } from '@jambonz/sdk/webhook';
 
-app.use(envVarsMiddleware(envVars));
-```
+const envVars = {
+  GREETING: { type: 'string', description: 'Greeting message', default: 'Hello!' },
+  LANGUAGE: { type: 'string', description: 'TTS language', default: 'en-US' },
+};
 
-Access values at runtime via `req.body`:
+const app = express();
+app.use(express.json());
+app.use(envVarsMiddleware(envVars));                                    // Step 1: declare
 
-```typescript
 app.post('/incoming', (req, res) => {
-  const apiKey = req.body.env_vars?.API_KEY;
+  const greeting = req.body.env_vars?.GREETING || 'Hello!';            // Step 2: read
+  const language = req.body.env_vars?.LANGUAGE || 'en-US';
+
+  const jambonz = new WebhookResponse();
+  jambonz.say({ text: greeting, language }).hangup();
+  res.json(jambonz);
 });
 ```
 
-**Note**: `env_vars` is only present in the initial call webhook, not in subsequent actionHook callbacks.
+**Note**: `env_vars` is only present in the initial call webhook (or `session:new` for WebSocket), not in subsequent actionHook callbacks. If you need env var values in actionHook handlers, store them in a variable during the initial call.
 
 ## Mid-Call Control
 
