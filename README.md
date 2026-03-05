@@ -359,11 +359,11 @@ The two packages are versioned and published independently. Each has its own Git
 
 ```bash
 cd typescript
-npm version patch   # or minor, or major
+npm version patch   # or minor, or major — note the new version number it prints
 cd ..
 git add typescript/package.json typescript/package-lock.json
-git commit -m "sdk v$(node -p \"require('./typescript/package.json').version\")"
-git tag "v$(node -p \"require('./typescript/package.json').version\")"
+git commit -m "sdk v0.x.y"        # use the version from npm version output
+git tag v0.x.y                    # same version, prefixed with v
 git push && git push --tags
 ```
 
@@ -373,17 +373,17 @@ The `v*` tag triggers `.github/workflows/publish-sdk.yml`.
 
 ```bash
 cd mcp-server
-npm version patch   # or minor, or major
+npm version patch   # or minor, or major — note the new version number it prints
 cd ..
 git add mcp-server/package.json mcp-server/package-lock.json
-git commit -m "mcp v$(node -p \"require('./mcp-server/package.json').version\")"
-git tag "mcp-v$(node -p \"require('./mcp-server/package.json').version\")"
+git commit -m "mcp v0.x.y"       # use the version from npm version output
+git tag mcp-v0.x.y               # same version, prefixed with mcp-v
 git push && git push --tags
 ```
 
 The `mcp-v*` tag triggers `.github/workflows/publish-mcp.yml`.
 
-**Note**: `npm version` bumps `package.json` but does not create a git commit when run from a monorepo subdirectory — you must commit and tag manually as shown above.
+**Note**: `npm version` bumps `package.json` but does not create a git commit when run from a monorepo subdirectory — you must commit and tag manually as shown above. Replace `0.x.y` with the actual version printed by `npm version`.
 
 ## Repository Structure
 
