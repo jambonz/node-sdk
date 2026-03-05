@@ -351,6 +351,40 @@ See the [examples/](examples/) directory:
 | [queue-with-hold](examples/queue-with-hold/) | Webhook + WS | Call queue with hold music |
 | [call-recording](examples/call-recording/) | Webhook + WS | Mid-call recording control |
 
+## Publishing to npm
+
+The two packages are versioned and published independently. Each has its own GitHub Actions workflow triggered by a specific tag pattern.
+
+### Publishing `@jambonz/sdk`
+
+```bash
+cd typescript
+npm version patch   # or minor, or major
+cd ..
+git add typescript/package.json typescript/package-lock.json
+git commit -m "sdk v$(node -p \"require('./typescript/package.json').version\")"
+git tag "v$(node -p \"require('./typescript/package.json').version\")"
+git push && git push --tags
+```
+
+The `v*` tag triggers `.github/workflows/publish-sdk.yml`.
+
+### Publishing `@jambonz/mcp-schema-server`
+
+```bash
+cd mcp-server
+npm version patch   # or minor, or major
+cd ..
+git add mcp-server/package.json mcp-server/package-lock.json
+git commit -m "mcp v$(node -p \"require('./mcp-server/package.json').version\")"
+git tag "mcp-v$(node -p \"require('./mcp-server/package.json').version\")"
+git push && git push --tags
+```
+
+The `mcp-v*` tag triggers `.github/workflows/publish-mcp.yml`.
+
+**Note**: `npm version` bumps `package.json` but does not create a git commit when run from a monorepo subdirectory — you must commit and tag manually as shown above.
+
 ## Repository Structure
 
 ```
