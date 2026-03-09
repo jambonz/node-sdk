@@ -43,8 +43,8 @@ const WS_PROTOCOL = 'ws.jambonz.org';
 const AUDIO_PROTOCOL = 'audio.drachtio.org';
 
 const defaultLogger: Logger = {
-  info: () => {},
-  error: () => {},
+  info: (...args: unknown[]) => console.log(...args),
+  error: (...args: unknown[]) => console.error(...args),
   debug: () => {},
 };
 

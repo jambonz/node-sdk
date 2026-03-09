@@ -30,8 +30,7 @@ app.post('/incoming', (req, res) => {
       }
     },
     {
-      verb: 'llm',
-      vendor: 'openai',
+      verb: 'openai_s2s',
       model: 'gpt-4o',
       auth: { apiKey: process.env.OPENAI_API_KEY },
       llmOptions: {

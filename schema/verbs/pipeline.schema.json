@@ -39,7 +39,8 @@
       "description": "If true, establish the LLM connection before the call starts to reduce latency on the first interaction."
     },
     "actionHook": { "$ref": "../components/actionHook", "description": "A webhook invoked when the pipeline ends." },
-    "eventHook": { "$ref": "../components/actionHook", "description": "A webhook invoked for pipeline events." }
+    "eventHook": { "$ref": "../components/actionHook", "description": "A webhook invoked for pipeline events." },
+    "toolHook": { "$ref": "../components/actionHook", "description": "A webhook invoked when the LLM requests a tool/function call. The payload includes the tool name and arguments; the response provides the tool result." }
   },
   "required": ["stt", "llm", "tts"],
   "examples": [

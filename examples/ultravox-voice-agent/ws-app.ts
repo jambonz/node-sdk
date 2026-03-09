@@ -6,37 +6,39 @@ const makeService = createEndpoint({
   server,
   port: 3000,
   envVars: {
-    DEEPGRAM_API_KEY: {
+    ULTRAVOX_API_KEY: {
       type: 'string',
-      description: 'Deepgram API key for Voice Agent',
+      description: 'Ultravox API key',
       required: true,
       obscure: true,
     },
   },
 });
 
-const svc = makeService({ path: '/deepgram-s2s' });
+const svc = makeService({ path: '/ultravox-s2s' });
 
 svc.on('session:new', (session) => {
   console.log(`Incoming call: ${session.callSid}`);
   console.log('  from: %s to: %s', session.data.from, session.data.to);
   console.log('  env_vars:', JSON.stringify(session.data.env_vars || {}));
 
-  const apiKey = session.data.env_vars?.DEEPGRAM_API_KEY;
+  const apiKey = session.data.env_vars?.ULTRAVOX_API_KEY;
   if (!apiKey) {
-    console.error('ERROR: DEEPGRAM_API_KEY not found in application environment variables');
+    console.error('ERROR: ULTRAVOX_API_KEY not found in application environment variables');
     return;
   }
 
   session
     .on('/event', (_evt: Record<string, any>) => {
-      // Deepgram voice agent events
+      // Ultravox events (state changes, transcripts, etc.)
     })
     .on('/toolCall', async (evt: Record<string, any>) => {
       const { name, args, tool_call_id } = evt;
 
       if (name === 'get_weather') {
         try {
+          const scale = (args.scale || 'celsius').toLowerCase().startsWith('f') ? 'fahrenheit' : 'celsius';
+
           const geoRes = await fetch(
             `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(args.location)}&count=1&language=en&format=json`
           );
@@ -45,23 +47,26 @@ svc.on('session:new', (session) => {
 
           const { latitude: lat, longitude: lng } = geoData.results[0];
           const wxRes = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m&temperature_unit=${args.scale}`
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m&temperature_unit=${scale}`
           );
           const weather = await wxRes.json();
 
           session.sendToolOutput(tool_call_id, {
-            type: 'FunctionCallResponse',
-            id: tool_call_id,
-            name,
-            content: JSON.stringify(weather),
+            type: 'client_tool_result',
+            invocation_id: tool_call_id,
+            result: JSON.stringify(weather),
           });
         } catch (err) {
-          session.sendToolOutput(tool_call_id, { error: String(err) });
+          session.sendToolOutput(tool_call_id, {
+            type: 'client_tool_result',
+            invocation_id: tool_call_id,
+            result: JSON.stringify({ error: String(err) }),
+          });
         }
       }
     })
     .on('/final', (evt: Record<string, any>) => {
-      if (['server failure', 'server error'].includes(evt.completion_reason)) {
+      if (['server error', 'connection failure'].includes(evt.completion_reason)) {
         session.say({ text: 'Sorry, there was an error processing your request.' }).hangup();
       }
       session.reply();
@@ -76,43 +81,36 @@ svc.on('session:new', (session) => {
   session
     .answer()
     .pause({ length: 1 })
-    .say({ text: 'Hello, how can I help you today?' })
-    .deepgram_s2s({
-      model: 'voice-agent',
+    .ultravox_s2s({
       auth: { apiKey },
       actionHook: '/final',
       eventHook: '/event',
       toolHook: '/toolCall',
       events: ['all'],
       llmOptions: {
-        Settings: {
-          type: 'Settings',
-          agent: {
-            listen: { provider: { type: 'deepgram', model: 'nova-3' } },
-            think: {
-              provider: { type: 'open_ai', model: 'gpt-4o-mini' },
-              prompt: 'Please help the user with their request.',
-              functions: [
-                {
-                  name: 'get_weather',
-                  description: 'Get the weather at a given location',
-                  parameters: {
-                    type: 'object',
-                    properties: {
-                      location: { type: 'string', description: 'Location to get the weather from' },
-                      scale: { type: 'string', enum: ['fahrenheit', 'celsius'] },
-                    },
-                    required: ['location', 'scale'],
-                  },
-                },
+        systemPrompt: `You are a helpful weather assistant.
+You can look up current weather for any location using the get_weather tool.
+When asked about weather, always use the tool to fetch real data — do not guess or make up temperatures.
+After receiving tool results, report the temperature and wind speed to the user.
+Give concise, friendly responses in plain text.`,
+        selectedTools: [
+          {
+            temporaryTool: {
+              modelToolName: 'get_weather',
+              description: 'Get the weather at a given location',
+              dynamicParameters: [
+                { name: 'location', location: 'PARAMETER_LOCATION_BODY', required: true },
+                { name: 'scale', location: 'PARAMETER_LOCATION_BODY', required: true,
+                  schema: { type: 'string', enum: ['fahrenheit', 'celsius'], description: 'Temperature unit' } },
               ],
+              client: {},
             },
           },
-        },
+        ],
       },
     })
     .hangup()
     .send();
 });
 
-console.log('Deepgram voice agent listening on port 3000');
+console.log('Ultravox voice agent listening on port 3000');

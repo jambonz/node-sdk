@@ -14,12 +14,15 @@ const verbsDir = resolve(schemaDir, 'verbs');
 const componentsDir = resolve(schemaDir, 'components');
 const typesDir = resolve(__dirname_test, '../src/types');
 
-/** Parse top-level interface property names from a TypeScript source string. */
+/** Parse top-level interface property names from a TypeScript source string.
+ *  Also follows `extends BaseInterface` to collect inherited properties. */
 function parseInterfaceProps(source: string, interfaceName: string): string[] {
-  const regex = new RegExp(`export interface ${interfaceName}\\s*\\{`);
+  // Match interface with optional extends clause
+  const regex = new RegExp(`export interface ${interfaceName}\\s+(?:extends\\s+(\\w+)\\s*)?\\{`);
   const match = regex.exec(source);
   if (!match) return [];
 
+  const parentName = match[1]; // e.g. 'LlmBaseOptions' or undefined
   const start = match.index + match[0].length;
   const props: string[] = [];
   let depth = 0; // 0 = inside the top-level interface body
@@ -44,6 +47,11 @@ function parseInterfaceProps(source: string, interfaceName: string): string[] {
     if (depth < 0) break;
   }
 
+  // Recurse into parent interface if present
+  if (parentName) {
+    props.push(...parseInterfaceProps(source, parentName));
+  }
+
   return props;
 }
 
@@ -63,6 +71,14 @@ function schemaNameToInterface(schemaBaseName: string, isVerb: boolean): string 
 
   if (mapping[schemaBaseName]) return mapping[schemaBaseName];
 
+  // Handle underscore-separated names (e.g. openai_s2s -> OpenaiS2sVerb)
+  if (schemaBaseName.includes('_')) {
+    return schemaBaseName
+      .split('_')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('') + 'Verb';
+  }
+
   // Regular verb: capitalize + append "Verb"
   return schemaBaseName.charAt(0).toUpperCase() + schemaBaseName.slice(1) + 'Verb';
 }
@@ -80,13 +96,30 @@ describe('Schema drift detection', () => {
 
       it(`${schemaName} schema properties match ${interfaceName}`, () => {
         const schema = JSON.parse(readFileSync(resolve(verbsDir, file), 'utf-8'));
-        const schemaProps = Object.keys(schema.properties || {}).sort();
+        const schemaProps = [...Object.keys(schema.properties || {})];
+
+        // Resolve allOf $ref to collect inherited properties
+        if (schema.allOf) {
+          for (const entry of schema.allOf) {
+            if (entry.$ref) {
+              const refPath = resolve(verbsDir, entry.$ref + '.schema.json');
+              const refSchema = JSON.parse(readFileSync(refPath, 'utf-8'));
+              schemaProps.push(...Object.keys(refSchema.properties || {}));
+            }
+            if (entry.properties) {
+              schemaProps.push(...Object.keys(entry.properties));
+            }
+          }
+        }
+
+        // Deduplicate (e.g. 'vendor' may appear in both allOf base and local properties)
+        const uniqueSchemaProps = [...new Set(schemaProps)].sort();
         const tsProps = parseInterfaceProps(verbsSource, interfaceName).sort();
 
         // Every schema property should exist in the TypeScript interface
-        const missingInTs = schemaProps.filter((p) => !tsProps.includes(p));
+        const missingInTs = uniqueSchemaProps.filter((p) => !tsProps.includes(p));
         // Every TS property should exist in the schema (except inherited ones)
-        const extraInTs = tsProps.filter((p) => !schemaProps.includes(p));
+        const extraInTs = tsProps.filter((p) => !uniqueSchemaProps.includes(p));
 
         expect(
           missingInTs,

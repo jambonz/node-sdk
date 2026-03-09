@@ -9,6 +9,7 @@ import type {
   ConferenceVerb,
   ConfigVerb,
   DequeueVerb,
+  DialogflowVerb,
   DialVerb,
   DtmfVerb,
   DubVerb,
@@ -17,12 +18,14 @@ import type {
   HangupVerb,
   LeaveVerb,
   ListenVerb,
+  LlmBaseOptions,
   LlmVerb,
   MessageVerb,
   PauseVerb,
   PipelineVerb,
   PlayVerb,
   RedirectVerb,
+  S2sVerb,
   SayVerb,
   SipDeclineVerb,
   SipReferVerb,
@@ -82,6 +85,41 @@ export class VerbBuilder {
   /** Connect the caller to an LLM for real-time voice conversation. */
   llm(opts: Omit<LlmVerb, 'verb'>): this {
     return this.addVerb({ verb: 'llm', ...opts });
+  }
+
+  /** Synonym for {@link llm}. Requires vendor to be specified. */
+  s2s(opts: Omit<S2sVerb, 'verb'>): this {
+    return this.addVerb({ verb: 's2s', ...opts });
+  }
+
+  /** Shortcut for s2s with vendor='openai'. */
+  openai_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'openai_s2s', ...opts });
+  }
+
+  /** Shortcut for s2s with vendor='google'. */
+  google_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'google_s2s', ...opts });
+  }
+
+  /** Shortcut for s2s with vendor='elevenlabs'. */
+  elevenlabs_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'elevenlabs_s2s', ...opts });
+  }
+
+  /** Shortcut for s2s with vendor='deepgram'. */
+  deepgram_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'deepgram_s2s', ...opts });
+  }
+
+  /** Shortcut for s2s with vendor='ultravox'. */
+  ultravox_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'ultravox_s2s', ...opts });
+  }
+
+  /** Connect the caller to a Google Dialogflow agent (ES, CX, or CES). */
+  dialogflow(opts: Omit<DialogflowVerb, 'verb'>): this {
+    return this.addVerb({ verb: 'dialogflow', ...opts });
   }
 
   /** Voice AI pipeline with integrated turn detection. */

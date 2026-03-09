@@ -1,8 +1,19 @@
 import http from 'http';
-import { createEndpoint, type Session } from '@jambonz/sdk/websocket';
+import { createEndpoint } from '@jambonz/sdk/websocket';
 
 const server = http.createServer();
-const makeService = createEndpoint({ server, port: 3000 });
+const makeService = createEndpoint({
+  server,
+  port: 3000,
+  envVars: {
+    OPENAI_API_KEY: {
+      type: 'string',
+      description: 'OpenAI API key',
+      required: true,
+      obscure: true,
+    },
+  },
+});
 
 const svc = makeService({ path: '/' });
 
@@ -14,6 +25,9 @@ If the customer wants to speak to a human, use the transferToAgent function.`;
 
 svc.on('session:new', (session) => {
   console.log(`Incoming call: ${session.callSid}`);
+
+  const apiKey = session.data.env_vars?.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('Set OPENAI_API_KEY in your jambonz application environment variables');
 
   session
     .config({
@@ -33,10 +47,9 @@ svc.on('session:new', (session) => {
         startDelaySecs: 2,
       },
     })
-    .llm({
-      vendor: 'openai',
+    .openai_s2s({
       model: 'gpt-4o',
-      auth: { apiKey: process.env.OPENAI_API_KEY! },
+      auth: { apiKey },
       llmOptions: {
         messages: [{ role: 'system', content: SYSTEM_PROMPT }],
         temperature: 0.7,

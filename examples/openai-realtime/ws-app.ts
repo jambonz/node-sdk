@@ -2,15 +2,31 @@ import http from 'http';
 import { createEndpoint } from '@jambonz/sdk/websocket';
 
 const server = http.createServer();
-const makeService = createEndpoint({ server, port: 3000 });
+const makeService = createEndpoint({
+  server,
+  port: 3000,
+  envVars: {
+    OPENAI_API_KEY: {
+      type: 'string',
+      description: 'OpenAI API key for Realtime',
+      required: true,
+      obscure: true,
+    },
+  },
+});
 
 const svc = makeService({ path: '/openai-s2s' });
 
 svc.on('session:new', (session) => {
   console.log(`Incoming call: ${session.callSid}`);
+  console.log('  from: %s to: %s', session.data.from, session.data.to);
+  console.log('  env_vars:', JSON.stringify(session.data.env_vars || {}));
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error('OPENAI_API_KEY env variable is required');
+  const apiKey = session.data.env_vars?.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.error('ERROR: OPENAI_API_KEY not found in application environment variables');
+    return;
+  }
 
   session
     .on('/event', (_evt: Record<string, any>) => {
@@ -22,7 +38,7 @@ svc.on('session:new', (session) => {
       if (name === 'get_weather') {
         try {
           const geoRes = await fetch(
-            `https://geocoding-api.open-meteo.com/v1/search?name=${args.location}&count=1&language=en&format=json`
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(args.location)}&count=1&language=en&format=json`
           );
           const geoData = await geoRes.json() as any;
           if (!geoData.results?.length) throw new Error('location_not_found');
@@ -35,10 +51,13 @@ svc.on('session:new', (session) => {
 
           session.sendToolOutput(tool_call_id, {
             type: 'conversation.item.create',
-            item: { type: 'function_call_output', call_id: tool_call_id, output: weather },
+            item: { type: 'function_call_output', call_id: tool_call_id, output: JSON.stringify(weather) },
           });
         } catch (err) {
-          session.sendToolOutput(tool_call_id, { error: String(err) });
+          session.sendToolOutput(tool_call_id, {
+            type: 'conversation.item.create',
+            item: { type: 'function_call_output', call_id: tool_call_id, output: JSON.stringify({ error: String(err) }) },
+          });
         }
       }
     })
@@ -58,8 +77,7 @@ svc.on('session:new', (session) => {
   session
     .answer()
     .pause({ length: 1 })
-    .llm({
-      vendor: 'openai',
+    .openai_s2s({
       model: 'gpt-4o-realtime-preview-2024-12-17',
       auth: { apiKey },
       actionHook: '/final',

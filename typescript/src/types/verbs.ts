@@ -106,11 +106,17 @@ export interface GatherVerb {
 // AI & Real-time
 // ---------------------------------------------------------------------------
 
-export interface LlmVerb {
-  verb: 'llm';
+export interface McpServerConfig {
+  url: string;
+  auth?: Record<string, unknown>;
+  roots?: Record<string, unknown>[];
+}
+
+/** Shared properties for llm, s2s, and vendor-specific s2s verbs. */
+export interface LlmBaseOptions {
   id?: string;
   /** LLM vendor. */
-  vendor: string;
+  vendor?: string;
   /** Model name. */
   model?: string;
   /** LLM vendor authentication. */
@@ -131,10 +137,82 @@ export interface LlmVerb {
   events?: string[];
 }
 
-export interface McpServerConfig {
-  url: string;
-  auth?: Record<string, unknown>;
-  roots?: Record<string, unknown>[];
+export interface LlmVerb extends LlmBaseOptions {
+  verb: 'llm';
+  vendor: string;
+}
+
+export interface S2sVerb extends LlmBaseOptions {
+  verb: 's2s';
+  vendor: string;
+}
+
+export interface OpenaiS2sVerb extends LlmBaseOptions {
+  verb: 'openai_s2s';
+}
+
+export interface GoogleS2sVerb extends LlmBaseOptions {
+  verb: 'google_s2s';
+}
+
+export interface ElevenlabsS2sVerb extends LlmBaseOptions {
+  verb: 'elevenlabs_s2s';
+}
+
+export interface DeepgramS2sVerb extends LlmBaseOptions {
+  verb: 'deepgram_s2s';
+}
+
+export interface UltravoxS2sVerb extends LlmBaseOptions {
+  verb: 'ultravox_s2s';
+}
+
+export interface DialogflowVerb {
+  verb: 'dialogflow';
+  id?: string;
+  /** Google service account credentials as JSON object or stringified JSON. */
+  credentials: Record<string, unknown> | string;
+  /** Google Cloud project ID. */
+  project: string;
+  /** Dialogflow agent ID. Required for CX agents. */
+  agent?: string;
+  /** Dialogflow environment. */
+  environment?: string;
+  /** Google Cloud region for the API endpoint. */
+  region?: string;
+  /** Dialogflow model type. */
+  model?: 'es' | 'cx' | 'ces';
+  /** Language code (e.g. 'en-US'). */
+  lang: string;
+  /** Webhook when session ends. */
+  actionHook?: ActionHook;
+  /** Webhook for Dialogflow events. */
+  eventHook?: ActionHook;
+  /** Event types to receive via eventHook. */
+  events?: string[];
+  /** Event to trigger at conversation start. */
+  welcomeEvent?: string;
+  /** Parameters for the welcome event. */
+  welcomeEventParams?: Record<string, unknown>;
+  /** Seconds to wait for input before no-input event. */
+  noInputTimeout?: number;
+  /** Event to trigger on no input. */
+  noInputEvent?: string;
+  /** Pass DTMF digits as text input. */
+  passDtmfAsTextInput?: boolean;
+  /** Audio URL to play while waiting for Dialogflow. */
+  thinkingMusic?: string;
+  /** TTS configuration for responses. */
+  tts?: Synthesizer;
+  /** Allow caller to interrupt responses. */
+  bargein?: boolean;
+  /** Initial query input. */
+  queryInput?: {
+    text?: string;
+    intent?: string;
+    event?: string;
+    dtmf?: string;
+  };
 }
 
 export interface PipelineVerb {
@@ -160,6 +238,8 @@ export interface PipelineVerb {
   actionHook?: ActionHook;
   /** Webhook for pipeline events. */
   eventHook?: ActionHook;
+  /** Webhook when the LLM requests a tool/function call. */
+  toolHook?: ActionHook;
 }
 
 export interface ListenVerb {
@@ -232,6 +312,8 @@ export interface StreamVerb {
   transcribe?: Omit<TranscribeVerb, 'verb'>;
   /** Stream before call is answered. */
   earlyMedia?: boolean;
+  /** Specific audio channel to stream. */
+  channel?: number;
 }
 
 export interface TranscribeVerb {
@@ -608,6 +690,13 @@ export type Verb =
   | ListenVerb
   | StreamVerb
   | LlmVerb
+  | S2sVerb
+  | OpenaiS2sVerb
+  | GoogleS2sVerb
+  | ElevenlabsS2sVerb
+  | DeepgramS2sVerb
+  | UltravoxS2sVerb
+  | DialogflowVerb
   | PipelineVerb
   | ConferenceVerb
   | TranscribeVerb

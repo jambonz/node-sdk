@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/verbs/openai_s2s",
+  "title": "OpenAI S2S",
+  "description": "Shortcut for 'llm' with vendor automatically set to 'openai'. Connects the caller to an OpenAI model for real-time speech-to-speech voice conversation.",
+  "type": "object",
+  "allOf": [{ "$ref": "../components/llm-base" }],
+  "properties": {
+    "verb": { "const": "openai_s2s", "description": "The verb name." },
+    "vendor": { "type": "string", "const": "openai", "description": "The LLM vendor (always 'openai' for this shortcut)." }
+  },
+  "required": ["llmOptions"],
+  "examples": [
+    {
+      "verb": "openai_s2s",
+      "model": "gpt-4o-realtime",
+      "llmOptions": {
+        "messages": [{ "role": "system", "content": "You are a helpful voice assistant." }]
+      },
+      "actionHook": "/s2s-complete"
+    }
+  ]
+}

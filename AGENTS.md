@@ -43,9 +43,11 @@ Individual verb schemas are in `schema/verbs/`. Shared component types (synthesi
 - **gather** — Collect speech (STT) and/or DTMF input. The workhorse for interactive menus and voice input.
 
 ### AI & Real-time
-- **llm** — Connect the caller to an LLM for real-time voice conversation. Handles the full STT→LLM→TTS pipeline.
+- **openai_s2s** / **google_s2s** / **elevenlabs_s2s** / **deepgram_s2s** / **ultravox_s2s** — Connect the caller to a vendor-specific LLM for real-time voice conversation. These are the **preferred** verbs when the vendor is known. Each handles the full STT→LLM→TTS pipeline with the vendor pre-set.
+- **s2s** — Generic LLM voice conversation verb. Use only when the vendor is determined at runtime (e.g. from an env var). Requires `vendor` to be specified.
 - **pipeline** — Higher-level voice AI pipeline with integrated turn detection.
-- **listen** / **stream** — Stream raw audio to a websocket endpoint for custom processing.
+- **dialogflow** — Connect the caller to a Google Dialogflow agent (ES, CX, or CES).
+- **stream** — Stream raw audio to a websocket endpoint for custom processing.
 - **transcribe** — Real-time call transcription sent to a webhook.
 
 ### Call Control
@@ -71,8 +73,17 @@ Individual verb schemas are in `schema/verbs/`. Shared component types (synthesi
 - **answer** — Explicitly answer the call.
 - **leave** — Leave a conference or queue.
 
-### Verb synonyms
-- **listen** and **stream** are synonyms - but use "stream" always when generating application code.
+### Verb Synonyms and Shortcuts
+
+**IMPORTANT — Code generation rules:**
+
+1. **Always use `stream`, never `listen`** — they are synonyms; `stream` is the preferred name.
+2. **Always use the vendor-specific shortcut when the LLM vendor is known** — use `openai_s2s`, `google_s2s`, `elevenlabs_s2s`, `deepgram_s2s`, or `ultravox_s2s`. Do NOT use `llm` or `s2s` with a `vendor` property when a shortcut exists.
+3. **Use `s2s` (not `llm`) when the vendor is dynamic** — e.g. the vendor comes from an env var or runtime config. Both `s2s` and `llm` are synonyms, but prefer `s2s`.
+4. **Never use `llm` in generated code** — it is a legacy name. Use either a vendor shortcut or `s2s`.
+
+The same rules apply to SDK method calls: use `.openai_s2s(opts)`, `.deepgram_s2s(opts)`, etc. instead of `.llm({ vendor: 'openai', ... })`. Use `.stream(opts)` instead of `.listen(opts)`.
+
 ## Using the @jambonz/sdk
 
 **IMPORTANT**: Always use the `@jambonz/sdk` package (version 0.1.x+) to build jambonz applications. The older packages `@jambonz/node-client-ws` and `@jambonz/node-client` are **deprecated and replaced** by `@jambonz/sdk`. Do NOT use those old packages. Do NOT build apps with raw JSON verb arrays and plain Express/WS — use `@jambonz/sdk`.
@@ -252,7 +263,7 @@ console.log('Speech echo WebSocket app listening on port 3000');
 
 Both `WebhookResponse` and `Session` support the same chainable verb methods:
 
-`.say(opts)` `.play(opts)` `.gather(opts)` `.dial(opts)` `.llm(opts)` `.conference(opts)` `.enqueue(opts)` `.dequeue(opts)` `.hangup()` `.pause(opts)` `.redirect(opts)` `.config(opts)` `.tag(opts)` `.dtmf(opts)` `.listen(opts)` `.transcribe(opts)` `.message(opts)` `.stream(opts)` `.pipeline(opts)` `.dub(opts)` `.alert(opts)` `.answer(opts)` `.leave()` `.sipDecline(opts)` `.sipRefer(opts)` `.sipRequest(opts)`
+`.say(opts)` `.play(opts)` `.gather(opts)` `.dial(opts)` `.llm(opts)` `.s2s(opts)` `.openai_s2s(opts)` `.google_s2s(opts)` `.elevenlabs_s2s(opts)` `.deepgram_s2s(opts)` `.ultravox_s2s(opts)` `.dialogflow(opts)` `.conference(opts)` `.enqueue(opts)` `.dequeue(opts)` `.hangup()` `.pause(opts)` `.redirect(opts)` `.config(opts)` `.tag(opts)` `.dtmf(opts)` `.listen(opts)` `.transcribe(opts)` `.message(opts)` `.stream(opts)` `.pipeline(opts)` `.dub(opts)` `.alert(opts)` `.answer(opts)` `.leave()` `.sipDecline(opts)` `.sipRefer(opts)` `.sipRequest(opts)`
 
 All methods accept the same options as the corresponding verb JSON Schema. Methods are chainable — they return `this`.
 
@@ -294,8 +305,7 @@ These are the raw JSON verb arrays that the SDK generates. You should use the SD
     "recognizer": { "vendor": "deepgram", "language": "en-US" }
   },
   {
-    "verb": "llm",
-    "vendor": "openai",
+    "verb": "openai_s2s",
     "model": "gpt-4o",
     "llmOptions": {
       "messages": [{ "role": "system", "content": "You are a helpful assistant." }]

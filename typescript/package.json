@@ -81,7 +81,7 @@
     "schema"
   ],
   "scripts": {
-    "build": "tsup && cp -r ../schema ./schema",
+    "build": "tsup && rm -rf ./schema && cp -r ../schema ./schema",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",

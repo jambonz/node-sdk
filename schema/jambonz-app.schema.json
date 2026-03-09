@@ -21,6 +21,13 @@
         { "$ref": "verbs/listen" },
         { "$ref": "verbs/stream" },
         { "$ref": "verbs/llm" },
+        { "$ref": "verbs/s2s" },
+        { "$ref": "verbs/openai_s2s" },
+        { "$ref": "verbs/google_s2s" },
+        { "$ref": "verbs/elevenlabs_s2s" },
+        { "$ref": "verbs/deepgram_s2s" },
+        { "$ref": "verbs/ultravox_s2s" },
+        { "$ref": "verbs/dialogflow" },
         { "$ref": "verbs/pipeline" },
         { "$ref": "verbs/conference" },
         { "$ref": "verbs/transcribe" },
@@ -89,8 +96,7 @@
         "recognizer": { "vendor": "deepgram", "language": "en-US" }
       },
       {
-        "verb": "llm",
-        "vendor": "openai",
+        "verb": "openai_s2s",
         "model": "gpt-4o",
         "llmOptions": {
           "messages": [

@@ -112,8 +112,22 @@ export class Session extends EventEmitter {
   play(opts: Parameters<VerbBuilder['play']>[0]): this { this.builder.play(opts); return this; }
   /** Collect speech (STT) and/or DTMF input from the caller. */
   gather(opts: Parameters<VerbBuilder['gather']>[0]): this { this.builder.gather(opts); return this; }
-  /** Connect the caller to an LLM for real-time voice conversation. */
+  /** Connect the caller to an LLM for real-time voice conversation (deprecated — use vendor shortcuts). */
   llm(opts: Parameters<VerbBuilder['llm']>[0]): this { this.builder.llm(opts); return this; }
+  /** Connect the caller to a speech-to-speech LLM. */
+  s2s(opts: Parameters<VerbBuilder['s2s']>[0]): this { this.builder.s2s(opts); return this; }
+  /** Shortcut for s2s with vendor='openai'. */
+  openai_s2s(opts: Parameters<VerbBuilder['openai_s2s']>[0]): this { this.builder.openai_s2s(opts); return this; }
+  /** Shortcut for s2s with vendor='google'. */
+  google_s2s(opts: Parameters<VerbBuilder['google_s2s']>[0]): this { this.builder.google_s2s(opts); return this; }
+  /** Shortcut for s2s with vendor='elevenlabs'. */
+  elevenlabs_s2s(opts: Parameters<VerbBuilder['elevenlabs_s2s']>[0]): this { this.builder.elevenlabs_s2s(opts); return this; }
+  /** Shortcut for s2s with vendor='deepgram'. */
+  deepgram_s2s(opts: Parameters<VerbBuilder['deepgram_s2s']>[0]): this { this.builder.deepgram_s2s(opts); return this; }
+  /** Shortcut for s2s with vendor='ultravox'. */
+  ultravox_s2s(opts: Parameters<VerbBuilder['ultravox_s2s']>[0]): this { this.builder.ultravox_s2s(opts); return this; }
+  /** Connect the caller to a Google Dialogflow agent. */
+  dialogflow(opts: Parameters<VerbBuilder['dialogflow']>[0]): this { this.builder.dialogflow(opts); return this; }
   /** Voice AI pipeline with integrated turn detection. */
   pipeline(opts: Parameters<VerbBuilder['pipeline']>[0]): this { this.builder.pipeline(opts); return this; }
   /** Stream real-time call audio to a WebSocket endpoint. Supports bidirectional audio. */
@@ -294,10 +308,12 @@ export class Session extends EventEmitter {
 
   /** Send tool output to an active LLM conversation. */
   sendToolOutput(toolCallId: string, data: unknown): void {
+    const payload = typeof data === 'object' && data !== null ? data : { result: data };
     this.wsSend({
       type: 'command',
-      command: 'llm:tool-result',
-      data: { tool_call_id: toolCallId, ...((typeof data === 'object' && data !== null ? data : { result: data })) },
+      command: 'llm:tool-output',
+      tool_call_id: toolCallId,
+      data: payload,
     });
   }
 

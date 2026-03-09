@@ -31,8 +31,7 @@ app.post('/incoming', (_req, res) => {
         startDelaySecs: 2,
       },
     })
-    .llm({
-      vendor: 'openai',
+    .openai_s2s({
       model: 'gpt-4o',
       auth: { apiKey: process.env.OPENAI_API_KEY! },
       llmOptions: {

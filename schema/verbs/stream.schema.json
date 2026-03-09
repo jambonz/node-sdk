@@ -21,7 +21,8 @@
     "bidirectionalAudio": { "$ref": "../components/bidirectionalAudio", "description": "Bidirectional audio configuration." },
     "timeout": { "type": "number", "description": "Inactivity timeout in seconds." },
     "transcribe": { "$ref": "transcribe", "description": "Nested transcribe verb — enables simultaneous real-time transcription of the streamed audio." },
-    "earlyMedia": { "type": "boolean", "description": "Stream audio before the call is answered." }
+    "earlyMedia": { "type": "boolean", "description": "Stream audio before the call is answered." },
+    "channel": { "type": "number", "description": "Specific audio channel to stream. Used when streaming a single channel of a multi-channel call." }
   },
   "required": ["url"],
   "examples": [
