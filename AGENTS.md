@@ -29,6 +29,8 @@ The verb schemas and JSON structure are identical in both modes. The difference 
 - **Webhook**: Simple IVR, call routing, voicemail, basic gather-and-respond patterns.
 - **WebSocket**: LLM-powered voice agents, real-time audio streaming, complex conversational flows, anything requiring bidirectional communication, or asynchronous logic, or streaming tts.
 
+**IMPORTANT**: Any application that uses a speech-to-speech verb (`openai_s2s`, `google_s2s`, `deepgram_s2s`, `ultravox_s2s`, `elevenlabs_s2s`, `s2s`, or `pipeline`) MUST use WebSocket transport, not webhooks. These verbs require persistent bidirectional communication for real-time audio and events. Always use `createEndpoint` from `@jambonz/sdk/websocket` for s2s applications.
+
 ## Schema
 
 The complete verb schema is at `schema/jambonz-app.schema.json`. This is a JSON Schema (draft 2020-12) that defines the structure of a jambonz application.
