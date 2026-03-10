@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/gather",
+  "minVersion": "0.9.6",
   "title": "Gather",
   "description": "Collects user input via speech (STT) and/or DTMF digits. Optionally plays a prompt (using nested 'say' or 'play') while listening. When input is received, the result is sent to the actionHook which should return the next set of verbs. This is the primary verb for building interactive voice menus and conversational flows.",
   "type": "object",
@@ -21,16 +22,35 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["speech", "digits"]
+        "enum": [
+          "speech",
+          "digits"
+        ]
       },
       "description": "The types of input to accept. Can include 'speech' (STT), 'digits' (DTMF), or both.",
-      "default": ["digits"],
-      "examples": [["speech", "digits"], ["speech"], ["digits"]]
+      "default": [
+        "digits"
+      ],
+      "examples": [
+        [
+          "speech",
+          "digits"
+        ],
+        [
+          "speech"
+        ],
+        [
+          "digits"
+        ]
+      ]
     },
     "finishOnKey": {
       "type": "string",
       "description": "A DTMF key that signals the end of digit input. The key itself is not included in the collected digits.",
-      "examples": ["#", "*"]
+      "examples": [
+        "#",
+        "*"
+      ]
     },
     "numDigits": {
       "type": "number",
@@ -47,17 +67,25 @@
     "interDigitTimeout": {
       "type": "number",
       "description": "Time in seconds to wait between DTMF digits before considering input complete.",
-      "examples": [5]
+      "examples": [
+        5
+      ]
     },
     "speechTimeout": {
       "type": "number",
       "description": "Time in seconds of silence after speech before considering the utterance complete.",
-      "examples": [2, 3]
+      "examples": [
+        2,
+        3
+      ]
     },
     "timeout": {
       "type": "number",
       "description": "Overall timeout in seconds. If no input is received within this time, the gather completes with no input and the actionHook is invoked.",
-      "examples": [10, 30]
+      "examples": [
+        10,
+        30
+      ]
     },
     "partialResultHook": {
       "$ref": "../components/actionHook",
@@ -79,7 +107,10 @@
     "minBargeinWordCount": {
       "type": "number",
       "description": "Minimum number of words that must be recognized before barge-in is triggered. Prevents brief noises from interrupting prompts.",
-      "examples": [1, 2]
+      "examples": [
+        1,
+        2
+      ]
     },
     "recognizer": {
       "$ref": "../components/recognizer",
@@ -105,7 +136,10 @@
   "examples": [
     {
       "verb": "gather",
-      "input": ["speech", "digits"],
+      "input": [
+        "speech",
+        "digits"
+      ],
       "actionHook": "/gather-result",
       "timeout": 15,
       "say": {
@@ -114,7 +148,9 @@
     },
     {
       "verb": "gather",
-      "input": ["digits"],
+      "input": [
+        "digits"
+      ],
       "actionHook": "/menu-selection",
       "numDigits": 1,
       "say": {
@@ -123,14 +159,21 @@
     },
     {
       "verb": "gather",
-      "input": ["speech"],
+      "input": [
+        "speech"
+      ],
       "actionHook": "/process-speech",
       "timeout": 20,
       "bargein": true,
       "recognizer": {
         "vendor": "deepgram",
         "language": "en-US",
-        "hints": ["account", "balance", "transfer", "payment"]
+        "hints": [
+          "account",
+          "balance",
+          "transfer",
+          "payment"
+        ]
       },
       "say": {
         "text": "How can I help you today?"

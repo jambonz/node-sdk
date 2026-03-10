@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/dial",
+  "minVersion": "0.9.6",
   "title": "Dial",
   "description": "Initiates an outbound call to one or more targets and bridges the caller to the first target that answers. Targets can be phone numbers (PSTN), SIP endpoints, registered users, or Microsoft Teams users. Supports simultaneous ringing, call screening, recording, and DTMF capture during the bridged call.",
   "type": "object",
@@ -15,7 +16,9 @@
     },
     "target": {
       "type": "array",
-      "items": { "$ref": "../components/target" },
+      "items": {
+        "$ref": "../components/target"
+      },
       "description": "One or more call targets to dial. If multiple targets are specified, they are rung simultaneously and the first to answer is connected. The rest are canceled.",
       "minItems": 1
     },
@@ -34,7 +37,9 @@
     "callerId": {
       "type": "string",
       "description": "The caller ID (phone number) to present on the outbound call. Overrides the default caller ID.",
-      "examples": ["+15085551212"]
+      "examples": [
+        "+15085551212"
+      ]
     },
     "callerName": {
       "type": "string",
@@ -65,7 +70,9 @@
     "headers": {
       "type": "object",
       "description": "Custom SIP headers to include on the outbound INVITE.",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "anchorMedia": {
       "type": "boolean",
@@ -77,11 +84,18 @@
     },
     "boostAudioSignal": {
       "oneOf": [
-        { "type": "number" },
-        { "type": "string" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Boost (or attenuate) the audio signal in dB. Positive values increase volume, negative values decrease it.",
-      "examples": [6, -3]
+      "examples": [
+        6,
+        -3
+      ]
     },
     "listen": {
       "$ref": "listen",
@@ -98,17 +112,24 @@
     "timeLimit": {
       "type": "number",
       "description": "Maximum duration in seconds for the bridged call. The call is automatically hung up when this limit is reached.",
-      "examples": [3600]
+      "examples": [
+        3600
+      ]
     },
     "timeout": {
       "type": "number",
       "description": "Time in seconds to wait for the target to answer before giving up.",
-      "examples": [30, 60]
+      "examples": [
+        30,
+        60
+      ]
     },
     "proxy": {
       "type": "string",
       "description": "A SIP proxy to route the outbound call through.",
-      "examples": ["sip:proxy.example.com"]
+      "examples": [
+        "sip:proxy.example.com"
+      ]
     },
     "amd": {
       "$ref": "../components/amd",
@@ -116,7 +137,9 @@
     },
     "dub": {
       "type": "array",
-      "items": { "$ref": "dub" },
+      "items": {
+        "$ref": "dub"
+      },
       "description": "Nested dub verbs — audio dubbing configuration for mixing additional audio tracks into the bridged call."
     },
     "tag": {
@@ -129,12 +152,17 @@
       "description": "If true, forward the P-Asserted-Identity header from the inbound call to the outbound call."
     }
   },
-  "required": ["target"],
+  "required": [
+    "target"
+  ],
   "examples": [
     {
       "verb": "dial",
       "target": [
-        { "type": "phone", "number": "+15085551212" }
+        {
+          "type": "phone",
+          "number": "+15085551212"
+        }
       ],
       "answerOnBridge": true,
       "timeout": 30,
@@ -143,8 +171,14 @@
     {
       "verb": "dial",
       "target": [
-        { "type": "sip", "sipUri": "sip:alice@example.com" },
-        { "type": "sip", "sipUri": "sip:bob@example.com" }
+        {
+          "type": "sip",
+          "sipUri": "sip:alice@example.com"
+        },
+        {
+          "type": "sip",
+          "sipUri": "sip:bob@example.com"
+        }
       ],
       "confirmHook": "/screen-call",
       "timeLimit": 3600

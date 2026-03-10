@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/say",
+  "minVersion": "0.9.6",
   "title": "Say",
   "description": "Speaks text to the caller using text-to-speech. The text can be plain text or SSML. Optionally streams TTS output incrementally for lower latency. This is one of the most commonly used verbs in jambonz applications.",
   "type": "object",
@@ -15,23 +16,34 @@
     },
     "text": {
       "oneOf": [
-        { "type": "string" },
+        {
+          "type": "string"
+        },
         {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         }
       ],
       "description": "The text to speak. Can be plain text or SSML markup. If an array is provided, one entry is selected at random (useful for variety in prompts).",
       "examples": [
         "Hello, welcome to our service.",
         "<speak>Hello <break time='500ms'/> welcome.</speak>",
-        ["Hello!", "Hi there!", "Welcome!"]
+        [
+          "Hello!",
+          "Hi there!",
+          "Welcome!"
+        ]
       ]
     },
     "instructions": {
       "type": "string",
       "description": "Natural language instructions to guide TTS expression and delivery. Supported by vendors that offer instruction-based synthesis (e.g. ElevenLabs, some OpenAI models).",
-      "examples": ["Speak in a warm, friendly tone", "Sound excited and energetic"]
+      "examples": [
+        "Speak in a warm, friendly tone",
+        "Sound excited and energetic"
+      ]
     },
     "stream": {
       "type": "boolean",
@@ -39,11 +51,18 @@
     },
     "loop": {
       "oneOf": [
-        { "type": "number" },
-        { "type": "string" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Number of times to repeat the speech. Use 0 or 'forever' to loop indefinitely until interrupted.",
-      "examples": [2, "forever"]
+      "examples": [
+        2,
+        "forever"
+      ]
     },
     "synthesizer": {
       "$ref": "../components/synthesizer",
@@ -77,7 +96,11 @@
     },
     {
       "verb": "say",
-      "text": ["Hello!", "Hi there!", "Welcome!"],
+      "text": [
+        "Hello!",
+        "Hi there!",
+        "Welcome!"
+      ],
       "loop": 1
     }
   ]

@@ -1,12 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/redirect",
+  "minVersion": "0.9.6",
   "title": "Redirect",
   "description": "Transfers call control to a different webhook URL. The current verb stack is abandoned and the new webhook's response becomes the active application. Useful for modular application design where different URLs handle different phases of a call.",
   "type": "object",
   "properties": {
-    "verb": { "const": "redirect" },
-    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "verb": {
+      "const": "redirect"
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
     "actionHook": {
       "$ref": "../components/actionHook",
       "description": "The webhook to transfer control to. Must return a new array of verbs."
@@ -16,8 +22,13 @@
       "description": "A webhook to receive call status events after the redirect."
     }
   },
-  "required": ["actionHook"],
+  "required": [
+    "actionHook"
+  ],
   "examples": [
-    { "verb": "redirect", "actionHook": "/new-handler" }
+    {
+      "verb": "redirect",
+      "actionHook": "/new-handler"
+    }
   ]
 }

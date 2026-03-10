@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/dialogflow",
+  "minVersion": "0.9.6",
   "title": "Dialogflow",
   "description": "Connects the caller to a Google Dialogflow agent for a voice conversation. Supports Dialogflow ES, CX, and CES models. The caller speaks and Dialogflow handles intent detection and response generation.",
   "type": "object",
@@ -15,8 +16,13 @@
     },
     "credentials": {
       "oneOf": [
-        { "type": "object", "additionalProperties": true },
-        { "type": "string" }
+        {
+          "type": "object",
+          "additionalProperties": true
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Google service account credentials as a JSON object or stringified JSON."
     },
@@ -38,7 +44,11 @@
     },
     "model": {
       "type": "string",
-      "enum": ["es", "cx", "ces"],
+      "enum": [
+        "es",
+        "cx",
+        "ces"
+      ],
       "description": "The Dialogflow model type: 'es' for Dialogflow ES, 'cx' for Dialogflow CX, 'ces' for Dialogflow CES."
     },
     "lang": {
@@ -55,7 +65,9 @@
     },
     "events": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "List of event types to receive via the eventHook."
     },
     "welcomeEvent": {
@@ -95,15 +107,31 @@
       "type": "object",
       "description": "Initial query input to send to Dialogflow.",
       "properties": {
-        "text": { "type": "string", "description": "Text input." },
-        "intent": { "type": "string", "description": "Intent to trigger." },
-        "event": { "type": "string", "description": "Event to trigger." },
-        "dtmf": { "type": "string", "description": "DTMF input." }
+        "text": {
+          "type": "string",
+          "description": "Text input."
+        },
+        "intent": {
+          "type": "string",
+          "description": "Intent to trigger."
+        },
+        "event": {
+          "type": "string",
+          "description": "Event to trigger."
+        },
+        "dtmf": {
+          "type": "string",
+          "description": "DTMF input."
+        }
       },
       "additionalProperties": false
     }
   },
-  "required": ["project", "credentials", "lang"],
+  "required": [
+    "project",
+    "credentials",
+    "lang"
+  ],
   "examples": [
     {
       "verb": "dialogflow",

@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/play",
+  "minVersion": "0.9.6",
   "title": "Play",
   "description": "Plays an audio file to the caller. Supports WAV and MP3 formats hosted at a URL. Can play a single file or cycle through a list of files.",
   "type": "object",
@@ -15,25 +16,41 @@
     },
     "url": {
       "oneOf": [
-        { "type": "string", "format": "uri" },
+        {
+          "type": "string",
+          "format": "uri"
+        },
         {
           "type": "array",
-          "items": { "type": "string", "format": "uri" }
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       ],
       "description": "The URL(s) of the audio file(s) to play. Supports WAV and MP3. If an array, files are played in sequence.",
       "examples": [
         "https://example.com/sounds/greeting.wav",
-        ["https://example.com/sounds/part1.wav", "https://example.com/sounds/part2.wav"]
+        [
+          "https://example.com/sounds/part1.wav",
+          "https://example.com/sounds/part2.wav"
+        ]
       ]
     },
     "loop": {
       "oneOf": [
-        { "type": "number" },
-        { "type": "string" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Number of times to repeat playback. Use 0 or 'forever' to loop indefinitely until interrupted.",
-      "examples": [3, "forever"]
+      "examples": [
+        3,
+        "forever"
+      ]
     },
     "earlyMedia": {
       "type": "boolean",
@@ -41,15 +58,23 @@
     },
     "seekOffset": {
       "oneOf": [
-        { "type": "number" },
-        { "type": "string" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Start playback at this offset in seconds from the beginning of the file."
     },
     "timeoutSecs": {
       "oneOf": [
-        { "type": "number" },
-        { "type": "string" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Maximum time in seconds to play the audio. Playback stops after this duration even if the file has not finished."
     },
@@ -58,7 +83,9 @@
       "description": "A webhook to invoke when playback completes."
     }
   },
-  "required": ["url"],
+  "required": [
+    "url"
+  ],
   "examples": [
     {
       "verb": "play",

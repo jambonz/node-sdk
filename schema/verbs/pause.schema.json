@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/pause",
+  "minVersion": "0.9.6",
   "title": "Pause",
   "description": "Pauses execution for a specified number of seconds. The caller hears silence during the pause. Useful for adding delays between verbs.",
   "type": "object",
@@ -16,11 +17,20 @@
     "length": {
       "type": "number",
       "description": "The duration of the pause in seconds.",
-      "examples": [1, 2, 5]
+      "examples": [
+        1,
+        2,
+        5
+      ]
     }
   },
-  "required": ["length"],
+  "required": [
+    "length"
+  ],
   "examples": [
-    { "verb": "pause", "length": 2 }
+    {
+      "verb": "pause",
+      "length": 2
+    }
   ]
 }

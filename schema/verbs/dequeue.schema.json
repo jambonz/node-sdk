@@ -1,16 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/dequeue",
+  "minVersion": "0.9.6",
   "title": "Dequeue",
   "description": "Removes a caller from a named queue and bridges them to the current call. Typically used by an agent or operator call flow to connect with the next waiting caller.",
   "type": "object",
   "properties": {
-    "verb": { "const": "dequeue" },
-    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "verb": {
+      "const": "dequeue"
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
     "name": {
       "type": "string",
       "description": "The name of the queue to dequeue from.",
-      "examples": ["support", "sales"]
+      "examples": [
+        "support",
+        "sales"
+      ]
     },
     "actionHook": {
       "$ref": "../components/actionHook",
@@ -29,8 +38,14 @@
       "description": "Dequeue a specific call by its call SID, rather than the next caller in line."
     }
   },
-  "required": ["name"],
+  "required": [
+    "name"
+  ],
   "examples": [
-    { "verb": "dequeue", "name": "support", "beep": true }
+    {
+      "verb": "dequeue",
+      "name": "support",
+      "beep": true
+    }
   ]
 }

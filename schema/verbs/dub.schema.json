@@ -1,21 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/dub",
+  "minVersion": "0.9.6",
   "title": "Dub",
   "description": "Manages audio dubbing tracks on a call. Allows adding, removing, and controlling auxiliary audio tracks that are mixed into the call audio. Used for background music, coaching whispers, or injecting audio from external sources.",
   "type": "object",
   "properties": {
-    "verb": { "const": "dub" },
-    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "verb": {
+      "const": "dub"
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
     "action": {
       "type": "string",
       "description": "The dubbing action to perform.",
-      "enum": ["addTrack", "removeTrack", "silenceTrack", "playOnTrack", "sayOnTrack"]
+      "enum": [
+        "addTrack",
+        "removeTrack",
+        "silenceTrack",
+        "playOnTrack",
+        "sayOnTrack"
+      ]
     },
     "track": {
       "type": "string",
       "description": "The name of the audio track. Used to reference the track in subsequent dub actions.",
-      "examples": ["background-music", "coach-whisper"]
+      "examples": [
+        "background-music",
+        "coach-whisper"
+      ]
     },
     "play": {
       "type": "string",
@@ -24,8 +39,13 @@
     },
     "say": {
       "oneOf": [
-        { "type": "string" },
-        { "type": "object", "additionalProperties": true }
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "additionalProperties": true
+        }
       ],
       "description": "Text to synthesize and play on the track. Used with 'sayOnTrack' action. Can be a string or a say configuration object."
     },
@@ -35,18 +55,49 @@
     },
     "gain": {
       "oneOf": [
-        { "type": "number" },
-        { "type": "string" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
       ],
       "description": "Audio gain for the track in dB. Use negative values to reduce volume.",
-      "examples": [-10, 0, 6]
+      "examples": [
+        -10,
+        0,
+        6
+      ]
     }
   },
-  "required": ["action", "track"],
+  "required": [
+    "action",
+    "track"
+  ],
   "examples": [
-    { "verb": "dub", "action": "addTrack", "track": "bgm" },
-    { "verb": "dub", "action": "playOnTrack", "track": "bgm", "play": "https://example.com/music.mp3", "loop": true, "gain": -15 },
-    { "verb": "dub", "action": "sayOnTrack", "track": "coach", "say": "Ask about their budget" },
-    { "verb": "dub", "action": "removeTrack", "track": "bgm" }
+    {
+      "verb": "dub",
+      "action": "addTrack",
+      "track": "bgm"
+    },
+    {
+      "verb": "dub",
+      "action": "playOnTrack",
+      "track": "bgm",
+      "play": "https://example.com/music.mp3",
+      "loop": true,
+      "gain": -15
+    },
+    {
+      "verb": "dub",
+      "action": "sayOnTrack",
+      "track": "coach",
+      "say": "Ask about their budget"
+    },
+    {
+      "verb": "dub",
+      "action": "removeTrack",
+      "track": "bgm"
+    }
   ]
 }

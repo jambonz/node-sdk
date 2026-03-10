@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/hangup",
+  "minVersion": "0.9.6",
   "title": "Hangup",
   "description": "Terminates the call. Optionally includes custom SIP headers on the BYE request.",
   "type": "object",
@@ -16,14 +17,20 @@
     "headers": {
       "type": "object",
       "description": "Custom SIP headers to include on the BYE request.",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   },
   "examples": [
-    { "verb": "hangup" },
+    {
+      "verb": "hangup"
+    },
     {
       "verb": "hangup",
-      "headers": { "X-Reason": "call-complete" }
+      "headers": {
+        "X-Reason": "call-complete"
+      }
     }
   ]
 }

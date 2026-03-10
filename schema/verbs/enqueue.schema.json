@@ -1,16 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/enqueue",
+  "minVersion": "0.9.6",
   "title": "Enqueue",
   "description": "Places the caller into a named call queue. While in the queue, the caller hears content returned by the waitHook (typically hold music or position announcements). The caller remains in the queue until dequeued by another call or process.",
   "type": "object",
   "properties": {
-    "verb": { "const": "enqueue" },
-    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "verb": {
+      "const": "enqueue"
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
     "name": {
       "type": "string",
       "description": "The name of the queue to place the caller in. Queues are created implicitly when first referenced.",
-      "examples": ["support", "sales"]
+      "examples": [
+        "support",
+        "sales"
+      ]
     },
     "actionHook": {
       "$ref": "../components/actionHook",
@@ -23,10 +32,16 @@
     "priority": {
       "type": "number",
       "description": "The priority of this caller in the queue. Lower numbers are higher priority and are dequeued first.",
-      "examples": [1, 5, 10]
+      "examples": [
+        1,
+        5,
+        10
+      ]
     }
   },
-  "required": ["name"],
+  "required": [
+    "name"
+  ],
   "examples": [
     {
       "verb": "enqueue",

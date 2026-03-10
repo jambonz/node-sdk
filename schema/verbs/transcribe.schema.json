@@ -1,12 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/verbs/transcribe",
+  "minVersion": "0.9.6",
   "title": "Transcribe",
   "description": "Enables real-time transcription of the call audio. Transcription results are sent to the transcriptionHook as they are produced. Runs as a background process — subsequent verbs execute immediately while transcription continues.",
   "type": "object",
   "properties": {
-    "verb": { "const": "transcribe" },
-    "id": { "type": "string", "description": "An optional unique identifier for this verb instance." },
+    "verb": {
+      "const": "transcribe"
+    },
+    "id": {
+      "type": "string",
+      "description": "An optional unique identifier for this verb instance."
+    },
     "enable": {
       "type": "boolean",
       "description": "Enable or disable transcription. Used when transcribe is nested inside a config or dial verb to start or stop background transcription."
@@ -41,7 +47,10 @@
       "recognizer": {
         "vendor": "deepgram",
         "language": "en-US",
-        "deepgramOptions": { "model": "nova-2", "smartFormatting": true }
+        "deepgramOptions": {
+          "model": "nova-2",
+          "smartFormatting": true
+        }
       }
     }
   ]
