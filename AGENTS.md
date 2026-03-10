@@ -43,7 +43,8 @@ Individual verb schemas are in `schema/verbs/`. Shared component types (synthesi
 - **gather** — Collect speech (STT) and/or DTMF input. The workhorse for interactive menus and voice input.
 
 ### AI & Real-time
-- **openai_s2s** / **google_s2s** / **elevenlabs_s2s** / **deepgram_s2s** / **ultravox_s2s** — Connect the caller to a vendor-specific LLM for real-time voice conversation. These are the **preferred** verbs when the vendor is known. Each handles the full STT→LLM→TTS pipeline with the vendor pre-set.
+- **openai_s2s** / **google_s2s** / **deepgram_s2s** / **ultravox_s2s** — Connect the caller to a vendor-specific LLM for real-time voice conversation. These are the **preferred** verbs when the vendor is known. Each handles the full STT→LLM→TTS pipeline with the vendor pre-set.
+- **elevenlabs_s2s** — Connect the caller to an ElevenLabs Conversational AI agent. **Unlike other s2s vendors**, ElevenLabs requires a pre-configured `agent_id` (created in the ElevenLabs dashboard) rather than a model and messages. See [ElevenLabs S2S specifics](#elevenlabs-s2s-specifics) below.
 - **s2s** — Generic LLM voice conversation verb. Use only when the vendor is determined at runtime (e.g. from an env var). Requires `vendor` to be specified.
 - **pipeline** — Higher-level voice AI pipeline with integrated turn detection.
 - **dialogflow** — Connect the caller to a Google Dialogflow agent (ES, CX, or CES).
@@ -314,6 +315,46 @@ These are the raw JSON verb arrays that the SDK generates. You should use the SD
     "toolHook": "/tool-call"
   }
 ]
+```
+
+### ElevenLabs S2S Specifics
+
+ElevenLabs works differently from other s2s vendors. Instead of passing a model and system prompt, you create a **Conversational AI agent** in the ElevenLabs dashboard and pass the `agent_id` to jambonz. The agent's voice, personality, tools, and LLM configuration are all managed on the ElevenLabs side.
+
+**Key differences from other s2s verbs:**
+- `auth` requires `agent_id` (required) and optionally `api_key` (enables signed WebSocket URLs)
+- `model` is NOT used — the model is configured in the ElevenLabs agent
+- `llmOptions` should be an empty object `{}` (do NOT pass `messages` or `temperature`)
+- `llmOptions.conversation_initiation_client_data` can optionally send data to the agent at conversation start
+- Always include `eventHook` and `events: ['all']` — omitting eventHook causes errors on the server
+
+```json
+[
+  {
+    "verb": "elevenlabs_s2s",
+    "auth": {
+      "agent_id": "your-agent-id",
+      "api_key": "your-api-key"
+    },
+    "llmOptions": {},
+    "actionHook": "/s2s-complete",
+    "eventHook": "/event",
+    "events": ["all"]
+  }
+]
+```
+
+SDK example:
+```typescript
+session
+  .elevenlabs_s2s({
+    auth: { agent_id: agentId, api_key: apiKey },
+    llmOptions: {},
+    actionHook: '/s2s-complete',
+    eventHook: '/event',
+    events: ['all'],
+  })
+  .send();
 ```
 
 ### Dial with Fallback
@@ -894,6 +935,7 @@ Complete working examples are in the `examples/` directory:
 - **voice-agent** — LLM-powered conversational AI with tool calls (webhook + WebSocket)
 - **openai-realtime** — OpenAI Realtime API voice agent with function calling (WebSocket)
 - **deepgram-voice-agent** — Deepgram Voice Agent API with function calling (WebSocket)
+- **elevenlabs-voice-agent** — ElevenLabs Conversational AI agent (WebSocket). Demonstrates the agent_id auth pattern unique to ElevenLabs.
 - **llm-streaming** — Anthropic LLM with TTS token streaming and barge-in (WebSocket)
 - **queue-with-hold** — Call queue with hold music and agent dequeue (webhook + WebSocket)
 - **call-recording** — Mid-call recording control via REST API and inject commands (webhook + WebSocket)
