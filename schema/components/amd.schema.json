@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jambonz.org/schema/components/amd",
   "title": "Answering Machine Detection",
-  "description": "Configuration for answering machine detection (AMD). Detects whether an outbound or inbound call was answered by a human or a machine. Used as a nested property on the 'config' or 'dial' verb.",
+  "description": "Configuration for answering machine detection (AMD). Detects whether an outbound or inbound call was answered by a human or a machine. Used as a nested property on the 'config' or 'dial' verb. IMPORTANT: AMD runs asynchronously in the background. When using AMD with the 'config' verb, you MUST follow it with a 'pause' verb (e.g. pause({ length: 25 })) to keep the call alive while AMD detection runs. Without a pause, the call will end immediately after config completes.",
   "type": "object",
   "properties": {
     "actionHook": {
