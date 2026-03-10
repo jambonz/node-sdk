@@ -7,14 +7,45 @@
   "allOf": [{ "$ref": "../components/llm-base" }],
   "properties": {
     "verb": { "const": "deepgram_s2s", "description": "The verb name." },
-    "vendor": { "type": "string", "const": "deepgram", "description": "The LLM vendor (always 'deepgram' for this shortcut)." }
+    "vendor": { "type": "string", "const": "deepgram", "description": "The LLM vendor (always 'deepgram' for this shortcut)." },
+    "llmOptions": {
+      "type": "object",
+      "description": "IMPORTANT: Deepgram does NOT use a 'messages' array. The llmOptions must contain a 'Settings' object with 'agent.think' (LLM provider, model, and prompt) and 'agent.speak' (TTS provider and voice model). The system prompt goes in Settings.agent.think.prompt, NOT in messages.",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "Settings": {
+            "agent": {
+              "think": {
+                "provider": { "type": "open_ai", "model": "gpt-4o" },
+                "prompt": "You are a helpful voice assistant."
+              },
+              "speak": {
+                "provider": { "type": "deepgram", "model": "aura-2-thalia-en" }
+              }
+            }
+          }
+        }
+      ]
+    }
   },
   "required": ["llmOptions"],
   "examples": [
     {
       "verb": "deepgram_s2s",
+      "auth": { "apiKey": "your-deepgram-api-key" },
       "llmOptions": {
-        "messages": [{ "role": "system", "content": "You are a helpful voice assistant." }]
+        "Settings": {
+          "agent": {
+            "think": {
+              "provider": { "type": "open_ai", "model": "gpt-4o" },
+              "prompt": "You are a helpful voice assistant."
+            },
+            "speak": {
+              "provider": { "type": "deepgram", "model": "aura-2-thalia-en" }
+            }
+          }
+        }
       },
       "actionHook": "/s2s-complete"
     }
