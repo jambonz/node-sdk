@@ -2,12 +2,13 @@
 
 Build voice applications on [jambonz](https://jambonz.org) with AI-assisted development.
 
-This monorepo contains two packages:
+This monorepo contains two packages and an Agent Skill:
 
 | Package | Description |
 |---------|-------------|
 | [`@jambonz/sdk`](typescript/) | TypeScript SDK for building jambonz webhook and WebSocket voice applications |
 | [`@jambonz/mcp-schema-server`](mcp-server/) | MCP server that gives AI coding assistants deep knowledge of jambonz APIs |
+| [`jambonz` skill](jambonz/) | [Agent Skill](https://agentskills.io) that teaches AI agents how to build jambonz voice applications |
 
 ## Quick Start
 
@@ -240,6 +241,34 @@ The AI should automatically call the `jambonz_developer_toolkit` tool, then gene
 
 If the AI generates code using the old `@jambonz/node-client-ws` package, raw JSON arrays without the SDK, or uses `.send()` where `.reply()` is needed, the MCP server is not connected. Check your configuration and restart the AI tool.
 
+## Agent Skill
+
+The [`jambonz/`](jambonz/) directory contains an [Agent Skill](https://agentskills.io) — a structured knowledge package that teaches AI coding agents how to build jambonz voice applications. It complements the MCP server: the skill provides **decision-making guidance** (which verbs to use, which transport to pick, common patterns, gotchas), while the MCP server provides **reference data** (schemas, SDK guide).
+
+The skill is language-neutral — it works whether you're using the TypeScript SDK or building raw JSON verb arrays in Python, Go, or any other language.
+
+### Installing the skill
+
+**Claude Code**: Copy the `jambonz/` folder to your project or user skills directory:
+```bash
+cp -r jambonz/ .claude/skills/jambonz/
+```
+
+**Cursor**: Copy to `.cursor/skills/jambonz/`
+
+**VS Code Copilot**: Copy to `.vscode/skills/jambonz/`
+
+**Other agents**: Copy to the agent-specific skills directory. See [agentskills.io](https://agentskills.io) for details on supported agents.
+
+### Skill + MCP server together
+
+For the best AI-assisted development experience, use both:
+
+1. **Install the MCP server** (see [Setup](#setup) above) — gives the AI access to schemas and SDK reference
+2. **Install the skill** — gives the AI procedural knowledge about jambonz patterns and best practices
+
+The skill tells the AI *what* to build; the MCP server tells it *how*.
+
 ## API Documentation
 
 Full API reference documentation is available at **[jambonz.github.io/node-sdk](https://jambonz.github.io/node-sdk/)**.
@@ -378,9 +407,12 @@ The script bumps the version, commits, tags with `mcp-v{version}`, and pushes. T
 ## Repository Structure
 
 ```
-node-sdk/
+agent-toolkit/
 ├── typescript/          # @jambonz/sdk — the TypeScript SDK
 ├── mcp-server/          # @jambonz/mcp-schema-server — MCP server for AI assistants
+├── jambonz/             # Agent Skill — procedural knowledge for AI coding agents
+│   ├── SKILL.md         # Main skill file (decision trees, patterns, gotchas)
+│   └── references/      # On-demand reference files (voice AI, IVR, call control, env vars)
 ├── schema/
 │   ├── verbs/           # JSON Schema for each jambonz verb
 │   ├── components/      # JSON Schema for shared types (recognizer, synthesizer, etc.)
