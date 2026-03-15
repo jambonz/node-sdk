@@ -249,16 +249,13 @@ The skill is language-neutral — it works whether you're using the TypeScript S
 
 ### Installing the skill
 
-**Claude Code**: Copy the `jambonz/` folder to your project or user skills directory:
+Install from the [jambonz/skills](https://github.com/jambonz/skills) repo using the skills CLI:
+
 ```bash
-cp -r jambonz/ .claude/skills/jambonz/
+npx skills add jambonz/skills
 ```
 
-**Cursor**: Copy to `.cursor/skills/jambonz/`
-
-**VS Code Copilot**: Copy to `.vscode/skills/jambonz/`
-
-**Other agents**: Copy to the agent-specific skills directory. See [agentskills.io](https://agentskills.io) for details on supported agents.
+Or manually copy the `jambonz/` folder to your agent's skills directory (`.claude/skills/`, `.cursor/skills/`, `.agents/skills/`, etc.).
 
 ### Skill + MCP server together
 
