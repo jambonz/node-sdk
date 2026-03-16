@@ -89,15 +89,15 @@ export function createEndpoint(opts: EndpointOptions): MakeService {
   // Audio path registry (exact match — no prefix routing needed)
   const audioRoutes = new Map<string, AudioClient>();
 
-  // Handle regular HTTP requests (OPTIONS for env var discovery, 426 for everything else)
+  // Handle regular HTTP requests (OPTIONS for env var discovery, 405 for everything else)
   server.on('request', (req: http.IncomingMessage, res: http.ServerResponse) => {
     if (req.method === 'OPTIONS' && envVars) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(envVars));
       return;
     }
-    res.writeHead(426, { 'Content-Type': 'text/plain' });
-    res.end('Upgrade Required');
+    res.writeHead(405, { 'Content-Type': 'text/plain' });
+    res.end('Method Not Allowed');
   });
 
   server.on('upgrade', (req: http.IncomingMessage, socket, head: Buffer) => {
