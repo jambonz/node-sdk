@@ -48,5 +48,5 @@
       "description": "Enable PII entity identification."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

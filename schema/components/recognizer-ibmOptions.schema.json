@@ -50,5 +50,5 @@
       "description": "Opt out of IBM data collection for service improvements."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

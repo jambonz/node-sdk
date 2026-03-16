@@ -49,5 +49,5 @@
     "languageModel": { "type": "string", "description": "Language model to use." },
     "audioQueryAbsoluteTimeout": { "type": "number", "description": "Absolute timeout for audio queries." }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

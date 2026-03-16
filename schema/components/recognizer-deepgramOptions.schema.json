@@ -143,5 +143,5 @@
       "description": "Eager end-of-turn threshold for faster response."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

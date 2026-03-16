@@ -30,5 +30,5 @@
       "description": "Context token for server-side context."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

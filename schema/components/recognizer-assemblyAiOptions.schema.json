@@ -14,6 +14,10 @@
       "enum": ["v2", "v3"],
       "description": "AssemblyAI streaming API version."
     },
+    "speechModel": {
+      "type": "string",
+      "description": "AssemblyAI speech model to use for recognition."
+    },
     "formatTurns": {
       "type": "boolean",
       "description": "Enable turn-level formatting."
@@ -29,7 +33,34 @@
     "maxTurnSilence": {
       "type": "number",
       "description": "Maximum silence duration (seconds) before forcing end-of-turn."
+    },
+    "minTurnSilence": {
+      "type": "number",
+      "description": "Minimum silence duration (seconds) before allowing end-of-turn."
+    },
+    "keyterms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of key terms to boost in recognition."
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Prompt to guide the recognition model."
+    },
+    "languageDetection": {
+      "type": "boolean",
+      "description": "Enable automatic language detection."
+    },
+    "vadThreshold": {
+      "type": "number",
+      "description": "Voice activity detection threshold."
+    },
+    "inactivityTimeout": {
+      "type": "number",
+      "description": "Timeout (seconds) for inactivity before closing the stream."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

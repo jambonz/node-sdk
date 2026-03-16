@@ -31,5 +31,5 @@
       "description": "Array of transcript normalization rules."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

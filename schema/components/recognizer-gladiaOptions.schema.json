@@ -4,5 +4,5 @@
   "title": "Gladia Recognizer Options",
   "description": "Gladia-specific STT options. Only applies when recognizer vendor is 'gladia'. See Gladia API documentation for available options.",
   "type": "object",
-  "additionalProperties": true
+  "additionalProperties": false
 }

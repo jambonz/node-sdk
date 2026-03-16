@@ -35,5 +35,5 @@
       "description": "Enable server-side logging."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

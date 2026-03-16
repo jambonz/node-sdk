@@ -28,5 +28,5 @@
       "description": "Speech recognition mode optimized for the interaction type."
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

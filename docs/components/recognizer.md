@@ -28,6 +28,16 @@ Refer to vendor documentation for supported models and languages.
 
 - [Supported Languages](https://www.assemblyai.com/docs/getting-started/supported-languages)
 
+#### Prompting (Universal-3 Pro)
+
+AssemblyAI's Universal-3 Pro streaming model supports a `prompt` parameter that guides transcription behavior around punctuation, disfluencies, formatting, and domain-specific terminology. The default prompt achieves strong turn detection accuracy out of the box — only customize if needed, and start by extending the default rather than replacing it.
+
+A `keyterms` array can boost recognition of specific names, brands, or technical terms. This can be updated mid-stream, making it useful for voice agent scenarios where context changes during the call.
+
+> **Caution**: Custom prompts that reduce punctuation output can degrade turn detection, which impacts `gather` and `pipeline` verb behavior in jambonz.
+
+See [AssemblyAI Prompting Guide](https://www.assemblyai.com/docs/streaming/universal-3-pro/prompting) for details.
+
 ### OpenAI (Whisper)
 
 - [Speech to Text Guide](https://platform.openai.com/docs/guides/speech-to-text)

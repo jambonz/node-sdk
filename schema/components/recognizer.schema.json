@@ -35,6 +35,10 @@
       "$ref": "vad",
       "description": "Voice activity detection settings for this recognizer."
     },
+    "autogeneratePrompt": {
+      "type": "boolean",
+      "description": "If true, automatically generate a prompt for the STT vendor based on context (e.g. TTS voice, language). Supported by vendors that accept prompts for recognition guidance."
+    },
     "hints": {
       "type": "array",
       "items": { "type": "string" },
