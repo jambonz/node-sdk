@@ -63,6 +63,8 @@ export interface Recognizer {
   fallbackLanguage?: string;
   /** Voice activity detection settings. */
   vad?: Vad;
+  /** Auto-generate a prompt for the STT vendor based on context (e.g. TTS voice, language). */
+  autogeneratePrompt?: boolean;
   /** Words or phrases to boost recognition for. */
   hints?: string[];
   /** Boost factor for hint words. */
