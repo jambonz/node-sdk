@@ -21,42 +21,67 @@
       "$ref": "../components/synthesizer",
       "description": "Text-to-speech configuration for the pipeline."
     },
-    "vad": {
-      "$ref": "../components/vad",
-      "description": "Voice activity detection configuration for the pipeline."
-    },
     "turnDetection": {
-      "type": "object",
-      "description": "Turn detection configuration. Determines when the user has finished speaking and it's the AI's turn to respond.",
-      "properties": {
-        "vendor": {
+      "oneOf": [
+        {
           "type": "string",
-          "enum": [
-            "krisp"
-          ],
-          "description": "The turn detection vendor."
+          "enum": ["stt", "krisp"],
+          "description": "Turn detection strategy shorthand. 'stt' uses the STT vendor's native signals (silence-based for most vendors; acoustic+semantic for deepgramflux, assemblyai, speechmatics). 'krisp' uses the Krisp acoustic end-of-turn model with default settings."
         },
-        "threshold": {
-          "type": "number",
-          "description": "Confidence threshold for turn detection."
+        {
+          "type": "object",
+          "description": "Turn detection configuration with tunable parameters.",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["krisp"],
+              "description": "Turn detection mode. Currently only 'krisp' supports object-form tuning."
+            },
+            "threshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Krisp end-of-turn confidence threshold (0.0–1.0). Lower values trigger earlier turn transitions. Default: 0.5"
+            },
+            "model": {
+              "type": "string",
+              "description": "Optional Krisp model name override."
+            }
+          },
+          "required": ["mode"],
+          "additionalProperties": false
+        }
+      ],
+      "default": "stt",
+      "description": "Turn detection strategy. Controls when the pipeline decides the user has finished speaking. STT vendors with native turn-taking (deepgramflux, assemblyai, speechmatics) always use their built-in detection regardless of this setting."
+    },
+    "bargeIn": {
+      "type": "object",
+      "description": "Controls whether and how the user can interrupt the assistant while it is speaking.",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Allow the user to interrupt the assistant while it is speaking. Default: true.",
+          "default": true
         },
-        "eagerEotThreshold": {
+        "minSpeechDuration": {
           "type": "number",
-          "description": "Threshold for eager end-of-turn detection. Lower values cause earlier turn transitions."
+          "minimum": 0,
+          "description": "Seconds of detected speech required before confirming an interruption. Prevents brief noises from cutting off the assistant. Default: 0.5",
+          "default": 0.5
+        },
+        "sticky": {
+          "type": "boolean",
+          "description": "If true, once the user interrupts the assistant does not resume speaking. Default: false.",
+          "default": false
         }
       },
-      "required": [
-        "vendor"
-      ]
+      "additionalProperties": false
     },
     "llm": {
       "type": "object",
       "description": "LLM configuration for the pipeline. See the 'llm' verb schema for details.",
       "additionalProperties": true
-    },
-    "preflightLlm": {
-      "type": "boolean",
-      "description": "If true, establish the LLM connection before the call starts to reduce latency on the first interaction."
     },
     "actionHook": {
       "$ref": "../components/actionHook",
@@ -99,9 +124,39 @@
           ]
         }
       },
+      "turnDetection": "stt",
+      "actionHook": "/pipeline-complete"
+    },
+    {
+      "verb": "pipeline",
+      "stt": {
+        "vendor": "deepgram",
+        "language": "en-US"
+      },
+      "tts": {
+        "vendor": "cartesia",
+        "voice": "sonic-english"
+      },
+      "llm": {
+        "vendor": "anthropic",
+        "model": "claude-opus-4-6",
+        "llmOptions": {
+          "messages": [
+            {
+              "role": "user",
+              "content": "You are a helpful voice assistant."
+            }
+          ]
+        }
+      },
       "turnDetection": {
-        "vendor": "krisp",
-        "threshold": 0.5
+        "mode": "krisp",
+        "threshold": 0.3
+      },
+      "bargeIn": {
+        "enable": true,
+        "minSpeechDuration": 0.3,
+        "sticky": false
       },
       "actionHook": "/pipeline-complete"
     }
