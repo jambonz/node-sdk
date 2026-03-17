@@ -222,18 +222,20 @@ export interface PipelineVerb {
   stt: Recognizer;
   /** TTS configuration. */
   tts: Synthesizer;
-  /** VAD configuration. */
-  vad?: Vad;
-  /** Turn detection configuration. */
-  turnDetection?: {
-    vendor: string;
+  /** Turn detection strategy. String shorthand ('stt' or 'krisp') or object with tunable params. */
+  turnDetection?: 'stt' | 'krisp' | {
+    mode: 'krisp';
     threshold?: number;
-    eagerEotThreshold?: number;
+    model?: string;
+  };
+  /** Barge-in configuration — controls user interruption of assistant speech. */
+  bargeIn?: {
+    enable?: boolean;
+    minSpeechDuration?: number;
+    sticky?: boolean;
   };
   /** LLM configuration. */
   llm: Record<string, unknown>;
-  /** Pre-establish LLM connection before call starts. */
-  preflightLlm?: boolean;
   /** Webhook when pipeline ends. */
   actionHook?: ActionHook;
   /** Webhook for pipeline events. */
