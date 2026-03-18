@@ -97,9 +97,7 @@
     }
   },
   "required": [
-    "stt",
-    "llm",
-    "tts"
+    "llm"
   ],
   "examples": [
     {
