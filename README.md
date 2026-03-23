@@ -160,7 +160,11 @@ Add to your project's `.mcp.json`:
 Or run interactively:
 
 ```bash
+# Project-level (current project only)
 claude mcp add jambonz -- npx -y @jambonz/mcp-schema-server
+
+# Global (available in all projects)
+claude mcp add --scope user jambonz -- npx -y @jambonz/mcp-schema-server
 ```
 
 #### Claude Desktop
@@ -252,7 +256,11 @@ The skill is language-neutral — it works whether you're using the TypeScript S
 Install from the [jambonz/skills](https://github.com/jambonz/skills) repo using the skills CLI:
 
 ```bash
+# Project-level (current project only)
 npx skills add jambonz/skills
+
+# Global (available in all projects)
+npx skills add -g jambonz/skills
 ```
 
 Or manually copy the `jambonz/` folder to your agent's skills directory (`.claude/skills/`, `.cursor/skills/`, `.agents/skills/`, etc.).
