@@ -242,6 +242,10 @@ export interface PipelineVerb {
   eventHook?: ActionHook;
   /** Webhook when the LLM requests a tool/function call. */
   toolHook?: ActionHook;
+  /** Whether the LLM generates an initial greeting before the user speaks. Default: true. */
+  greeting?: boolean;
+  /** Speculatively prompt the LLM on final transcript before Krisp end-of-turn. Default: false. */
+  earlyGeneration?: boolean;
 }
 
 export interface ListenVerb {

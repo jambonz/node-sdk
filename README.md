@@ -142,34 +142,85 @@ When you ask the AI to build a jambonz application, it calls these tools automat
 
 Choose the setup that matches your development environment. You only need one.
 
-#### Claude Code (CLI)
+#### Option A: Remote server (no install needed)
 
-Add to your project's `.mcp.json`:
+A hosted instance is available at `https://mcp-server.jambonz.app/mcp`. This is the simplest option — no local install or npx required.
+
+**Claude Code (CLI)**
+
+```bash
+# Project-level
+claude mcp add jambonz -t streamable-http https://mcp-server.jambonz.app/mcp
+
+# Global
+claude mcp add --scope user jambonz -t streamable-http https://mcp-server.jambonz.app/mcp
+```
+
+Or add to your project's `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "jambonz": {
-      "command": "npx",
-      "args": ["-y", "@jambonz/mcp-schema-server"]
+      "type": "streamable-http",
+      "url": "https://mcp-server.jambonz.app/mcp"
     }
   }
 }
 ```
 
-Or run interactively:
+**Cursor** — add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "jambonz": {
+      "url": "https://mcp-server.jambonz.app/mcp"
+    }
+  }
+}
+```
+
+**VS Code (GitHub Copilot / Claude Extension)** — add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "jambonz": {
+      "type": "http",
+      "url": "https://mcp-server.jambonz.app/mcp"
+    }
+  }
+}
+```
+
+**Windsurf** — open **Windsurf Settings > MCP** and add:
+
+```json
+{
+  "mcpServers": {
+    "jambonz": {
+      "serverUrl": "https://mcp-server.jambonz.app/mcp"
+    }
+  }
+}
+```
+
+#### Option B: Local via npx
+
+Run the MCP server locally using npx. This uses stdio transport and requires no network access.
+
+**Claude Code (CLI)**
 
 ```bash
-# Project-level (current project only)
+# Project-level
 claude mcp add jambonz -- npx -y @jambonz/mcp-schema-server
 
-# Global (available in all projects)
+# Global
 claude mcp add --scope user jambonz -- npx -y @jambonz/mcp-schema-server
 ```
 
-#### Claude Desktop
-
-Open **Settings > Developer > Edit Config** and add to `mcpServers`:
+Or add to your project's `.mcp.json`:
 
 ```json
 {
@@ -182,17 +233,7 @@ Open **Settings > Developer > Edit Config** and add to `mcpServers`:
 }
 ```
 
-Restart Claude Desktop after saving.
-
-#### Cursor
-
-Open **Cursor Settings > MCP** and add a new server:
-
-- **Name**: `jambonz`
-- **Type**: `command`
-- **Command**: `npx -y @jambonz/mcp-schema-server`
-
-Or add to your project's `.cursor/mcp.json`:
+**Claude Desktop** — open **Settings > Developer > Edit Config** and add to `mcpServers`:
 
 ```json
 {
@@ -205,9 +246,20 @@ Or add to your project's `.cursor/mcp.json`:
 }
 ```
 
-#### VS Code (GitHub Copilot / Claude Extension)
+**Cursor** — add to `.cursor/mcp.json`:
 
-Add to your workspace's `.vscode/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "jambonz": {
+      "command": "npx",
+      "args": ["-y", "@jambonz/mcp-schema-server"]
+    }
+  }
+}
+```
+
+**VS Code (GitHub Copilot / Claude Extension)** — add to `.vscode/mcp.json`:
 
 ```json
 {
@@ -220,9 +272,7 @@ Add to your workspace's `.vscode/mcp.json`:
 }
 ```
 
-#### Windsurf
-
-Open **Windsurf Settings > MCP** and add:
+**Windsurf** — open **Windsurf Settings > MCP** and add:
 
 ```json
 {
