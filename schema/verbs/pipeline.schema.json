@@ -89,7 +89,7 @@
     },
     "eventHook": {
       "$ref": "../components/actionHook",
-      "description": "A webhook invoked for pipeline events."
+      "description": "A webhook invoked for pipeline events. Receives event types: 'user_transcript' (user speech recognized), 'agent_response' (assistant reply), 'user_interruption' (barge-in detected), and 'turn_end' (end-of-turn summary with transcript, response, and latency metrics)."
     },
     "toolHook": {
       "$ref": "../components/actionHook",

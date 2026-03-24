@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jambonz.org/schema/callbacks/pipeline-turn",
+  "title": "Pipeline Turn End Event",
+  "description": "Payload sent to the pipeline verb's eventHook at the end of each conversational turn. Provides the user transcript, assistant response, and per-component latency metrics for the turn.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "const": "turn_end",
+      "description": "Event type identifier."
+    },
+    "transcript": {
+      "type": "string",
+      "description": "The user's final speech-to-text transcript for this turn. May be '(none)' if no transcript was captured (e.g. an interrupted turn before STT completed)."
+    },
+    "response": {
+      "type": "string",
+      "description": "The assistant's full text response for this turn. May be empty or partial if the turn was interrupted."
+    },
+    "interrupted": {
+      "type": "boolean",
+      "description": "True if this turn was interrupted by the user barging in before the assistant finished speaking.",
+      "default": false
+    },
+    "latency": {
+      "type": "object",
+      "description": "Per-component latency metrics for this turn. All values are in milliseconds relative to the start of the turn (when the user began speaking). Fields are absent when not applicable.",
+      "properties": {
+        "total_ms": {
+          "type": "integer",
+          "description": "Total turn duration from start of user speech to LLM response completion."
+        },
+        "stt": {
+          "type": "object",
+          "description": "Speech-to-text latency metrics.",
+          "properties": {
+            "final_transcript_ms": {
+              "type": "integer",
+              "description": "Time from turn start until the final transcript was received from the STT engine."
+            }
+          },
+          "additionalProperties": false
+        },
+        "llm": {
+          "type": "object",
+          "description": "LLM latency metrics.",
+          "properties": {
+            "prompted_ms": {
+              "type": "integer",
+              "description": "Time from turn start until the LLM was prompted."
+            },
+            "ttft_ms": {
+              "type": "integer",
+              "description": "Time-to-first-token: time from LLM prompt to first token received."
+            }
+          },
+          "additionalProperties": false
+        },
+        "tts": {
+          "type": "object",
+          "description": "Text-to-speech latency metrics.",
+          "properties": {
+            "first_buffered_ms": {
+              "type": "integer",
+              "description": "Time from turn start until the first LLM token was buffered for TTS."
+            },
+            "first_send_ms": {
+              "type": "integer",
+              "description": "Time from turn start until audio was first sent to the TTS engine."
+            },
+            "buffer_delay_ms": {
+              "type": "integer",
+              "description": "Delay between first token buffered and first send to TTS engine."
+            }
+          },
+          "additionalProperties": false
+        },
+        "preflight": {
+          "type": "object",
+          "description": "Early generation (preflight) metrics. Only present when earlyGeneration is enabled.",
+          "properties": {
+            "ms": {
+              "type": "integer",
+              "description": "Time from turn start until the preflight prompt was sent."
+            },
+            "result": {
+              "type": "string",
+              "enum": ["hit", "miss", "pending"],
+              "description": "Whether the preflight transcript matched the final transcript ('hit'), did not match ('miss'), or was still in progress ('pending')."
+            },
+            "tokens": {
+              "type": "integer",
+              "description": "Number of preflight tokens that were buffered. Only present on a 'hit'."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["type", "transcript", "response", "interrupted", "latency"],
+  "additionalProperties": false
+}
