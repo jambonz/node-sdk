@@ -42,10 +42,6 @@
           "type": "integer",
           "description": "LLM time-to-first-token: time from when the LLM was prompted until the first response token arrived."
         },
-        "tts_ttfa_ms": {
-          "type": "integer",
-          "description": "TTS time-to-first-audio: time from when the first text chunk was sent to the TTS engine until audio was ready to play."
-        },
         "preflight": {
           "type": "object",
           "description": "Early generation (preflight) metrics. Only present when earlyGeneration is enabled.",
