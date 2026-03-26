@@ -160,7 +160,7 @@ Use the `config` verb at the start of the call to set session-wide TTS and STT d
 ```typescript
 session
   .config({
-    synthesizer: { vendor: 'elevenlabs', voice: 'Rachel', language: 'en-US' },
+    synthesizer: { vendor: 'elevenlabs', voice: 'EXAVITQu4vr4xnSDxMaL', language: 'en-US' },
     recognizer: { vendor: 'deepgram', language: 'en-US' },
   })
   .gather({

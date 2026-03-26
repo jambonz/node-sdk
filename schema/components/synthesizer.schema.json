@@ -24,8 +24,8 @@
         { "type": "string" },
         { "type": "object", "additionalProperties": true }
       ],
-      "description": "The voice to use for synthesis. Typically a string voice name (e.g. 'en-US-Wavenet-D' for Google, 'Joanna' for AWS Polly). Some vendors accept an object for more complex voice configuration.",
-      "examples": ["en-US-Wavenet-D", "Joanna", "Rachel"]
+      "description": "The voice to use for synthesis. Format varies by vendor: Google uses voice names like 'en-US-Wavenet-D', AWS Polly uses names like 'Joanna', but ElevenLabs and Cartesia require voice IDs (alphanumeric strings like 'EXAVITQu4vr4xnSDxMaL'), not human-readable names. Some vendors accept an object for more complex voice configuration.",
+      "examples": ["en-US-Wavenet-D", "Joanna", "EXAVITQu4vr4xnSDxMaL"]
     },
     "fallbackVendor": {
       "type": "string",

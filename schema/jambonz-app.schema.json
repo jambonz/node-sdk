@@ -54,7 +54,7 @@
     [
       {
         "verb": "config",
-        "synthesizer": { "vendor": "elevenlabs", "voice": "Rachel", "language": "en-US" },
+        "synthesizer": { "vendor": "elevenlabs", "voice": "EXAVITQu4vr4xnSDxMaL", "language": "en-US" },
         "recognizer": { "vendor": "deepgram", "language": "en-US" }
       },
       {

@@ -181,7 +181,7 @@ session
       model: 'claude-sonnet-4-20250514',
       messages: [{ role: 'system', content: 'You are a helpful assistant.' }],
     },
-    synthesizer: { vendor: 'elevenlabs', voice: 'Rachel' },
+    synthesizer: { vendor: 'elevenlabs', voice: 'EXAVITQu4vr4xnSDxMaL' },
     actionHook: '/done',
   })
   .send();

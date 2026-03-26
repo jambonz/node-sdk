@@ -40,7 +40,7 @@ describe('WebhookResponse', () => {
     const response = new WebhookResponse({ validate: false });
     response
       .config({
-        synthesizer: { vendor: 'elevenlabs', voice: 'Rachel' },
+        synthesizer: { vendor: 'elevenlabs', voice: 'EXAVITQu4vr4xnSDxMaL' },
         recognizer: { vendor: 'deepgram', language: 'en-US' },
       })
       .llm({

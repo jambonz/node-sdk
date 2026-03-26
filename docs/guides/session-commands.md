@@ -16,7 +16,7 @@ Enable TTS streaming via the `config` verb before sending tokens:
 session
   .config({
     ttsStream: { enable: true },
-    synthesizer: { vendor: 'elevenlabs', voice: 'Rachel' },
+    synthesizer: { vendor: 'elevenlabs', voice: 'EXAVITQu4vr4xnSDxMaL' },  // ElevenLabs requires voice ID, not name
   })
   .say({ text: 'Hi there, how can I help you?' })
   .send();

@@ -312,7 +312,7 @@ These are the raw JSON verb arrays that the SDK generates. You should use the SD
 [
   {
     "verb": "config",
-    "synthesizer": { "vendor": "elevenlabs", "voice": "Rachel" },
+    "synthesizer": { "vendor": "elevenlabs", "voice": "EXAVITQu4vr4xnSDxMaL" },
     "recognizer": { "vendor": "deepgram", "language": "en-US" }
   },
   {
