@@ -2,11 +2,13 @@
 
 jambonz is an open-source CPaaS (Communications Platform as a Service) for building voice and messaging applications. It handles telephony infrastructure — SIP, carriers, phone numbers, media processing — so you can focus on application logic.
 
-## Server Versions — IMPORTANT
+## Before You Start — Ask the User
 
-jambonz has two editions: **v0.9.x (open source)** and **v10.x (commercial)**. The commercial version is a superset of the open source version. Each verb schema includes a `minVersion` field indicating the minimum jambonz server version required. **Always check `minVersion` before using a verb.**
+Before generating any jambonz application code, ask the user: **"Do you prefer TypeScript or JavaScript?"** Then generate all code examples in their chosen language. If they don't have a preference, default to TypeScript.
 
-**Only ask the user about their server version if the task requires a verb with `minVersion` higher than `0.9.6`.** If all verbs needed have `minVersion: "0.9.6"`, the code works on both editions — no need to ask. When you do need to ask, use this question: "Are you targeting the commercial version of jambonz or the open source version?" If they say open source (v0.9.x), use the appropriate fallback (e.g. for s2s verbs, use the `llm` verb with a `vendor` property instead). The SDK methods `.llm()` and `.s2s()` produce the same wire format — only the verb name differs.
+## Server Versions
+
+jambonz has two editions: **v0.9.x (open source)** and **v10.x (commercial)**. Always target the commercial version (v10.x). All verb schemas and features are available.
 
 ## How jambonz Applications Work
 

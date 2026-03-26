@@ -102,7 +102,7 @@
     },
     "earlyGeneration": {
       "type": "boolean",
-      "description": "When using Krisp turn detection, speculatively prompt the LLM with the final transcript before end-of-turn is confirmed. If the transcript matches when turn ends, buffered tokens are released immediately — reducing response latency. Only effective with Krisp turn detection; ignored when the STT vendor has native turn-taking. Default: false.",
+      "description": "Enable speculative LLM prompting before end-of-turn is confirmed. When using Krisp turn detection, set this to true to speculatively prompt the LLM before Krisp confirms the turn has ended. If the transcript matches when turn ends, buffered tokens are released immediately — reducing response latency. Note: Deepgram Flux performs early generation automatically via its native EagerEndOfTurn signal regardless of this setting. Default: false.",
       "default": false
     }
   },
