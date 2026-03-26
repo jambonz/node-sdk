@@ -576,6 +576,18 @@ session.injectTag({ supervisor: 'jane', priority: 'high' });
 session.injectCommand('redirect', { call_hook: '/new-flow' });
 ```
 
+## Session Commands
+
+Beyond verbs, WebSocket apps can perform async operations at any time during a call: TTS token streaming, inject commands (mute, whisper, DTMF, recording), and LLM tool output. These are SDK method calls that execute immediately without affecting the verb stack.
+
+**Fetch the full reference with `guide:session-commands`** — covers all commands with SDK methods, events, setup, and complete examples including how to build a cascaded voice AI agent (app-managed LLM with TTS token streaming).
+
+Key capabilities:
+- **TTS token streaming** — `sendTtsTokens()`, `flushTtsTokens()`, `clearTtsTokens()` — pipe LLM tokens to jambonz incrementally for lowest-latency TTS playback. **Not the same as `autoStreamTts`** (which is a jambonz-internal audio optimization).
+- **Inject commands** — `injectMute()`, `injectWhisper()`, `injectDtmf()`, `injectRecord()`, `injectTag()`, `injectListenStatus()` — modify the call mid-stream.
+- **LLM tool output** — `toolOutput()` — return tool call results to the pipeline verb's LLM.
+- **Cascaded voice AI agents** — build your own STT→LLM→TTS loop using `config` (ttsStream + bargeIn) + `sendTtsTokens()`. Full control over LLM interaction and conversation history.
+
 ## WebSocket Protocol
 
 ### Message Types (jambonz → app)

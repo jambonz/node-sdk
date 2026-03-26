@@ -3,10 +3,11 @@
  *
  * Two tools:
  *  1. jambonz_developer_toolkit — returns the full guide (AGENTS.md) plus
- *     a verb/component/callback index.  ~15 KB, always safe under token limits.
+ *     a verb/component/callback/guide index.
  *  2. get_jambonz_schema — returns the full JSON Schema for a single verb,
  *     component, or callback on demand.  If a usage guide exists in docs/verbs/
- *     it is appended automatically.
+ *     it is appended automatically.  Also supports guide:<name> for fetching
+ *     in-depth markdown guides from docs/guides/.
  */
 
 import { readFileSync, readdirSync, existsSync } from 'fs';
@@ -76,6 +77,14 @@ function listSchemas(dir: string, exclude: string[] = []): string[] {
     .filter((n) => !exclude.includes(n));
 }
 
+/** List markdown guides in a directory, returning names without .md suffix. */
+function listGuides(dir: string): string[] {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => basename(f, '.md'));
+}
+
 export function registerTools(server: McpServer): void {
   const schemaDir = findSchemaDir();
   const agentsMdPath = findAgentsMd();
@@ -84,10 +93,12 @@ export function registerTools(server: McpServer): void {
   const verbsDir = resolve(schemaDir, 'verbs');
   const componentsDir = resolve(schemaDir, 'components');
   const callbacksDir = resolve(schemaDir, 'callbacks');
+  const guidesDir = docsDir ? resolve(docsDir, 'guides') : null;
 
   const verbNames = listSchemas(verbsDir);
   const componentNames = listSchemas(componentsDir);
   const callbackNames = listSchemas(callbacksDir, ['base']);
+  const guideNames = guidesDir ? listGuides(guidesDir) : [];
 
   // Build the index suffix (static — names don't change at runtime)
   const indexParts = [
@@ -100,6 +111,11 @@ export function registerTools(server: McpServer): void {
   if (callbackNames.length > 0) {
     indexParts.push(
       `\n## Callbacks (actionHook payloads)\n${callbackNames.join(', ')}\n`
+    );
+  }
+  if (guideNames.length > 0) {
+    indexParts.push(
+      `\n## Guides\nIn-depth documentation on specific topics. Fetch with \`guide:<name>\`.\n${guideNames.join(', ')}\n`
     );
   }
   const indexSuffix = indexParts.join('\n');
@@ -122,6 +138,7 @@ export function registerTools(server: McpServer): void {
     ...verbNames.map((n) => `verb:${n}`),
     ...componentNames.map((n) => `component:${n}`),
     ...callbackNames.map((n) => `callback:${n}`),
+    ...guideNames.map((n) => `guide:${n}`),
   ];
   server.tool(
     'get_jambonz_schema',
@@ -129,8 +146,20 @@ export function registerTools(server: McpServer): void {
     { name: z.string().describe('The verb or component name (e.g. "say", "gather", "dial", "recognizer", "synthesizer")') },
     async ({ name }) => {
       // Strip optional prefix (e.g. "verb:say" -> "say", "component:recognizer" -> "recognizer")
-      const prefixMatch = name.match(/^(verb|component|callback):(.*)/);
+      const prefixMatch = name.match(/^(verb|component|callback|guide):(.*)/);
       const bare = prefixMatch ? prefixMatch[2] : name;
+
+      // Guide lookup — guides are markdown files, not JSON schemas
+      if (prefixMatch?.[1] === 'guide' && guidesDir) {
+        const guidePath = resolve(guidesDir, `${bare}.md`);
+        if (existsSync(guidePath)) {
+          return { content: [{ type: 'text' as const, text: readFileSync(guidePath, 'utf-8') }] };
+        }
+        return {
+          content: [{ type: 'text' as const, text: `Unknown guide "${bare}". Available guides: ${guideNames.join(', ')}` }],
+          isError: true,
+        };
+      }
 
       // All categories in search order
       const allCategories = [
