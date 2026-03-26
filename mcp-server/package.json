@@ -1,6 +1,6 @@
 {
   "name": "@jambonz/mcp-schema-server",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "MCP server that provides jambonz verb schemas and documentation as resources",
   "author": "Dave Horton",
   "license": "MIT",
