@@ -156,7 +156,7 @@
     },
     "trackTtsPlayout": {
       "type": "boolean",
-      "description": "If true, report the actual text spoken via TTS. On each utterance completion or interruption, a tts_spoken event is sent with the text and whether the user barged in."
+      "description": "If true, report the actual text spoken via TTS. Requires a TTS vendor that supports alignment data (e.g. ElevenLabs). On each utterance completion or interruption, a tts_spoken event is sent to the '/streaming-event' endpoint with fields: 'text' (string — the text actually spoken) and 'bargein' (boolean — true if the user interrupted before TTS finished). See the tts-streaming-event callback schema for full details."
     },
     "noiseIsolation": {
       "type": "object",
