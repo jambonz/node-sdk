@@ -89,11 +89,16 @@ export type TtsStreamingEventType =
   | 'stream_paused'
   | 'stream_resumed'
   | 'stream_closed'
-  | 'user_interruption';
+  | 'user_interruption'
+  | 'tts_spoken';
 
 /** Payload for tts:streaming-event messages. */
 export interface TtsStreamingEvent {
   event_type: TtsStreamingEventType;
+  /** The actual text spoken via TTS (present for tts_spoken events). */
+  text?: string;
+  /** Whether the user interrupted the TTS playout (present for tts_spoken events). */
+  bargein?: boolean;
 }
 
 /** WebSocket message types received from jambonz. */

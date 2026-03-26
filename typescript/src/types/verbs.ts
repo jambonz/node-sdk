@@ -598,6 +598,8 @@ export interface ConfigVerb {
   autoStreamTts?: boolean;
   /** Disable TTS caching. */
   disableTtsCache?: boolean;
+  /** Report actual text spoken via TTS playout. */
+  trackTtsPlayout?: boolean;
   /** Noise isolation config. */
   noiseIsolation?: {
     enable?: boolean;

@@ -154,6 +154,10 @@
       "type": "boolean",
       "description": "If true, disable TTS caching for the session."
     },
+    "trackTtsPlayout": {
+      "type": "boolean",
+      "description": "If true, report the actual text spoken via TTS. On each utterance completion or interruption, a tts_spoken event is sent with the text and whether the user barged in."
+    },
     "noiseIsolation": {
       "type": "object",
       "description": "Noise isolation configuration to reduce background noise on the caller's audio.",
