@@ -55,6 +55,14 @@ export type {
 // Session
 export type {
   CallSession,
+  PipelineAgentResponseEvent,
+  PipelineEvent,
+  PipelineEventType,
+  PipelinePreflightMetrics,
+  PipelineTurnEndEvent,
+  PipelineTurnLatency,
+  PipelineUserInterruptionEvent,
+  PipelineUserTranscriptEvent,
   TtsStreamingEvent,
   TtsStreamingEventType,
   WsMessage,

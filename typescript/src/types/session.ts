@@ -113,9 +113,71 @@ export type WsMessageType =
   | 'verb:status'
   | 'llm:event'
   | 'llm:tool-call'
+  | 'pipeline:event'
+  | 'pipeline:tool-call'
   | 'tts:streaming-event'
   | 'tts:tokens-result'
   | 'jambonz:error';
+
+/** Pipeline eventHook event types. */
+export type PipelineEventType =
+  | 'turn_end'
+  | 'user_transcript'
+  | 'agent_response'
+  | 'user_interruption';
+
+/** Preflight (early generation) metrics. */
+export interface PipelinePreflightMetrics {
+  result: 'hit' | 'miss' | 'pending';
+  tokens?: number;
+}
+
+/** Per-turn latency metrics (all values in milliseconds). */
+export interface PipelineTurnLatency {
+  /** STT processing latency: stop talking to final transcript received. */
+  transcriber_latency?: number;
+  /** Additional wait after transcript for end-of-turn detection. */
+  turn_detection_latency?: number;
+  /** LLM latency: wait for first token after ready to prompt. Absent on preflight hit. */
+  model_latency?: number;
+  /** TTS engine latency: first text sent to TTS until first audio received. */
+  voice_latency?: number;
+  /** Early generation metrics. */
+  preflight?: PipelinePreflightMetrics;
+}
+
+/** Payload for pipeline:event turn_end messages. */
+export interface PipelineTurnEndEvent {
+  type: 'turn_end';
+  transcript: string;
+  response: string;
+  interrupted: boolean;
+  latency: PipelineTurnLatency;
+}
+
+/** Payload for pipeline:event user_transcript messages. */
+export interface PipelineUserTranscriptEvent {
+  type: 'user_transcript';
+  transcript: string;
+}
+
+/** Payload for pipeline:event agent_response messages. */
+export interface PipelineAgentResponseEvent {
+  type: 'agent_response';
+  response: string;
+}
+
+/** Payload for pipeline:event user_interruption messages. */
+export interface PipelineUserInterruptionEvent {
+  type: 'user_interruption';
+}
+
+/** Union of all pipeline eventHook payloads. */
+export type PipelineEvent =
+  | PipelineTurnEndEvent
+  | PipelineUserTranscriptEvent
+  | PipelineAgentResponseEvent
+  | PipelineUserInterruptionEvent;
 
 /** Inbound WebSocket message from jambonz. */
 export interface WsMessage {
