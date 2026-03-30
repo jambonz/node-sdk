@@ -466,6 +466,8 @@ export class Session extends EventEmitter {
 
         case 'llm:event':
         case 'llm:tool-call':
+        case 'pipeline:event':
+        case 'pipeline:tool-call':
           if (hook) {
             this.emit(hook, data);
           }
