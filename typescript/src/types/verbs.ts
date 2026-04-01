@@ -247,7 +247,7 @@ export interface PipelineVerb {
   /** Speculatively prompt the LLM on final transcript before Krisp end-of-turn. Default: false. */
   earlyGeneration?: boolean;
   /** Enable server-side noise isolation to reduce background noise on the caller's audio. */
-  noiseIsolation?: 'krisp' | {
+  noiseIsolation?: 'krisp' | 'rnnoise' | {
     mode: string;
     level?: number;
     direction?: 'read' | 'write';

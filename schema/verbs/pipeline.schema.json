@@ -109,8 +109,8 @@
       "oneOf": [
         {
           "type": "string",
-          "enum": ["krisp"],
-          "description": "Shorthand — enable Krisp noise isolation with default settings."
+          "enum": ["krisp", "rnnoise"],
+          "description": "Shorthand — enable noise isolation with the specified vendor using default settings."
         },
         {
           "type": "object",
