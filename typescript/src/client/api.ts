@@ -146,6 +146,20 @@ export class CallsResource {
   async mute(callSid: string, status: 'mute' | 'unmute'): Promise<void> {
     return this.update(callSid, { mute_status: status });
   }
+
+  /** Enable or disable server-side noise isolation. */
+  async noiseIsolation(
+    callSid: string,
+    status: 'enable' | 'disable',
+    opts?: { vendor?: string; level?: number; model?: string }
+  ): Promise<void> {
+    return this.update(callSid, {
+      noise_isolation_status: status,
+      ...(opts?.vendor ? { noise_isolation_vendor: opts.vendor } : {}),
+      ...(opts?.level !== undefined ? { noise_isolation_level: opts.level } : {}),
+      ...(opts?.model ? { noise_isolation_model: opts.model } : {}),
+    });
+  }
 }
 
 export class ConferencesResource {

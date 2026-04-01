@@ -104,6 +104,43 @@
       "type": "boolean",
       "description": "Enable speculative LLM prompting before end-of-turn is confirmed. When using Krisp turn detection, set this to true to speculatively prompt the LLM before Krisp confirms the turn has ended. If the transcript matches when turn ends, buffered tokens are released immediately — reducing response latency. Note: Deepgram Flux performs early generation automatically via its native EagerEndOfTurn signal regardless of this setting. Default: false.",
       "default": false
+    },
+    "noiseIsolation": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["krisp"],
+          "description": "Shorthand — enable Krisp noise isolation with default settings."
+        },
+        {
+          "type": "object",
+          "description": "Detailed noise isolation configuration.",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "description": "Noise isolation vendor/mode (e.g. 'krisp')."
+            },
+            "level": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Suppression level 0–100. Default: 100."
+            },
+            "direction": {
+              "type": "string",
+              "enum": ["read", "write"],
+              "description": "Audio direction to apply noise isolation. 'read' filters caller audio, 'write' filters outbound audio. Default: 'read'."
+            },
+            "model": {
+              "type": "string",
+              "description": "Optional model name override."
+            }
+          },
+          "required": ["mode"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Enable server-side noise isolation to reduce background noise on the caller's audio. Useful for improving STT accuracy in noisy environments."
     }
   },
   "required": [

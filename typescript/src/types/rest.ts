@@ -65,6 +65,14 @@ export interface UpdateCallRequest {
   dub?: Verb;
   /** Mute/unmute the call. */
   mute_status?: 'mute' | 'unmute';
+  /** Enable/disable server-side noise isolation. */
+  noise_isolation_status?: 'enable' | 'disable';
+  /** Noise isolation vendor (default: krisp). */
+  noise_isolation_vendor?: string;
+  /** Noise isolation level (0-100). */
+  noise_isolation_level?: number;
+  /** Noise isolation model. */
+  noise_isolation_model?: string;
   /** Mute/unmute in conference. */
   conf_mute_status?: 'mute' | 'unmute';
   /** Hold/unhold in conference. */
