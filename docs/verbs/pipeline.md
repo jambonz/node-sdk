@@ -49,7 +49,7 @@ For other STT vendors with native turn-taking (assemblyai, speechmatics), early 
 
 ## Noise isolation
 
-The `noiseIsolation` property enables server-side noise cancellation on the caller's audio, improving STT accuracy in noisy environments. Two vendors are available:
+The `noiseIsolation` property enables server-side noise cancellation on the call audio. By default it filters the inbound (caller) audio, improving STT accuracy in noisy environments. It can also be configured to filter outbound audio via the `direction` option. Two vendors are available:
 
 - **`"krisp"`** — Krisp's proprietary noise cancellation. Requires a Krisp API key on self-hosted systems.
 - **`"rnnoise"`** — Open-source RNNoise-based noise cancellation. No API key required.

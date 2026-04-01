@@ -160,7 +160,7 @@
     },
     "noiseIsolation": {
       "type": "object",
-      "description": "Noise isolation configuration to reduce background noise on the caller's audio.",
+      "description": "Noise isolation configuration to reduce background noise on call audio. Defaults to filtering inbound (caller) audio; can also filter outbound audio via the direction option.",
       "properties": {
         "enable": {
           "type": "boolean"

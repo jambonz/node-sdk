@@ -140,7 +140,7 @@
           "additionalProperties": false
         }
       ],
-      "description": "Enable server-side noise isolation to reduce background noise on the caller's audio. Useful for improving STT accuracy in noisy environments."
+      "description": "Enable server-side noise isolation to reduce background noise on call audio. Defaults to filtering inbound (caller) audio; set direction to 'write' for outbound. Useful for improving STT accuracy in noisy environments."
     },
     "mcpServers": {
       "type": "array",
