@@ -203,6 +203,46 @@ describe('CallsResource', () => {
       const body = JSON.parse(mock.mock.calls[0][1].body);
       expect(body.mute_status).toBe('unmute');
     });
+
+    it('noiseIsolation sends noise_isolation_status in update', async () => {
+      const mock = mockFetch(200, {});
+      globalThis.fetch = mock as unknown as typeof fetch;
+      const client = createClient();
+
+      await client.calls.noiseIsolation('call-1', 'enable');
+      const body = JSON.parse(mock.mock.calls[0][1].body);
+      expect(body.noise_isolation_status).toBe('enable');
+    });
+
+    it('noiseIsolation maps opts to flat noise_isolation_ fields', async () => {
+      const mock = mockFetch(200, {});
+      globalThis.fetch = mock as unknown as typeof fetch;
+      const client = createClient();
+
+      await client.calls.noiseIsolation('call-1', 'enable', {
+        vendor: 'krisp',
+        level: 80,
+        model: 'custom-model',
+      });
+      const body = JSON.parse(mock.mock.calls[0][1].body);
+      expect(body.noise_isolation_status).toBe('enable');
+      expect(body.noise_isolation_vendor).toBe('krisp');
+      expect(body.noise_isolation_level).toBe(80);
+      expect(body.noise_isolation_model).toBe('custom-model');
+    });
+
+    it('noiseIsolation omits undefined opts fields', async () => {
+      const mock = mockFetch(200, {});
+      globalThis.fetch = mock as unknown as typeof fetch;
+      const client = createClient();
+
+      await client.calls.noiseIsolation('call-1', 'disable');
+      const body = JSON.parse(mock.mock.calls[0][1].body);
+      expect(body.noise_isolation_status).toBe('disable');
+      expect(body).not.toHaveProperty('noise_isolation_vendor');
+      expect(body).not.toHaveProperty('noise_isolation_level');
+      expect(body).not.toHaveProperty('noise_isolation_model');
+    });
   });
 });
 

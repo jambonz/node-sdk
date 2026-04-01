@@ -277,6 +277,18 @@ export class Session extends EventEmitter {
     this.injectCommand('mute:status', { mute_status: status }, callSid);
   }
 
+  /** Enable or disable server-side noise isolation. */
+  injectNoiseIsolation(
+    status: 'enable' | 'disable',
+    opts?: { vendor?: string; level?: number; model?: string },
+    callSid?: string
+  ): void {
+    this.injectCommand('noiseIsolation:status', {
+      noise_isolation_status: status,
+      ...opts,
+    }, callSid);
+  }
+
   /** Pause or resume audio streaming (listen/stream). */
   injectListenStatus(status: 'pause' | 'resume', callSid?: string): void {
     this.injectCommand('listen:status', { listen_status: status }, callSid);

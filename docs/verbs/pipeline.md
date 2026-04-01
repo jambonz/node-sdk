@@ -47,6 +47,40 @@ There are two ways early generation is triggered:
 
 For other STT vendors with native turn-taking (assemblyai, speechmatics), early generation is not available — they don't emit a preflight signal.
 
+## Noise isolation
+
+The `noiseIsolation` property enables server-side noise cancellation on the call audio. By default it filters the inbound (caller) audio, improving STT accuracy in noisy environments. It can also be configured to filter outbound audio via the `direction` option. Two vendors are available:
+
+- **`"krisp"`** — Krisp's proprietary noise cancellation. Requires a Krisp API key on self-hosted systems.
+- **`"rnnoise"`** — Open-source RNNoise-based noise cancellation. No API key required.
+
+Shorthand (default settings):
+
+```json
+{
+  "noiseIsolation": "krisp"
+}
+```
+
+Detailed configuration:
+
+```json
+{
+  "noiseIsolation": {
+    "mode": "krisp",
+    "level": 80,
+    "direction": "read"
+  }
+}
+```
+
+- `mode` — Vendor: `"krisp"` or `"rnnoise"`.
+- `level` — Suppression level 0–100. Higher values are more aggressive. Default: 100.
+- `direction` — `"read"` filters caller audio (default), `"write"` filters outbound audio.
+- `model` — Optional model name override.
+
+Noise isolation can also be enabled/disabled mid-call via the `config` verb, the REST LCC API, or a WebSocket inject command (`noiseIsolation:status`).
+
 ## Barge-in
 
 By default, users can interrupt the assistant while it's speaking. The `bargeIn` object controls this:
@@ -94,6 +128,78 @@ The `arguments` field is already parsed (an object, not a JSON string).
 **Webhook response**: Return the tool result in the HTTP response body as JSON. The result is stringified and fed back to the LLM.
 
 **WebSocket**: The tool call arrives as an event on the hook path. Respond by calling `session.toolOutput(tool_call_id, result).reply()`.
+
+## MCP servers (external tools)
+
+Instead of (or in addition to) defining tools inline via `llmOptions.tools` and handling them with `toolHook`, you can connect to external MCP servers. The pipeline connects to each server at startup via SSE transport, discovers available tools, and makes them available to the LLM alongside any inline tools.
+
+```json
+{
+  "verb": "pipeline",
+  "mcpServers": [
+    {
+      "url": "https://livescoremcp.com/sse"
+    }
+  ],
+  "llm": {
+    "vendor": "openai",
+    "model": "gpt-4.1",
+    "llmOptions": {
+      "messages": [
+        { "role": "system", "content": "You are a sports assistant. Use available tools to look up live scores and fixtures when asked." }
+      ]
+    }
+  },
+  "stt": { "vendor": "deepgram", "language": "en-US" },
+  "tts": { "vendor": "cartesia", "voice": "sonic-english" }
+}
+```
+
+The [LiveScore MCP server](https://livescoremcp.com/) is a free, public MCP server that exposes tools for live football scores, fixtures, team stats, and player data. The pipeline discovers these tools automatically at startup — no need to define tool schemas in `llmOptions.tools`. A caller can simply ask "what football matches are on right now?" and the LLM will use the `get_live_scores` tool to fetch real-time data.
+
+If an MCP server requires authentication, pass credentials in the `auth` property:
+
+```json
+{
+  "mcpServers": [
+    {
+      "url": "https://mcp.example.com/sse",
+      "auth": {
+        "apiKey": "your-api-key-here"
+      }
+    }
+  ]
+}
+```
+
+**How tool dispatch works**: When the LLM requests a tool call, the pipeline checks MCP servers first. If the tool name matches one discovered from an MCP server, the call is dispatched there directly and the result is fed back to the LLM. If no MCP server provides the tool, it falls through to the `toolHook` webhook. You can use both MCP servers and `toolHook` together — MCP handles the tools it knows about, and `toolHook` handles the rest.
+
+**TypeScript example** — a pipeline agent with the LiveScore MCP server:
+
+```typescript
+session
+  .pipeline({
+    stt: { vendor: 'deepgram', language: 'en-US' },
+    tts: { vendor: 'cartesia', voice: 'sonic-english' },
+    llm: {
+      vendor: 'openai',
+      model: 'gpt-4.1',
+      llmOptions: {
+        messages: [
+          { role: 'system', content: 'You are a sports assistant. Use available tools to answer questions about football scores, fixtures, and teams.' },
+        ],
+      },
+    },
+    mcpServers: [
+      { url: 'https://livescoremcp.com/sse' },
+      // To use a server that requires auth:
+      // { url: 'https://mcp.example.com/sse', auth: { apiKey: 'your-key' } },
+    ],
+    turnDetection: 'krisp',
+    actionHook: '/pipeline-complete',
+  })
+  .send();
+```
 
 ## LLM configuration
 
