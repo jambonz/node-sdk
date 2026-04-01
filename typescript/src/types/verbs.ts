@@ -253,6 +253,8 @@ export interface PipelineVerb {
     direction?: 'read' | 'write';
     model?: string;
   };
+  /** External MCP servers that provide tools to the LLM. */
+  mcpServers?: McpServerConfig[];
 }
 
 export interface ListenVerb {

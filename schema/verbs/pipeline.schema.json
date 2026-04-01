@@ -141,6 +141,31 @@
         }
       ],
       "description": "Enable server-side noise isolation to reduce background noise on the caller's audio. Useful for improving STT accuracy in noisy environments."
+    },
+    "mcpServers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL of the MCP server."
+          },
+          "auth": {
+            "type": "object",
+            "description": "Authentication for the MCP server.",
+            "additionalProperties": true
+          },
+          "roots": {
+            "type": "array",
+            "items": { "type": "object" },
+            "description": "MCP root definitions."
+          }
+        },
+        "required": ["url"]
+      },
+      "description": "External MCP servers that provide tools to the LLM. The pipeline connects at startup via SSE, discovers available tools, and makes them callable by the LLM."
     }
   },
   "required": [
