@@ -150,10 +150,10 @@ A hosted instance is available at `https://mcp-server.jambonz.app/mcp`. This is 
 
 ```bash
 # Project-level
-claude mcp add jambonz -t streamable-http https://mcp-server.jambonz.app/mcp
+claude mcp add jambonz -t http https://mcp-server.jambonz.app/mcp
 
 # Global
-claude mcp add --scope user jambonz -t streamable-http https://mcp-server.jambonz.app/mcp
+claude mcp add --scope user jambonz -t http https://mcp-server.jambonz.app/mcp
 ```
 
 Or add to your project's `.mcp.json`:
@@ -162,7 +162,7 @@ Or add to your project's `.mcp.json`:
 {
   "mcpServers": {
     "jambonz": {
-      "type": "streamable-http",
+      "type": "http",
       "url": "https://mcp-server.jambonz.app/mcp"
     }
   }
