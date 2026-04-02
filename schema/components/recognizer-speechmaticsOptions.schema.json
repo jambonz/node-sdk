@@ -5,6 +5,15 @@
   "description": "Speechmatics-specific STT options. Only applies when recognizer vendor is 'speechmatics'.",
   "type": "object",
   "properties": {
+    "host": {
+      "type": "string",
+      "description": "Speechmatics host URL."
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["adaptive", "agile", "smart", "external"],
+      "description": "Speechmatics profile."
+    },
     "transcription_config": {
       "type": "object",
       "description": "Speechmatics transcription configuration.",
