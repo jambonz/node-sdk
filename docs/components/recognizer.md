@@ -52,6 +52,15 @@ A `keyterms` array can boost recognition of specific names, brands, or technical
 
 - [Transcription Languages](https://docs.speechmatics.com/speech-to-text/languages#transcription-languages)
 
+#### Voice Agent (Preview)
+
+Speechmatics offers a Voice Agent API (currently in preview) that provides low-latency conversational AI capabilities. When using the Voice Agent API, set the `host` and `profile` properties in `speechmaticsOptions`:
+
+- `host` - the Speechmatics Voice Agent endpoint URL
+- `profile` - one of `adaptive`, `agile`, `smart`, or `external`
+
+See [Voice Agent API documentation](https://docs.speechmatics.com/private/voice-agent-api#introduction) for details.
+
 ### Soniox
 
 - [STT Models](https://soniox.com/docs/stt/models)
