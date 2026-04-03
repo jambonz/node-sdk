@@ -255,6 +255,8 @@ export interface PipelineVerb {
   };
   /** External MCP servers that provide tools to the LLM. */
   mcpServers?: McpServerConfig[];
+  /** Seconds to wait after assistant finishes speaking before prompting user to respond. 0 disables. Default: 0. */
+  noResponseTimeout?: number;
 }
 
 export interface ListenVerb {

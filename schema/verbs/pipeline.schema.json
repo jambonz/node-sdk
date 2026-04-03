@@ -78,6 +78,12 @@
       },
       "additionalProperties": false
     },
+    "noResponseTimeout": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Seconds to wait after the assistant finishes speaking before prompting the user to respond. 0 disables. Default: 0.",
+      "default": 0
+    },
     "llm": {
       "type": "object",
       "description": "LLM configuration for the pipeline. See the 'llm' verb schema for details.",
