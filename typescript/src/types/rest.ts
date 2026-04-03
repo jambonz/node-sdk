@@ -98,6 +98,15 @@ export interface UpdateCallRequest {
   dtmf?: { digit: string; duration?: number };
   /** Tag metadata. */
   tag?: Record<string, unknown>;
+  /** Mid-conversation pipeline update. */
+  pipeline_update?: {
+    type: 'update_instructions' | 'inject_context' | 'update_tools' | 'generate_reply';
+    instructions?: string;
+    messages?: Array<{ role: string; content: string }>;
+    tools?: unknown[];
+    user_input?: string;
+    interrupt?: boolean;
+  };
 }
 
 export interface ListCallsFilter {

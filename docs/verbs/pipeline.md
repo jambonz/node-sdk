@@ -201,6 +201,93 @@ session
   .send();
 ```
 
+## Mid-conversation updates
+
+The pipeline supports asynchronous updates while a conversation is in progress. These let you change the agent's behavior, inject new context, modify available tools, or trigger a new LLM response — without interrupting the current verb stack.
+
+Updates can be sent via:
+- **WebSocket**: `session.updatePipeline(data)` (sends a `pipeline:update` command)
+- **REST API**: `client.calls.updatePipeline(callSid, data)` (sends `pipeline_update` in the PUT body)
+
+### update_instructions
+
+Replace the LLM system prompt mid-conversation. Useful when the conversation transitions to a different topic or agent persona.
+
+```typescript
+// WebSocket
+session.updatePipeline({
+  type: 'update_instructions',
+  instructions: 'You are now a billing support agent. Help the caller with invoice questions.',
+});
+
+// REST
+await client.calls.updatePipeline(callSid, {
+  type: 'update_instructions',
+  instructions: 'You are now a billing support agent. Help the caller with invoice questions.',
+});
+```
+
+### inject_context
+
+Append messages to the LLM conversation history. Useful for injecting CRM data, call notes, or other context retrieved after the call started.
+
+```typescript
+session.updatePipeline({
+  type: 'inject_context',
+  messages: [
+    { role: 'system', content: 'Customer account #12345: Gold tier, 3 open tickets.' },
+  ],
+});
+```
+
+### update_tools
+
+Replace the tool set available to the LLM. The new tools take effect on the next LLM turn.
+
+```typescript
+session.updatePipeline({
+  type: 'update_tools',
+  tools: [
+    {
+      type: 'function',
+      function: {
+        name: 'transfer_call',
+        description: 'Transfer the caller to a specialist',
+        parameters: { type: 'object', properties: { department: { type: 'string' } } },
+      },
+    },
+  ],
+});
+```
+
+### generate_reply
+
+Prompt the LLM to generate a new response. If the pipeline is currently idle, the prompt executes immediately. If the pipeline is busy (e.g. the assistant is speaking), the request is queued and executes when the current turn completes.
+
+Use `interrupt: true` to cancel the current response and generate immediately — useful for supervisor overrides or urgent context changes.
+
+```typescript
+// Simple prompt
+session.updatePipeline({
+  type: 'generate_reply',
+  user_input: 'The customer just entered their account number: 12345',
+});
+
+// With one-shot instructions
+session.updatePipeline({
+  type: 'generate_reply',
+  user_input: 'Customer is asking about refunds',
+  instructions: 'Be empathetic and offer a 20% discount before processing a refund.',
+});
+
+// Interrupt current response
+session.updatePipeline({
+  type: 'generate_reply',
+  user_input: 'Urgent: supervisor override',
+  interrupt: true,
+});
+```
+
 ## LLM configuration
 
 The `llm` property is the only required field. It configures the text-to-text LLM:
