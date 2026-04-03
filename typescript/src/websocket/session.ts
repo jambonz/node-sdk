@@ -338,6 +338,15 @@ export class Session extends EventEmitter {
     });
   }
 
+  /** Update an active pipeline conversation mid-call. */
+  updatePipeline(data: Record<string, unknown>): void {
+    this.wsSend({
+      type: 'command',
+      command: 'pipeline:update',
+      data,
+    });
+  }
+
   // ---------------------------------------------------------------------------
   // TTS Token Streaming
   // ---------------------------------------------------------------------------
