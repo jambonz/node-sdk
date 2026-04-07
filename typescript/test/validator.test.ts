@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { JambonzValidator } from '../src/validator.js';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { resolve } from 'path';
+import { createRequire } from 'module';
 import { readFileSync } from 'fs';
 
-const __dirname_test = dirname(fileURLToPath(import.meta.url));
-const schemaDir = resolve(__dirname_test, '../../schema');
+const require = createRequire(import.meta.url);
+const schemaDir = resolve(require.resolve('@jambonz/schema'), '..');
 
 describe('JambonzValidator', () => {
   const validator = new JambonzValidator(schemaDir);

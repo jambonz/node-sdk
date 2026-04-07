@@ -7,9 +7,11 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'fs';
 import { resolve, basename, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
+const schemaDir = resolve(require.resolve('@jambonz/schema'), '..');
 const __dirname_test = dirname(fileURLToPath(import.meta.url));
-const schemaDir = resolve(__dirname_test, '../../schema');
 const verbsDir = resolve(schemaDir, 'verbs');
 const componentsDir = resolve(schemaDir, 'components');
 const typesDir = resolve(__dirname_test, '../src/types');
@@ -88,7 +90,11 @@ describe('Schema drift detection', () => {
   const componentsSource = readFileSync(resolve(typesDir, 'components.ts'), 'utf-8');
 
   describe('verb schemas match TypeScript interfaces', () => {
-    const verbFiles = readdirSync(verbsDir).filter((f) => f.endsWith('.schema.json'));
+    // rest_dial is an internal server verb — no public TypeScript interface needed
+    const SKIP_VERBS = ['rest_dial'];
+    const verbFiles = readdirSync(verbsDir)
+      .filter((f) => f.endsWith('.schema.json'))
+      .filter((f) => !SKIP_VERBS.includes(basename(f, '.schema.json')));
 
     for (const file of verbFiles) {
       const schemaName = basename(file, '.schema.json');

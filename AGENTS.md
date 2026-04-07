@@ -1,99 +1,13 @@
-# jambonz Agent Toolkit
+# @jambonz/sdk — Node.js SDK Guide
 
-jambonz is an open-source CPaaS (Communications Platform as a Service) for building voice and messaging applications. It handles telephony infrastructure — SIP, carriers, phone numbers, media processing — so you can focus on application logic.
+This guide covers the @jambonz/sdk TypeScript/JavaScript SDK. For the language-agnostic jambonz verb model and protocol reference, see the AGENTS.md in the @jambonz/schema package or use the jambonz MCP server:
+
+- **Remote**: `https://mcp-server.jambonz.app/mcp`
+- **Tools**: `jambonz_developer_toolkit` (full guide + schema index), `get_jambonz_schema` (individual verb/component schemas)
 
 ## Before You Start — Ask the User
 
 Before generating any jambonz application code, ask the user: **"Do you prefer TypeScript or JavaScript?"** Then generate all code examples in their chosen language. If they don't have a preference, default to TypeScript.
-
-## Server Versions
-
-jambonz has two editions: **v0.9.x (open source)** and **v10.x (commercial)**. Always target the commercial version (v10.x). All verb schemas and features are available.
-
-## How jambonz Applications Work
-
-A jambonz application controls phone calls by returning **arrays of verbs** — JSON instructions that execute sequentially. The runtime processes each verb in order: speak text, play audio, collect input, dial a number, connect to an AI model, etc.
-
-### The Webhook Lifecycle
-
-1. An incoming call arrives. jambonz invokes your application's URL with call details (caller, called number, SIP headers, etc.).
-2. Your application returns a JSON array of verbs.
-3. jambonz executes the verbs in order.
-4. When a verb with an `actionHook` completes (e.g. `gather` collects speech input), jambonz invokes the actionHook URL with the result.
-5. The actionHook response (a new verb array) replaces the remaining verb stack.
-6. This continues until the call ends or a `hangup` verb is executed.
-
-### Transport Modes
-
-jambonz supports two transport modes for delivering verb arrays:
-
-- **Webhook (HTTP)**: Your server receives HTTP POST requests with call data and returns JSON verb arrays in the response body. Stateless and simple. Good for IVR menus, call routing, and straightforward flows.
-- **WebSocket**: Your server maintains a persistent websocket connection with jambonz. Verb arrays are sent as JSON messages in both directions. Required for real-time features like LLM conversations, audio streaming, and event-driven flows.
-
-The verb schemas and JSON structure are identical in both modes. The difference is the transport.
-
-### When to Use Which
-
-- **Webhook**: Simple IVR, call routing, voicemail, basic gather-and-respond patterns.
-- **WebSocket**: LLM-powered voice agents, real-time audio streaming, complex conversational flows, anything requiring bidirectional communication, or asynchronous logic, or streaming tts.
-
-**IMPORTANT**: Any application that uses a speech-to-speech verb (`openai_s2s`, `google_s2s`, `deepgram_s2s`, `ultravox_s2s`, `elevenlabs_s2s`, `s2s`, or `pipeline`) MUST use WebSocket transport, not webhooks. These verbs require persistent bidirectional communication for real-time audio and events. Always use `createEndpoint` from `@jambonz/sdk/websocket` for s2s applications.
-
-## Schema
-
-The complete verb schema is at `schema/jambonz-app.schema.json`. This is a JSON Schema (draft 2020-12) that defines the structure of a jambonz application.
-
-Individual verb schemas are in `schema/verbs/`. Shared component types (synthesizer, recognizer, target, etc.) are in `schema/components/`.
-
-## Core Verbs
-
-### Audio & Speech
-- **say** — Speak text using TTS. Supports SSML, streaming, multiple voices.
-- **play** — Play an audio file from a URL.
-- **gather** — Collect speech (STT) and/or DTMF input. The workhorse for interactive menus and voice input.
-
-### AI & Real-time
-- **openai_s2s** / **google_s2s** / **deepgram_s2s** / **ultravox_s2s** — Connect the caller to a vendor-specific LLM for real-time voice conversation. These are the **preferred** verbs when the vendor is known. Each handles the full STT→LLM→TTS pipeline with the vendor pre-set.
-- **elevenlabs_s2s** — Connect the caller to an ElevenLabs Conversational AI agent. **Unlike other s2s vendors**, ElevenLabs requires a pre-configured `agent_id` (created in the ElevenLabs dashboard) rather than a model and messages. See [ElevenLabs S2S specifics](#elevenlabs-s2s-specifics) below.
-- **s2s** — Generic LLM voice conversation verb. Use only when the vendor is determined at runtime (e.g. from an env var). Requires `vendor` to be specified.
-- **pipeline** — Higher-level voice AI pipeline with integrated turn detection.
-- **dialogflow** — Connect the caller to a Google Dialogflow agent (ES, CX, or CES).
-- **stream** — Stream raw audio to a websocket endpoint for custom processing.
-- **transcribe** — Real-time call transcription sent to a webhook.
-
-### Call Control
-- **dial** — Place an outbound call and bridge it to the current caller.
-- **conference** — Multi-party conference room.
-- **enqueue** / **dequeue** — Call queuing.
-- **hangup** — End the call.
-- **redirect** — Transfer control to a different webhook.
-- **pause** — Wait for a specified duration.
-
-### SIP
-- **sip:decline** — Reject an incoming call with a SIP error.
-- **sip:request** — Send a SIP request within the dialog.
-- **sip:refer** — Transfer the call via SIP REFER.
-
-### Utility
-- **config** — Set session-level defaults (TTS vendor/voice, STT vendor, VAD, etc.).
-- **tag** — Attach metadata to the call.
-- **dtmf** — Send DTMF tones.
-- **dub** — Mix auxiliary audio tracks into the call.
-- **message** — Send SMS/MMS.
-- **alert** — Send a SIP 180 with Alert-Info.
-- **answer** — Explicitly answer the call.
-- **leave** — Leave a conference or queue.
-
-### Verb Synonyms and Shortcuts
-
-**IMPORTANT — Code generation rules:**
-
-1. **Always use `stream`, never `listen`** — they are synonyms; `stream` is the preferred name.
-2. **Always use the vendor-specific shortcut when the LLM vendor is known** — use `openai_s2s`, `google_s2s`, `elevenlabs_s2s`, `deepgram_s2s`, or `ultravox_s2s`. Do NOT use `llm` or `s2s` with a `vendor` property when a shortcut exists.
-3. **Use `s2s` (not `llm`) when the vendor is dynamic** — e.g. the vendor comes from an env var or runtime config. Both `s2s` and `llm` are synonyms, but prefer `s2s`.
-4. **Never use `llm` in generated code** — it is a legacy name. Use either a vendor shortcut or `s2s`.
-
-The same rules apply to SDK method calls: use `.openai_s2s(opts)`, `.deepgram_s2s(opts)`, etc. instead of `.llm({ vendor: 'openai', ... })`. Use `.stream(opts)` instead of `.listen(opts)`.
 
 ## Using the @jambonz/sdk
 
@@ -295,135 +209,6 @@ await client.calls.redirect(callSid, 'https://example.com/new-flow');
 await client.calls.update(callSid, { call_status: 'completed' });
 ```
 
-## Common Patterns (Raw JSON)
-
-These are the raw JSON verb arrays that the SDK generates. You should use the SDK verb methods above, but these show the underlying structure for reference.
-
-### Simple Greeting and Gather
-```json
-[
-  { "verb": "say", "text": "Welcome. Press 1 for sales, 2 for support." },
-  { "verb": "gather", "input": ["digits"], "numDigits": 1, "actionHook": "/menu" }
-]
-```
-
-### LLM Voice Agent
-```json
-[
-  {
-    "verb": "config",
-    "synthesizer": { "vendor": "elevenlabs", "voice": "EXAVITQu4vr4xnSDxMaL" },
-    "recognizer": { "vendor": "deepgram", "language": "en-US" }
-  },
-  {
-    "verb": "openai_s2s",
-    "model": "gpt-4o",
-    "llmOptions": {
-      "messages": [{ "role": "system", "content": "You are a helpful assistant." }]
-    },
-    "actionHook": "/llm-done",
-    "toolHook": "/tool-call"
-  }
-]
-```
-
-### ElevenLabs S2S Specifics
-
-ElevenLabs works differently from other s2s vendors. Instead of passing a model and system prompt, you create a **Conversational AI agent** in the ElevenLabs dashboard and pass the `agent_id` to jambonz. The agent's voice, personality, tools, and LLM configuration are all managed on the ElevenLabs side.
-
-**Key differences from other s2s verbs:**
-- `auth` requires `agent_id` (required) and optionally `api_key` (enables signed WebSocket URLs)
-- `model` is NOT used — the model is configured in the ElevenLabs agent
-- `llmOptions` should be an empty object `{}` (do NOT pass `messages` or `temperature`)
-- `llmOptions.conversation_initiation_client_data` can optionally send data to the agent at conversation start
-- Always include `eventHook` and `events: ['all']` — omitting eventHook causes errors on the server
-
-```json
-[
-  {
-    "verb": "elevenlabs_s2s",
-    "auth": {
-      "agent_id": "your-agent-id",
-      "api_key": "your-api-key"
-    },
-    "llmOptions": {},
-    "actionHook": "/s2s-complete",
-    "eventHook": "/event",
-    "events": ["all"]
-  }
-]
-```
-
-SDK example:
-```typescript
-session
-  .elevenlabs_s2s({
-    auth: { agent_id: agentId, api_key: apiKey },
-    llmOptions: {},
-    actionHook: '/s2s-complete',
-    eventHook: '/event',
-    events: ['all'],
-  })
-  .send();
-```
-
-### Dial with Fallback
-```json
-[
-  { "verb": "say", "text": "Connecting you now." },
-  {
-    "verb": "dial",
-    "target": [{ "type": "phone", "number": "+15085551212" }],
-    "answerOnBridge": true,
-    "timeout": 30,
-    "actionHook": "/dial-result"
-  },
-  { "verb": "say", "text": "The agent is unavailable. Goodbye." },
-  { "verb": "hangup" }
-]
-```
-
-### Call Queue
-```json
-[
-  { "verb": "say", "text": "All agents are busy. You are in the queue." },
-  {
-    "verb": "enqueue",
-    "name": "support",
-    "waitHook": "/hold-music",
-    "actionHook": "/queue-exit"
-  }
-]
-```
-
-## ActionHook Payloads
-
-When a verb completes, jambonz invokes the `actionHook` URL (webhook) or sends an event (WebSocket) with result data. Every actionHook payload includes these base fields:
-
-| Field | Description |
-|-------|-------------|
-| `call_sid` | Unique identifier for this call |
-| `account_sid` | Your account identifier |
-| `application_sid` | The application handling this call |
-| `direction` | `inbound` or `outbound` |
-| `from` | Caller phone number or SIP URI |
-| `to` | Called phone number or SIP URI |
-| `call_id` | SIP Call-ID |
-| `call_status` | Current call state (`trying`, `ringing`, `early-media`, `in-progress`, `completed`, `failed`, `busy`, `no-answer`) |
-| `sip_status` | SIP response code (e.g. `200`, `486`) |
-
-### Verb-Specific Payload Fields
-
-**gather**: `speech` (object with `alternatives[].transcript`), `digits` (string), `reason` (`speechDetected`, `dtmfDetected`, `timeout`)
-
-**dial**: `dial_call_sid`, `dial_call_status`, `dial_sip_status`, `dial_sbc_callid`, `duration`
-
-**llm**: `completion_reason` (`normal`, `timeout`, `error`), `llm_usage` (token counts)
-
-**enqueue**: `queue_result` (`dequeued`, `hangup`, `error`)
-
-**transcribe**: `transcription` (object with transcript text)
-
 ## Application Environment Variables
 
 jambonz has a built-in mechanism for application configuration that is **always preferred over `process.env`**. It works in two required steps:
@@ -587,32 +372,6 @@ Key capabilities:
 - **Inject commands** — `injectMute()`, `injectWhisper()`, `injectDtmf()`, `injectRecord()`, `injectTag()`, `injectListenStatus()` — modify the call mid-stream.
 - **LLM tool output** — `toolOutput()` — return tool call results to the pipeline verb's LLM.
 - **Cascaded voice AI agents** — build your own STT→LLM→TTS loop using `config` (ttsStream + bargeIn) + `sendTtsTokens()`. Full control over LLM interaction and conversation history.
-
-## WebSocket Protocol
-
-### Message Types (jambonz → app)
-
-| Type | Description |
-|------|-------------|
-| `session:new` | New call session established. Contains call details. |
-| `session:redirect` | Call was redirected to this app. |
-| `verb:hook` | An actionHook fired (e.g. gather completed). Contains `hook` (the actionHook name) and `data` (the payload). The SDK emits this as `session.on('/hookName', handler)`. Respond with `.reply()`. |
-| `verb:status` | Informational verb status notification (no reply needed). |
-| `call:status` | Call state changed (e.g. `completed`). |
-| `llm:tool-call` | LLM requested a tool/function call. |
-| `llm:event` | LLM lifecycle event (connected, tokens, etc.). |
-| `tts:tokens-result` | Ack for a TTS token streaming message. |
-| `tts:streaming-event` | TTS streaming lifecycle event (e.g. user interruption). |
-
-### Message Types (app → jambonz)
-
-| Type | Description |
-|------|-------------|
-| `ack` | Acknowledge a received message. Include verbs in the `data` array to replace the current verb stack. |
-| `command` | Send a command (e.g. inject a verb, control recording). |
-| `llm:tool-output` | Return the result of a tool call to the LLM. |
-| `tts:tokens` | Stream TTS text tokens for incremental speech synthesis. |
-| `tts:flush` | Signal end of a TTS token stream. |
 
 ### Session Events (SDK)
 
@@ -820,14 +579,6 @@ session.injectRecord('stopCallRecording');
 
 **Important**: The `dial` verb must use `anchorMedia: true` for recording to work during bridged calls. Without media anchoring, audio doesn't flow through the jambonz media server.
 
-## REST API
-
-jambonz provides a REST API for platform management and active call control. The API client is available in the SDK at `@jambonz/sdk/client`.
-
-Key resources:
-- **Calls** — Create outbound calls, query active calls, modify in-progress calls (redirect, whisper, mute, hangup)
-- **Messages** — Send SMS/MMS messages
-
 ## Code Structure
 
 ### Single File (default)
@@ -840,9 +591,9 @@ For applications with 3+ routes or significant per-route logic, split into a `sr
 
 ```
 src/
-  app.ts              ← entry point: server setup, route registration
+  app.ts              <- entry point: server setup, route registration
   routes/
-    incoming.ts       ← handler for one endpoint/path
+    incoming.ts       <- handler for one endpoint/path
     hold-music.ts
     queue-exit.ts
 ```
@@ -940,9 +691,9 @@ svc.on('session:new', (session) => {
 
 ### When to Split
 
-- **1-2 routes, simple logic** → single file
-- **3+ routes or substantial per-route logic** → `src/app.ts` + `src/routes/`
-- **Shared config, prompts, or utilities** → `src/config.ts`, `src/prompts.ts`, etc.
+- **1-2 routes, simple logic** -> single file
+- **3+ routes or substantial per-route logic** -> `src/app.ts` + `src/routes/`
+- **Shared config, prompts, or utilities** -> `src/config.ts`, `src/prompts.ts`, etc.
 
 When in doubt, start with a single file. It's easy to split later.
 
@@ -962,13 +713,3 @@ Complete working examples are in the `examples/` directory:
 - **queue-with-hold** — Call queue with hold music and agent dequeue (webhook + WebSocket)
 - **call-recording** — Mid-call recording control via REST API and inject commands (webhook + WebSocket)
 - **realtime-translator** — Bridges two parties with real-time speech translation using STT, Google Translate, and TTS dub tracks. Multi-file example with `src/routes/` structure (WebSocket)
-
-## Key Concepts
-
-- **Verb**: A JSON object with a `verb` property that tells jambonz what to do. Verbs execute sequentially.
-- **ActionHook**: A webhook URL that jambonz calls when a verb completes. Returns the next verb array. Payload includes call details and verb-specific results.
-- **Synthesizer**: TTS configuration (vendor, voice, language).
-- **Recognizer**: STT configuration (vendor, language, model).
-- **Target**: A call destination (phone number, SIP URI, registered user, Teams user).
-- **Session**: A single phone call. Session-level settings (set via `config`) persist across verbs.
-- **Inject Command**: Asynchronous mid-call modification (WebSocket). Executes immediately without replacing the verb stack.

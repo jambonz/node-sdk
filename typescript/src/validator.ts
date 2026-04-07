@@ -1,12 +1,13 @@
 /**
  * Schema-based validation using AJV.
- * Loads all JSON schemas from schema/ and validates verb arrays and individual verbs.
+ * Loads all JSON schemas from the @jambonz/schema package.
  */
 
 import Ajv, { type ValidateFunction, type ErrorObject } from 'ajv';
-import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { readFileSync, readdirSync, existsSync } from 'fs';
+import { resolve, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 export interface ValidationResult {
   valid: boolean;
@@ -18,105 +19,54 @@ export interface ValidationError {
   message: string;
 }
 
-// Schema $id to file path mapping
-const COMPONENT_SCHEMAS = [
-  'auth',
-  'actionHook',
-  'actionHookDelayAction',
-  'amd',
-  'bidirectionalAudio',
-  'fillerNoise',
-  'recognizer',
-  'recognizer-assemblyAiOptions',
-  'recognizer-awsOptions',
-  'recognizer-azureOptions',
-  'recognizer-cobaltOptions',
-  'recognizer-customOptions',
-  'recognizer-deepgramOptions',
-  'recognizer-elevenlabsOptions',
-  'recognizer-gladiaOptions',
-  'recognizer-googleOptions',
-  'recognizer-houndifyOptions',
-  'recognizer-ibmOptions',
-  'recognizer-nuanceOptions',
-  'recognizer-nvidiaOptions',
-  'recognizer-openaiOptions',
-  'recognizer-sonioxOptions',
-  'recognizer-speechmaticsOptions',
-  'recognizer-verbioOptions',
-  'llm-base',
-  'synthesizer',
-  'target',
-  'vad',
-] as const;
-
-const VERB_SCHEMAS = [
-  'answer',
-  'alert',
-  'config',
-  'say',
-  'play',
-  'gather',
-  'dial',
-  'listen',
-  'stream',
-  'llm',
-  's2s',
-  'openai_s2s',
-  'google_s2s',
-  'elevenlabs_s2s',
-  'deepgram_s2s',
-  'ultravox_s2s',
-  'dialogflow',
-  'pipeline',
-  'conference',
-  'transcribe',
-  'enqueue',
-  'dequeue',
-  'dtmf',
-  'dub',
-  'hangup',
-  'leave',
-  'message',
-  'pause',
-  'redirect',
-  'tag',
-  'sip-decline',
-  'sip-request',
-  'sip-refer',
-] as const;
-
-function loadSchema(schemaDir: string, relativePath: string): Record<string, unknown> {
-  const fullPath = resolve(schemaDir, relativePath);
-  return JSON.parse(readFileSync(fullPath, 'utf-8')) as Record<string, unknown>;
-}
-
+/** Locate the @jambonz/schema package directory. */
 function findSchemaDir(): string {
-  // Walk up from this file to find the schema/ directory
-  // In development: typescript/src/validator.ts -> ../../schema
-  // In dist: dist/index.js -> ../schema (tsup bundles to package-root/dist/)
+  // Method 1: use createRequire to resolve the package
+  try {
+    const req = createRequire(import.meta.url);
+    const schemaIndex = req.resolve('@jambonz/schema');
+    const dir = resolve(schemaIndex, '..');
+    if (existsSync(resolve(dir, 'jambonz-app.schema.json'))) {
+      return dir;
+    }
+  } catch {
+    // fall through
+  }
+
+  // Method 2: walk up from this file to find node_modules/@jambonz/schema
   const currentDir = typeof __dirname !== 'undefined'
     ? __dirname
     : dirname(fileURLToPath(import.meta.url));
 
-  // Try relative paths from both src and dist locations
-  const candidates = [
-    resolve(currentDir, '../../schema'),      // from typescript/src/
-    resolve(currentDir, '../schema'),          // from dist/ (tsup bundles to package-root/dist/)
-  ];
-
-  for (const candidate of candidates) {
-    try {
-      readFileSync(resolve(candidate, 'jambonz-app.schema.json'), 'utf-8');
+  let dir = currentDir;
+  for (let i = 0; i < 10; i++) {
+    const candidate = resolve(dir, 'node_modules', '@jambonz', 'schema');
+    if (existsSync(resolve(candidate, 'jambonz-app.schema.json'))) {
       return candidate;
-    } catch {
-      // try next
     }
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
   }
 
   throw new Error(
-    'Could not find jambonz schema directory. Ensure the schema/ directory is present alongside the typescript/ directory.'
+    'Could not find @jambonz/schema package. Ensure it is installed as a dependency.'
   );
+}
+
+/** Discover schema files in a subdirectory. */
+function discoverSchemas(dir: string): string[] {
+  try {
+    return readdirSync(dir)
+      .filter((f) => f.endsWith('.schema.json'))
+      .map((f) => basename(f, '.schema.json'));
+  } catch {
+    return [];
+  }
+}
+
+function loadSchema(filePath: string): Record<string, unknown> {
+  return JSON.parse(readFileSync(filePath, 'utf-8')) as Record<string, unknown>;
 }
 
 export class JambonzValidator {
@@ -133,19 +83,21 @@ export class JambonzValidator {
     });
 
     // Register component schemas first (they are referenced by verb schemas)
-    for (const name of COMPONENT_SCHEMAS) {
-      const schema = loadSchema(dir, `components/${name}.schema.json`);
+    const componentsDir = resolve(dir, 'components');
+    for (const name of discoverSchemas(componentsDir)) {
+      const schema = loadSchema(resolve(componentsDir, `${name}.schema.json`));
       this.ajv.addSchema(schema);
     }
 
     // Register verb schemas
-    for (const name of VERB_SCHEMAS) {
-      const schema = loadSchema(dir, `verbs/${name}.schema.json`);
+    const verbsDir = resolve(dir, 'verbs');
+    for (const name of discoverSchemas(verbsDir)) {
+      const schema = loadSchema(resolve(verbsDir, `${name}.schema.json`));
       this.ajv.addSchema(schema);
     }
 
     // Compile the root app schema
-    const appSchema = loadSchema(dir, 'jambonz-app.schema.json');
+    const appSchema = loadSchema(resolve(dir, 'jambonz-app.schema.json'));
     this.validateApp = this.ajv.compile(appSchema);
   }
 
