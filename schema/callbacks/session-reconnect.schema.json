@@ -1,9 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://jambonz.org/schema/callbacks/session-reconnect",
-  "title": "Session:reconnect Payload",
-  "description": "Payload delivered when a WebSocket client reconnects after a disconnection. The payload is identical to the original session:new payload — it is cached from the initial session setup and replayed on reconnect. This allows the application to restore state without needing to re-fetch call details.",
-  "allOf": [
-    { "$ref": "session-new" }
-  ]
-}

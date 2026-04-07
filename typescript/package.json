@@ -77,11 +77,10 @@
     }
   },
   "files": [
-    "dist",
-    "schema"
+    "dist"
   ],
   "scripts": {
-    "build": "tsup && rm -rf ./schema && cp -r ../schema ./schema",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -91,6 +90,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@jambonz/schema": "^0.1.1",
     "ajv": "^8.17.1",
     "ws": "^8.18.0"
   },

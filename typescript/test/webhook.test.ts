@@ -2,11 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { createHmac } from 'crypto';
 import { WebhookResponse } from '../src/webhook/response.js';
 import { envVarsMiddleware } from '../src/webhook/env-vars.js';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { resolve } from 'path';
+import { createRequire } from 'module';
 
-const __dirname_test = dirname(fileURLToPath(import.meta.url));
-const schemaDir = resolve(__dirname_test, '../../schema');
+const require = createRequire(import.meta.url);
+const schemaDir = resolve(require.resolve('@jambonz/schema'), '..');
 
 describe('WebhookResponse', () => {
   it('should build a simple greeting', () => {

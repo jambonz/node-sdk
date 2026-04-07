@@ -7,9 +7,11 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'fs';
 import { resolve, basename, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
+const schemaDir = resolve(require.resolve('@jambonz/schema'), '..');
 const __dirname_test = dirname(fileURLToPath(import.meta.url));
-const schemaDir = resolve(__dirname_test, '../../schema');
 const verbsDir = resolve(schemaDir, 'verbs');
 const componentsDir = resolve(schemaDir, 'components');
 const typesDir = resolve(__dirname_test, '../src/types');
