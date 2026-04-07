@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "jambonz": {
+      "type": "http",
+      "url": "https://mcp-server.jambonz.app/mcp"
+    }
+  }
+}
