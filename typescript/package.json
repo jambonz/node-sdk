@@ -90,7 +90,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@jambonz/schema": "^0.1.1",
+    "@jambonz/schema": "^0.1.5",
     "ajv": "^8.17.1",
     "ws": "^8.18.0"
   },

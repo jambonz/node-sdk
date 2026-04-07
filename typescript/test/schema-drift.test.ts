@@ -90,7 +90,11 @@ describe('Schema drift detection', () => {
   const componentsSource = readFileSync(resolve(typesDir, 'components.ts'), 'utf-8');
 
   describe('verb schemas match TypeScript interfaces', () => {
-    const verbFiles = readdirSync(verbsDir).filter((f) => f.endsWith('.schema.json'));
+    // rest_dial is an internal server verb — no public TypeScript interface needed
+    const SKIP_VERBS = ['rest_dial'];
+    const verbFiles = readdirSync(verbsDir)
+      .filter((f) => f.endsWith('.schema.json'))
+      .filter((f) => !SKIP_VERBS.includes(basename(f, '.schema.json')));
 
     for (const file of verbFiles) {
       const schemaName = basename(file, '.schema.json');
