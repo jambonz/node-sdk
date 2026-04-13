@@ -4,6 +4,7 @@
  */
 
 import type {
+  AgentVerb,
   AlertVerb,
   AnswerVerb,
   ConferenceVerb,
@@ -22,7 +23,6 @@ import type {
   LlmVerb,
   MessageVerb,
   PauseVerb,
-  PipelineVerb,
   PlayVerb,
   RedirectVerb,
   S2sVerb,
@@ -122,9 +122,9 @@ export class VerbBuilder {
     return this.addVerb({ verb: 'dialogflow', ...opts });
   }
 
-  /** Voice AI pipeline with integrated turn detection. */
-  pipeline(opts: Omit<PipelineVerb, 'verb'>): this {
-    return this.addVerb({ verb: 'pipeline', ...opts });
+  /** Voice AI agent with integrated turn detection. */
+  agent(opts: Omit<AgentVerb, 'verb'>): this {
+    return this.addVerb({ verb: 'agent', ...opts });
   }
 
   /** Stream real-time call audio to a WebSocket endpoint. Supports bidirectional audio. */

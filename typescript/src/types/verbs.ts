@@ -215,8 +215,8 @@ export interface DialogflowVerb {
   };
 }
 
-export interface PipelineVerb {
-  verb: 'pipeline';
+export interface AgentVerb {
+  verb: 'agent';
   id?: string;
   /** STT configuration. */
   stt: Recognizer;
@@ -236,9 +236,9 @@ export interface PipelineVerb {
   };
   /** LLM configuration. */
   llm: Record<string, unknown>;
-  /** Webhook when pipeline ends. */
+  /** Webhook when agent ends. */
   actionHook?: ActionHook;
-  /** Webhook for pipeline events. */
+  /** Webhook for agent events. */
   eventHook?: ActionHook;
   /** Webhook when the LLM requests a tool/function call. */
   toolHook?: ActionHook;
@@ -716,7 +716,7 @@ export type Verb =
   | DeepgramS2sVerb
   | UltravoxS2sVerb
   | DialogflowVerb
-  | PipelineVerb
+  | AgentVerb
   | ConferenceVerb
   | TranscribeVerb
   | EnqueueVerb

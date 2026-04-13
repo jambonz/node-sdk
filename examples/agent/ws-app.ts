@@ -15,7 +15,7 @@ const makeService = createEndpoint({
   },
 });
 
-const svc = makeService({ path: '/pipeline' });
+const svc = makeService({ path: '/agent' });
 
 const systemPrompt = `You are a helpful weather assistant.
 You can look up current weather for any location using the get_weather tool.
@@ -56,7 +56,7 @@ svc.on('session:new', (session) => {
 
   session
     .on('/event', (evt: Record<string, any>) => {
-      console.log('pipeline event:', evt.type);
+      console.log('agent event:', evt.type);
     })
     .on('/toolCall', async (evt: Record<string, any>) => {
       const { tool_call_id, name, arguments: args } = evt;
@@ -95,7 +95,7 @@ svc.on('session:new', (session) => {
       }
     })
     .on('/action', (evt: Record<string, any>) => {
-      console.log('pipeline ended:', evt.completion_reason);
+      console.log('agent ended:', evt.completion_reason);
       session.reply();
     })
     .on('close', (code: number) => {
@@ -106,7 +106,7 @@ svc.on('session:new', (session) => {
     });
 
   session
-    .pipeline({
+    .agent({
       stt: {
         vendor: 'deepgram',
         language: 'en-US',
@@ -135,4 +135,4 @@ svc.on('session:new', (session) => {
     .send();
 });
 
-console.log('Pipeline voice agent listening on port 3000');
+console.log('Agent listening on port 3000');

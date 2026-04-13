@@ -60,14 +60,14 @@ interface TtsConfig {
   options?: Record<string, unknown>;
 }
 
-interface PipelineOptions {
+interface AgentOptions {
   stt: SttConfig;
   tts: TtsConfig;
   turnDetection: 'krisp' | 'stt';
   noiseIsolation?: 'krisp' | 'rnnoise';
 }
 
-function handleSession(session: Session, opts: PipelineOptions) {
+function handleSession(session: Session, opts: AgentOptions) {
   const log = logger.child({ call_sid: session.callSid });
   const llmVendor = session.data.env_vars?.LLM_VENDOR || 'openai';
   const model = session.data.env_vars?.LLM_MODEL || 'gpt-4.1-mini';
@@ -78,19 +78,19 @@ function handleSession(session: Session, opts: PipelineOptions) {
   /* Demo: update_tools mid-conversation to add web search capability.
      After the user's second question (turn_end #2), inject a web_search tool.
      The agent starts without web search, so early questions get stale answers.
-     Once the tool is added, the agent can search the web via Tavily. */
+     Once the tool is added, it can search the web via Tavily. */
   let turnCount = 0;
   let toolsInjected = false;
 
-  session.on('/pipeline-event', (evt: Record<string, unknown>) => {
-    log.info({payload: evt}, `pipeline event: ${evt.type}`);
+  session.on('/agent-event', (evt: Record<string, unknown>) => {
+    log.info({payload: evt}, `agent event: ${evt.type}`);
 
     if (evt.type === 'turn_end') {
       turnCount++;
       if (turnCount === 2 && !toolsInjected) {
         toolsInjected = true;
         log.info('injecting web_search tool');
-        session.updatePipeline({
+        session.updateAgent({
           type: 'update_tools',
           tools: [
             {
@@ -112,7 +112,7 @@ function handleSession(session: Session, opts: PipelineOptions) {
             },
           ],
         });
-        session.updatePipeline({
+        session.updateAgent({
           type: 'inject_context',
           messages: [
             {
@@ -155,13 +155,13 @@ function handleSession(session: Session, opts: PipelineOptions) {
     }
   });
 
-  session.on('/pipeline-complete', (evt: Record<string, unknown>) => {
-    log.info({payload: evt}, 'pipeline completed');
+  session.on('/agent-complete', (evt: Record<string, unknown>) => {
+    log.info({payload: evt}, 'agent completed');
     session.hangup().reply();
   });
 
   session
-    .pipeline({
+    .agent({
       stt: opts.stt,
       tts: {
         vendor: opts.tts.vendor,
@@ -183,9 +183,9 @@ function handleSession(session: Session, opts: PipelineOptions) {
       bargeIn: {
         enable: true,
       },
-      eventHook: '/pipeline-event',
+      eventHook: '/agent-event',
       toolHook: '/tool-call',
-      actionHook: '/pipeline-complete',
+      actionHook: '/agent-complete',
     })
     .send();
 }

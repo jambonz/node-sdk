@@ -20,6 +20,7 @@ export type {
 
 // Verbs
 export type {
+  AgentVerb,
   AlertVerb,
   AnswerVerb,
   ConferenceVerb,
@@ -38,7 +39,6 @@ export type {
   McpServerConfig,
   MessageVerb,
   PauseVerb,
-  PipelineVerb,
   PlayVerb,
   RedirectVerb,
   SayVerb,
@@ -54,15 +54,15 @@ export type {
 
 // Session
 export type {
+  AgentEvent,
+  AgentEventType,
+  AgentLlmResponseEvent,
+  AgentPreflightMetrics,
+  AgentTurnEndEvent,
+  AgentTurnLatency,
+  AgentUserInterruptionEvent,
+  AgentUserTranscriptEvent,
   CallSession,
-  PipelineAgentResponseEvent,
-  PipelineEvent,
-  PipelineEventType,
-  PipelinePreflightMetrics,
-  PipelineTurnEndEvent,
-  PipelineTurnLatency,
-  PipelineUserInterruptionEvent,
-  PipelineUserTranscriptEvent,
   TtsStreamingEvent,
   TtsStreamingEventType,
   WsMessage,

@@ -188,7 +188,7 @@ console.log('Speech echo WebSocket app listening on port 3000');
 
 Both `WebhookResponse` and `Session` support the same chainable verb methods:
 
-`.say(opts)` `.play(opts)` `.gather(opts)` `.dial(opts)` `.llm(opts)` `.s2s(opts)` `.openai_s2s(opts)` `.google_s2s(opts)` `.elevenlabs_s2s(opts)` `.deepgram_s2s(opts)` `.ultravox_s2s(opts)` `.dialogflow(opts)` `.conference(opts)` `.enqueue(opts)` `.dequeue(opts)` `.hangup()` `.pause(opts)` `.redirect(opts)` `.config(opts)` `.tag(opts)` `.dtmf(opts)` `.listen(opts)` `.transcribe(opts)` `.message(opts)` `.stream(opts)` `.pipeline(opts)` `.dub(opts)` `.alert(opts)` `.answer(opts)` `.leave()` `.sipDecline(opts)` `.sipRefer(opts)` `.sipRequest(opts)`
+`.say(opts)` `.play(opts)` `.gather(opts)` `.dial(opts)` `.llm(opts)` `.s2s(opts)` `.openai_s2s(opts)` `.google_s2s(opts)` `.elevenlabs_s2s(opts)` `.deepgram_s2s(opts)` `.ultravox_s2s(opts)` `.dialogflow(opts)` `.conference(opts)` `.enqueue(opts)` `.dequeue(opts)` `.hangup()` `.pause(opts)` `.redirect(opts)` `.config(opts)` `.tag(opts)` `.dtmf(opts)` `.listen(opts)` `.transcribe(opts)` `.message(opts)` `.stream(opts)` `.agent(opts)` `.dub(opts)` `.alert(opts)` `.answer(opts)` `.leave()` `.sipDecline(opts)` `.sipRefer(opts)` `.sipRequest(opts)`
 
 All methods accept the same options as the corresponding verb JSON Schema. Methods are chainable — they return `this`.
 
@@ -370,7 +370,7 @@ Beyond verbs, WebSocket apps can perform async operations at any time during a c
 Key capabilities:
 - **TTS token streaming** — `sendTtsTokens()`, `flushTtsTokens()`, `clearTtsTokens()` — pipe LLM tokens to jambonz incrementally for lowest-latency TTS playback. **Not the same as `autoStreamTts`** (which is a jambonz-internal audio optimization).
 - **Inject commands** — `injectMute()`, `injectWhisper()`, `injectDtmf()`, `injectRecord()`, `injectTag()`, `injectListenStatus()` — modify the call mid-stream.
-- **LLM tool output** — `toolOutput()` — return tool call results to the pipeline verb's LLM.
+- **LLM tool output** — `toolOutput()` — return tool call results to the agent verb's LLM.
 - **Cascaded voice AI agents** — build your own STT→LLM→TTS loop using `config` (ttsStream + bargeIn) + `sendTtsTokens()`. Full control over LLM interaction and conversation history.
 
 ### Session Events (SDK)
