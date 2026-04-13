@@ -128,8 +128,8 @@ export class Session extends EventEmitter {
   ultravox_s2s(opts: Parameters<VerbBuilder['ultravox_s2s']>[0]): this { this.builder.ultravox_s2s(opts); return this; }
   /** Connect the caller to a Google Dialogflow agent. */
   dialogflow(opts: Parameters<VerbBuilder['dialogflow']>[0]): this { this.builder.dialogflow(opts); return this; }
-  /** Voice AI pipeline with integrated turn detection. */
-  pipeline(opts: Parameters<VerbBuilder['pipeline']>[0]): this { this.builder.pipeline(opts); return this; }
+  /** Voice AI agent with integrated turn detection. */
+  agent(opts: Parameters<VerbBuilder['agent']>[0]): this { this.builder.agent(opts); return this; }
   /** Stream real-time call audio to a WebSocket endpoint. Supports bidirectional audio. */
   listen(opts: Parameters<VerbBuilder['listen']>[0]): this { this.builder.listen(opts); return this; }
   /** Stream real-time call audio to a WebSocket endpoint. Synonym for {@link listen}. */
@@ -338,11 +338,11 @@ export class Session extends EventEmitter {
     });
   }
 
-  /** Update an active pipeline conversation mid-call. */
-  updatePipeline(data: Record<string, unknown>): void {
+  /** Update an active agent conversation mid-call. */
+  updateAgent(data: Record<string, unknown>): void {
     this.wsSend({
       type: 'command',
-      command: 'pipeline:update',
+      command: 'agent:update',
       data,
     });
   }
@@ -487,8 +487,8 @@ export class Session extends EventEmitter {
 
         case 'llm:event':
         case 'llm:tool-call':
-        case 'pipeline:event':
-        case 'pipeline:tool-call':
+        case 'agent:event':
+        case 'agent:tool-call':
           if (hook) {
             this.emit(hook, data);
           }

@@ -98,8 +98,8 @@ export interface UpdateCallRequest {
   dtmf?: { digit: string; duration?: number };
   /** Tag metadata. */
   tag?: Record<string, unknown>;
-  /** Mid-conversation pipeline update. */
-  pipeline_update?: {
+  /** Mid-conversation agent update. */
+  agent_update?: {
     type: 'update_instructions' | 'inject_context' | 'update_tools' | 'generate_reply';
     instructions?: string;
     messages?: Array<{ role: string; content: string }>;

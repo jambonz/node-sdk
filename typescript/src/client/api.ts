@@ -147,9 +147,9 @@ export class CallsResource {
     return this.update(callSid, { mute_status: status });
   }
 
-  /** Send a mid-conversation update to an active pipeline verb. */
-  async updatePipeline(callSid: string, data: NonNullable<UpdateCallRequest['pipeline_update']>): Promise<void> {
-    return this.update(callSid, { pipeline_update: data });
+  /** Send a mid-conversation update to an active agent verb. */
+  async updateAgent(callSid: string, data: NonNullable<UpdateCallRequest['agent_update']>): Promise<void> {
+    return this.update(callSid, { agent_update: data });
   }
 
   /** Enable or disable server-side noise isolation. */

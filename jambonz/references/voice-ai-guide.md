@@ -1,8 +1,8 @@
 # Voice AI Guide
 
-This reference covers building AI-powered voice agents with jambonz — speech-to-speech (s2s) verbs and the pipeline verb.
+This reference covers building AI-powered voice agents with jambonz — speech-to-speech (s2s) verbs and the agent verb.
 
-## s2s vs Pipeline: When to Use Which
+## s2s vs Agent: When to Use Which
 
 ### Speech-to-Speech (s2s) Verbs
 
@@ -17,14 +17,14 @@ Available vendor shortcuts (always prefer these over generic `s2s`):
 
 Use generic `s2s` with `vendor` property **only** when the vendor is determined at runtime.
 
-### Pipeline Verb
+### Agent Verb
 
-Use `pipeline` when you want **jambonz to orchestrate separate STT, LLM, and TTS components**. This gives you:
+Use `agent` when you want **jambonz to orchestrate separate STT, LLM, and TTS components**. This gives you:
 - Mix-and-match: e.g. Deepgram STT + Anthropic LLM + ElevenLabs TTS
 - More control over each component's configuration
 - Built-in turn detection and interruption handling
 
-The pipeline verb has three main configuration blocks: `recognizer` (STT), `llm` (text LLM), and `synthesizer` (TTS).
+The agent verb has three main configuration blocks: `recognizer` (STT), `llm` (text LLM), and `synthesizer` (TTS).
 
 ## Vendor-Specific Details
 
@@ -131,7 +131,7 @@ session.on('llm:event', (evt) => {
 
 ## TTS Token Streaming
 
-For pipeline or custom flows where you generate text and want incremental TTS:
+For agent or custom flows where you generate text and want incremental TTS:
 
 1. Enable streaming: `session.config({ ttsStream: { enable: true } })`
 2. Send tokens: `await session.sendTtsTokens('chunk of text')`
@@ -170,11 +170,11 @@ session
 
 Add `toolHook` and bind a handler for tool execution. See the Tool / Function Calling section above.
 
-### Pipeline (mix-and-match components)
+### Agent (mix-and-match components)
 
 ```typescript
 session
-  .pipeline({
+  .agent({
     recognizer: { vendor: 'deepgram', language: 'en-US' },
     llm: {
       vendor: 'anthropic',
@@ -187,4 +187,4 @@ session
   .send();
 ```
 
-Look up full schema: `get_jambonz_schema('pipeline')`
+Look up full schema: `get_jambonz_schema('agent')`

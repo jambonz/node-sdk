@@ -3,7 +3,7 @@ name: jambonz
 description: >-
   Build voice applications on jambonz, an open-source CPaaS. Covers the verb
   model, webhook and WebSocket transports, IVR menus, AI voice agents (OpenAI
-  Realtime, Deepgram, ElevenLabs, Google, Ultravox, pipeline), call routing,
+  Realtime, Deepgram, ElevenLabs, Google, Ultravox, agent), call routing,
   queuing, recording, mid-call control, and SIP. Works with @jambonz/sdk
   (TypeScript) or raw JSON from any language. Use with the jambonz MCP server
   for schema lookups.
@@ -38,7 +38,7 @@ jambonz has two editions: **v0.9.x (open source)** and **v10.x (commercial)**. E
 Choose the transport based on what the application needs:
 
 ### Use WebSocket when:
-- Using any speech-to-speech verb (`openai_s2s`, `google_s2s`, `deepgram_s2s`, `ultravox_s2s`, `elevenlabs_s2s`, `s2s`, `pipeline`) — **mandatory**
+- Using any speech-to-speech verb (`openai_s2s`, `google_s2s`, `deepgram_s2s`, `ultravox_s2s`, `elevenlabs_s2s`, `s2s`, `agent`) — **mandatory**
 - Streaming raw audio (`listen`/`stream` verb with bidirectional audio)
 - Using TTS token streaming
 - Building complex conversational flows with session state
@@ -69,11 +69,11 @@ The user wants a caller to have a conversation with an LLM.
 
 **Is the vendor determined at runtime** (e.g. from an env var)? Use `s2s` with `vendor` property.
 
-**Does the user want jambonz to orchestrate STT + LLM + TTS as separate components?** Use `pipeline`.
+**Does the user want jambonz to orchestrate STT + LLM + TTS as separate components?** Use `agent`.
 
 **Never use `llm` in generated code** — it is a legacy name. Use either a vendor shortcut or `s2s`.
 
-See [references/voice-ai-guide.md](references/voice-ai-guide.md) for details on s2s vs pipeline, tool calling, and vendor specifics.
+See [references/voice-ai-guide.md](references/voice-ai-guide.md) for details on s2s vs agent, tool calling, and vendor specifics.
 
 ### "Build an IVR menu / collect input"
 
@@ -209,7 +209,7 @@ Use `get_jambonz_schema` to look up the exact JSON structure for any verb.
 4. **Missing `anchorMedia: true` on `dial`** — Required for recording during bridged calls. Without it, audio doesn't flow through the media server.
 5. **Using `process.env`** — jambonz apps should use application environment variables (`session.data.env_vars` / `req.body.env_vars`), not `process.env`.
 6. **`env_vars` only on initial call** — The `env_vars` object is only present in the first webhook POST or `session:new`. Store values in a variable if needed in actionHook handlers.
-7. **Webhook transport for s2s/pipeline apps** — These verbs require WebSocket. Always use `createEndpoint` from `@jambonz/sdk/websocket`.
+7. **Webhook transport for s2s/agent apps** — These verbs require WebSocket. Always use `createEndpoint` from `@jambonz/sdk/websocket`.
 8. **ElevenLabs: passing `model` or `messages`** — ElevenLabs uses `agent_id` auth. The model and prompt are configured in the ElevenLabs dashboard. Pass `llmOptions: {}`.
 9. **Marks silently failing** — Marks require `bidirectionalAudio: { enabled: true, streaming: true }` on the listen/stream verb. Without streaming mode, marks are accepted but never fire.
 10. **Not binding actionHook listeners before `.send()`** — In WebSocket mode, if no listener is bound for an actionHook, the SDK auto-replies with an empty verb array, which usually means the call hangs up unexpectedly.
@@ -237,7 +237,7 @@ Use `get_jambonz_schema` to look up the exact JSON structure for any verb.
 
 Load these on demand based on the task:
 
-- [references/voice-ai-guide.md](references/voice-ai-guide.md) — **Load when** building s2s or pipeline voice AI apps. Covers s2s vs pipeline decision, vendor shortcuts, tool/function calling, TTS streaming, eventHook patterns.
+- [references/voice-ai-guide.md](references/voice-ai-guide.md) — **Load when** building s2s or agent voice AI apps. Covers s2s vs agent decision, vendor shortcuts, tool/function calling, TTS streaming, eventHook patterns.
 - [references/ivr-patterns.md](references/ivr-patterns.md) — **Load when** building IVR menus or gather-based input collection. Covers speech/DTMF/mixed input, multi-level menus, timeout and retry patterns.
 - [references/call-control.md](references/call-control.md) — **Load when** building apps with dial, transfer, queuing, conference, recording, or mid-call control. Covers dial targets, SIP ops, enqueue/dequeue, REST API control, inject commands.
 - [references/env-vars-and-config.md](references/env-vars-and-config.md) — **Load when** the app needs configurable parameters. Covers the two-step declare+read pattern, schema properties, the "only on initial call" gotcha.

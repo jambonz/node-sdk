@@ -369,7 +369,7 @@ import { JambonzClient } from '@jambonz/sdk/client';
 
 Both `WebhookResponse` and WebSocket `Session` support the same chainable verb methods:
 
-`.say()` `.play()` `.gather()` `.dial()` `.llm()` `.conference()` `.enqueue()` `.dequeue()` `.hangup()` `.pause()` `.redirect()` `.config()` `.tag()` `.dtmf()` `.listen()` `.transcribe()` `.message()` `.stream()` `.pipeline()` `.dub()` `.alert()` `.answer()` `.leave()` `.sipDecline()` `.sipRefer()` `.sipRequest()`
+`.say()` `.play()` `.gather()` `.dial()` `.llm()` `.conference()` `.enqueue()` `.dequeue()` `.hangup()` `.pause()` `.redirect()` `.config()` `.tag()` `.dtmf()` `.listen()` `.transcribe()` `.message()` `.stream()` `.agent()` `.dub()` `.alert()` `.answer()` `.leave()` `.sipDecline()` `.sipRefer()` `.sipRequest()`
 
 All methods accept the same options as the corresponding [verb JSON schemas](schema/verbs/) and are chainable.
 

@@ -113,27 +113,27 @@ export type WsMessageType =
   | 'verb:status'
   | 'llm:event'
   | 'llm:tool-call'
-  | 'pipeline:event'
-  | 'pipeline:tool-call'
+  | 'agent:event'
+  | 'agent:tool-call'
   | 'tts:streaming-event'
   | 'tts:tokens-result'
   | 'jambonz:error';
 
-/** Pipeline eventHook event types. */
-export type PipelineEventType =
+/** Agent eventHook event types. */
+export type AgentEventType =
   | 'turn_end'
   | 'user_transcript'
-  | 'agent_response'
+  | 'llm_response'
   | 'user_interruption';
 
 /** Preflight (early generation) metrics. */
-export interface PipelinePreflightMetrics {
+export interface AgentPreflightMetrics {
   result: 'hit' | 'miss' | 'pending';
   tokens?: number;
 }
 
 /** Per-turn latency metrics (all values in milliseconds). */
-export interface PipelineTurnLatency {
+export interface AgentTurnLatency {
   /** STT processing latency: stop talking to final transcript received. */
   transcriber_latency?: number;
   /** Additional wait after transcript for end-of-turn detection. */
@@ -143,41 +143,41 @@ export interface PipelineTurnLatency {
   /** TTS engine latency: first text sent to TTS until first audio received. */
   voice_latency?: number;
   /** Early generation metrics. */
-  preflight?: PipelinePreflightMetrics;
+  preflight?: AgentPreflightMetrics;
 }
 
-/** Payload for pipeline:event turn_end messages. */
-export interface PipelineTurnEndEvent {
+/** Payload for agent:event turn_end messages. */
+export interface AgentTurnEndEvent {
   type: 'turn_end';
   transcript: string;
   response: string;
   interrupted: boolean;
-  latency: PipelineTurnLatency;
+  latency: AgentTurnLatency;
 }
 
-/** Payload for pipeline:event user_transcript messages. */
-export interface PipelineUserTranscriptEvent {
+/** Payload for agent:event user_transcript messages. */
+export interface AgentUserTranscriptEvent {
   type: 'user_transcript';
   transcript: string;
 }
 
-/** Payload for pipeline:event agent_response messages. */
-export interface PipelineAgentResponseEvent {
-  type: 'agent_response';
+/** Payload for agent:event llm_response messages. */
+export interface AgentLlmResponseEvent {
+  type: 'llm_response';
   response: string;
 }
 
-/** Payload for pipeline:event user_interruption messages. */
-export interface PipelineUserInterruptionEvent {
+/** Payload for agent:event user_interruption messages. */
+export interface AgentUserInterruptionEvent {
   type: 'user_interruption';
 }
 
-/** Union of all pipeline eventHook payloads. */
-export type PipelineEvent =
-  | PipelineTurnEndEvent
-  | PipelineUserTranscriptEvent
-  | PipelineAgentResponseEvent
-  | PipelineUserInterruptionEvent;
+/** Union of all agent eventHook payloads. */
+export type AgentEvent =
+  | AgentTurnEndEvent
+  | AgentUserTranscriptEvent
+  | AgentLlmResponseEvent
+  | AgentUserInterruptionEvent;
 
 /** Inbound WebSocket message from jambonz. */
 export interface WsMessage {
