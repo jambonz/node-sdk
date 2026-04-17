@@ -1,6 +1,6 @@
 {
   "name": "@jambonz/sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "jambonz SDK for building voice applications — optimized for AI agents",
   "author": "Dave Horton",
   "license": "MIT",
@@ -77,7 +77,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "AGENTS.md",
+    "examples"
   ],
   "scripts": {
     "build": "tsup",
@@ -87,7 +89,10 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
     "docs": "typedoc",
-    "prepublishOnly": "npm run build"
+    "copy-docs": "cp ../AGENTS.md . && cp -r ../examples .",
+    "clean-docs": "rm -f AGENTS.md && rm -rf examples",
+    "prepublishOnly": "npm run copy-docs && npm run build",
+    "postpublish": "npm run clean-docs"
   },
   "dependencies": {
     "@jambonz/schema": "^0.2.1",
