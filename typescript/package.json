@@ -1,6 +1,6 @@
 {
   "name": "@jambonz/sdk",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "jambonz SDK for building voice applications — optimized for AI agents",
   "author": "Dave Horton",
   "license": "MIT",
@@ -95,7 +95,7 @@
     "postpublish": "npm run clean-docs"
   },
   "dependencies": {
-    "@jambonz/schema": "^0.2.1",
+    "@jambonz/schema": "^0.2.2",
     "ajv": "^8.17.1",
     "ws": "^8.18.0"
   },

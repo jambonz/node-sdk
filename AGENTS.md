@@ -359,7 +359,13 @@ session.injectTag({ supervisor: 'jane', priority: 'high' });
 
 // Generic inject (for any command)
 session.injectCommand('redirect', { call_hook: '/new-flow' });
+
+// Target a specific call leg (e.g., B-leg during a bridged call)
+// Pass call_sid as the third argument to route the command to that leg
+session.injectCommand('dub', { action: 'sayOnTrack', track: 'callee-audio', say: 'Hello' }, dialCallSid);
 ```
+
+**Targeting specific call legs:** When bridging calls with `dial`, inject commands default to the A-leg. To target the B-leg, pass its `call_sid` as the third argument. Capture the B-leg call_sid from `call:status` events where `direction === 'outbound'`. See `guide:session-commands` for the full pattern.
 
 ## Session Commands
 
