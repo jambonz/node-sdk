@@ -8,7 +8,7 @@ import { EventEmitter } from 'events';
 import type { WebSocket } from 'ws';
 import type { Logger } from '../types/common.js';
 import type { CallSession, WsMessage, WsResponse } from '../types/session.js';
-import type { Verb } from '../types/verbs.js';
+import type { LlmToolOutputData, Verb } from '../types/verbs.js';
 import { VerbBuilder, type VerbBuilderOptions } from '../verb-builder.js';
 
 interface QueueEntry {
@@ -318,9 +318,22 @@ export class Session extends EventEmitter {
     });
   }
 
-  /** Send tool output to an active LLM conversation. */
-  sendToolOutput(toolCallId: string, data: unknown): void {
-    const payload = typeof data === 'object' && data !== null ? data : { result: data };
+  /**
+   * Send tool output to an active LLM conversation.
+   *
+   * Canonical wire shape (validated by `@jambonz/schema`):
+   *   `{type: 'command', command: 'llm:tool-output', tool_call_id, data}`
+   *
+   * `data` should be an object; `{result: ...}` is the preferred carrier but
+   * any object shape is accepted (feature-server JSON-stringifies it into the
+   * tool_result on the wire). For caller convenience, a non-object `data`
+   * argument is wrapped as `{result: data}` before send.
+   */
+  sendToolOutput(toolCallId: string, data: LlmToolOutputData | unknown): void {
+    const payload: LlmToolOutputData =
+      typeof data === 'object' && data !== null
+        ? (data as LlmToolOutputData)
+        : { result: data };
     this.wsSend({
       type: 'command',
       command: 'llm:tool-output',
