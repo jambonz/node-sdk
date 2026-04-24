@@ -20,6 +20,8 @@ export type {
 
 // Verbs
 export type {
+  AgentLlm,
+  AgentLlmOptions,
   AgentVerb,
   AlertVerb,
   AnswerVerb,
@@ -35,6 +37,10 @@ export type {
   JambonzApp,
   LeaveVerb,
   ListenVerb,
+  LlmMessage,
+  LlmTool,
+  LlmToolOpenAIWrapped,
+  LlmToolOutputData,
   LlmVerb,
   McpServerConfig,
   MessageVerb,

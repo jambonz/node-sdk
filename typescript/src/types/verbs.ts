@@ -112,6 +112,75 @@ export interface McpServerConfig {
   roots?: Record<string, unknown>[];
 }
 
+// ---------------------------------------------------------------------------
+// AgentLlm — typed shape for the agent verb's `llm` block. Mirrors
+// `@jambonz/llm`'s adapter interface so typos surface at author time.
+// ---------------------------------------------------------------------------
+
+/** A conversation-history message passed via `llmOptions.messages`. */
+export interface LlmMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string | unknown;
+  [key: string]: unknown;
+}
+
+/** Tool / function definition (MCP-flat canonical shape). */
+export interface LlmTool {
+  name: string;
+  description?: string;
+  parameters?: Record<string, unknown>;
+}
+
+/** OpenAI-wrapped tool shape — also accepted for back-compat. */
+export interface LlmToolOpenAIWrapped {
+  type: 'function';
+  function: LlmTool;
+}
+
+/** Canonical tool-output payload carried by `llm:tool-output` commands. */
+export interface LlmToolOutputData {
+  result?: unknown;
+  [key: string]: unknown;
+}
+
+/** Per-call LLM configuration for the agent verb. */
+export interface AgentLlmOptions {
+  /** System prompt. Placed vendor-appropriately by the feature-server wrapper. */
+  systemPrompt?: string;
+  /** Seed conversation history. A role:'system' entry is extracted into systemPrompt. */
+  messages?: LlmMessage[];
+  /** Alias of `messages` (historical). */
+  initialMessages?: LlmMessage[];
+  /** Maximum tokens the model may generate per turn. */
+  maxTokens?: number;
+  /** Sampling temperature. */
+  temperature?: number;
+  /** Tools / functions the model may call. */
+  tools?: (LlmTool | LlmToolOpenAIWrapped)[];
+}
+
+/** `llm` block on the agent verb. */
+export interface AgentLlm {
+  vendor:
+    | 'openai'
+    | 'anthropic'
+    | 'google'
+    | 'vertex-gemini'
+    | 'vertex-openai'
+    | 'bedrock'
+    | 'deepseek';
+  model: string;
+  label?: string;
+  auth?: { apiKey?: string; [key: string]: unknown };
+  connectOptions?: {
+    timeout?: number;
+    maxRetries?: number;
+    endpoint?: string;
+    baseURL?: string;
+  };
+  llmOptions?: AgentLlmOptions;
+}
+
 /** Shared properties for llm, s2s, and vendor-specific s2s verbs. */
 export interface LlmBaseOptions {
   id?: string;
@@ -235,7 +304,7 @@ export interface AgentVerb {
     sticky?: boolean;
   };
   /** LLM configuration. */
-  llm: Record<string, unknown>;
+  llm: AgentLlm;
   /** Webhook when agent ends. */
   actionHook?: ActionHook;
   /** Webhook for agent events. */
