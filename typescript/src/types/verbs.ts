@@ -326,6 +326,10 @@ export interface AgentVerb {
   mcpServers?: McpServerConfig[];
   /** Seconds to wait after assistant finishes speaking before prompting user to respond. 0 disables. Default: 0. */
   noResponseTimeout?: number;
+  /** Auto-adjust STT/TTS based on detected language. true=lock on first, 'always'=adapt every turn. */
+  autoLockLanguage?: boolean | 'always';
+  /** Per-language TTS overrides. Keys are BCP-47 codes (e.g., 'es', 'fr'). */
+  languageConfig?: Record<string, { tts?: Synthesizer }>;
 }
 
 export interface ListenVerb {

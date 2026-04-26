@@ -95,7 +95,7 @@
     "postpublish": "npm run clean-docs"
   },
   "dependencies": {
-    "@jambonz/schema": "^0.3.0",
+    "@jambonz/schema": "^0.3.5",
     "ajv": "^8.17.1",
     "ws": "^8.18.0"
   },
