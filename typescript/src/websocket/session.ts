@@ -360,6 +360,19 @@ export class Session extends EventEmitter {
     });
   }
 
+  /**
+   * Reconfigure STT (speech-to-text) settings mid-call.
+   * Currently supports updating language hints for Deepgram Flux Multilingual.
+   *
+   * @param opts - STT reconfiguration options
+   * @param opts.languageHints - Array of BCP-47 language codes (e.g., ['en', 'es']).
+   *                             Pass empty array [] to clear hints and enable auto-detection.
+   * @param callSid - Optional call SID for targeting specific leg
+   */
+  injectSttReconfigure(opts: { languageHints?: string[] }, callSid?: string): void {
+    this.injectCommand('stt:reconfigure', opts, callSid);
+  }
+
   // ---------------------------------------------------------------------------
   // TTS Token Streaming
   // ---------------------------------------------------------------------------
