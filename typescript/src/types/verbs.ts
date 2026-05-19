@@ -311,6 +311,19 @@ export interface AgentVerb {
   eventHook?: ActionHook;
   /** Webhook when the LLM requests a tool/function call. */
   toolHook?: ActionHook;
+  /** Configuration for playing filler audio while tool calls are in progress. Prevents silence during long-running tool executions. */
+  toolFiller?: false | {
+    /** Filler mode. 'audio' plays a looping audio file. 'backchannel' uses TTS to speak short phrases. */
+    type: 'audio' | 'backchannel';
+    /** Seconds to wait after tool invocation before playing filler. Default: 2. */
+    startDelaySecs?: number;
+    /** Audio file URL (for type='audio'). Should be loopable. */
+    url?: string;
+    /** Free-form style hint for LLM-generated phrases (for type='backchannel'). */
+    style?: string;
+    /** Seconds from tool invocation before generating a longer explanatory response (for type='backchannel'). Default: 10. */
+    escalationSecs?: number;
+  };
   /** Whether the LLM generates an initial greeting before the user speaks. Default: true. */
   greeting?: boolean;
   /** Speculatively prompt the LLM on final transcript before Krisp end-of-turn. Default: false. */
