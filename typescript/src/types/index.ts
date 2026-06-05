@@ -58,6 +58,10 @@ export type {
   VerbName,
 } from './verbs.js';
 
+// LLM vendors (derived from @jambonz/schema)
+export type { LlmVendor } from './llm-vendors.generated.js';
+export { LLM_VENDORS } from './llm-vendors.generated.js';
+
 // Session
 export type {
   AgentEvent,

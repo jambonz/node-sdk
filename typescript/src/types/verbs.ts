@@ -16,6 +16,7 @@ import type {
   Target,
   Vad,
 } from './components.js';
+import type { LlmVendor } from './llm-vendors.generated.js';
 
 // ---------------------------------------------------------------------------
 // Audio & Speech
@@ -161,14 +162,8 @@ export interface AgentLlmOptions {
 
 /** `llm` block on the agent verb. */
 export interface AgentLlm {
-  vendor:
-    | 'openai'
-    | 'anthropic'
-    | 'google'
-    | 'vertex-gemini'
-    | 'vertex-openai'
-    | 'bedrock'
-    | 'deepseek';
+  /** LLM vendor. Derived from the @jambonz/schema agent verb enum — see llm-vendors.generated.ts. */
+  vendor: LlmVendor;
   model: string;
   label?: string;
   auth?: { apiKey?: string; [key: string]: unknown };
