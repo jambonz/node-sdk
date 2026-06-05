@@ -181,4 +181,23 @@ describe('Schema drift detection', () => {
       });
     }
   });
+
+  // The agent verb's llm.vendor union is code-generated from the schema enum
+  // (src/types/llm-vendors.generated.ts, via scripts/gen-llm-vendors.mjs). The
+  // generated file is committed, so it can go stale if the @jambonz/schema dep is
+  // bumped without re-running `npm run gen:types`. This guards the committed artifact.
+  describe('generated LLM vendor list matches schema enum', () => {
+    it('LLM_VENDORS equals agent.schema.json llm.vendor.enum', async () => {
+      const agentSchema = JSON.parse(
+        readFileSync(resolve(verbsDir, 'agent.schema.json'), 'utf-8')
+      );
+      const schemaEnum: string[] = agentSchema.properties.llm.properties.vendor.enum;
+      const { LLM_VENDORS } = await import('../src/types/llm-vendors.generated.js');
+
+      expect(
+        [...LLM_VENDORS],
+        'generated LLM_VENDORS is stale — run `npm run gen:types`'
+      ).toEqual(schemaEnum);
+    });
+  });
 });

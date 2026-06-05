@@ -82,10 +82,13 @@
     "examples"
   ],
   "scripts": {
+    "gen:types": "node scripts/gen-llm-vendors.mjs",
+    "prebuild": "npm run gen:types",
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "pretypecheck": "npm run gen:types",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
     "docs": "typedoc",
