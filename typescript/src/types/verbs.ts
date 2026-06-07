@@ -282,10 +282,10 @@ export interface DialogflowVerb {
 export interface AgentVerb {
   verb: 'agent';
   id?: string;
-  /** STT configuration. */
-  stt: Recognizer;
-  /** TTS configuration. */
-  tts: Synthesizer;
+  /** STT configuration. Optional — can be set at the application level. */
+  stt?: Recognizer;
+  /** TTS configuration. Optional — can be set at the application level. */
+  tts?: Synthesizer;
   /** Turn detection strategy. String shorthand ('stt' or 'krisp') or object with tunable params. */
   turnDetection?: 'stt' | 'krisp' | {
     mode: 'krisp';
