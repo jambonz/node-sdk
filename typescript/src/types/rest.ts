@@ -81,6 +81,15 @@ export interface UpdateCallRequest {
   listen_status?: 'pause' | 'silence' | 'resume';
   /** Pause/resume live transcription. */
   transcribe_status?: 'pause' | 'resume';
+  /**
+   * Move a live speech-to-speech (llm verb) session into a conference and back,
+   * or stop it. `move-to-conference` also joins the caller into `conference`
+   * (created if it does not exist) so both legs end up in the room, the vendor
+   * WebSocket preserved.
+   */
+  llm_status?: 'move-to-conference' | 'move-from-conference' | 'stop';
+  /** Conference (room) name for `llm_status: 'move-to-conference'`. */
+  conference?: string;
   /** Send a SIP request within the dialog. */
   sip_request?: { method: string; content_type?: string; content?: string; headers?: Record<string, string> };
   /** Control call recording. */
