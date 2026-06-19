@@ -1,5 +1,5 @@
 // AUTO-GENERATED — DO NOT EDIT BY HAND.
-// Source of truth: @jambonz/schema@0.3.14 verbs/agent.schema.json (llm.vendor.enum)
+// Source of truth: @jambonz/schema@0.3.15 verbs/agent.schema.json (llm.vendor.enum)
 // Regenerate with: npm run gen:types
 //
 // This file derives the LLM vendor list from the JSON schema so the SDK's
