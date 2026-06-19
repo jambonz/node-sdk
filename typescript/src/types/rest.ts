@@ -3,7 +3,7 @@
  */
 
 import type { ActionHook } from './components.js';
-import type { Verb } from './verbs.js';
+import type { SayVerb, Verb } from './verbs.js';
 
 export interface CreateCallRequest {
   /** Application SID to handle the call. */
@@ -90,6 +90,15 @@ export interface UpdateCallRequest {
   llm_status?: 'move-to-conference' | 'move-from-conference' | 'stop';
   /** Conference (room) name for `llm_status: 'move-to-conference'`. */
   conference?: string;
+  /**
+   * Speak one-shot TTS into the room (conference) the call is in, heard by every
+   * member. Mirrors the `say` verb; `id` is an optional correlation id echoed in
+   * the `say-start`/`say-done` events, `replace` ends any in-flight room say/play
+   * first. (Streaming — `stream: true` — is not yet supported.)
+   */
+  room_say?: Omit<SayVerb, 'verb'> & { replace?: boolean };
+  /** Play a file/tone into the room the call is in, heard by every member. */
+  room_play?: { url: string; id?: string; replace?: boolean };
   /** Send a SIP request within the dialog. */
   sip_request?: { method: string; content_type?: string; content?: string; headers?: Record<string, string> };
   /** Control call recording. */

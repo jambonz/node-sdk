@@ -295,6 +295,12 @@ export interface AgentVerb {
   /** Barge-in configuration — controls user interruption of assistant speech. */
   bargeIn?: {
     enable?: boolean;
+    /** How interruptions are detected. 'vad' (default): speech onset tentatively interrupts the assistant and is confirmed after minSpeechDuration of sustained speech, otherwise the assistant resumes. 'interruptPrediction': an ML model scores whether caller speech is a genuine interruption attempt vs backchannel (e.g. 'uh-huh'), so the assistant is never tentatively paused and backchannel does not cut it off; requires a provisioned vendor API key. */
+    strategy?: 'vad' | 'interruptPrediction';
+    /** Detection vendor for strategy 'interruptPrediction'; defaults to 'krisp' (currently the only option). Not used with strategy 'vad'. */
+    vendor?: string;
+    /** Probability threshold for interruptPrediction (0-1). Higher values require stronger evidence before interrupting the assistant. Default: 0.5. */
+    threshold?: number;
     minSpeechDuration?: number;
     sticky?: boolean;
   };
@@ -515,7 +521,12 @@ export interface ConferenceVerb {
   actionHook?: ActionHook;
   /** Webhook while waiting for conference to start. */
   waitHook?: ActionHook;
-  /** Conference event types to receive. */
+  /**
+   * Conference event types to receive on `statusHook`:
+   * 'start', 'end', 'join', 'leave', 'start-talking', 'stop-talking',
+   * and the room media lifecycle 'say-start', 'say-done', 'play-start',
+   * 'play-done' (see {@link WebsocketSession.injectSay}/`injectPlay`).
+   */
   statusEvents?: string[];
   /** Webhook for conference status events. */
   statusHook?: ActionHook;
@@ -527,6 +538,15 @@ export interface ConferenceVerb {
   listen?: Omit<ListenVerb, 'verb'>;
   /** Distribute DTMF to all participants. */
   distributeDtmf?: boolean;
+}
+
+/**
+ * `room` is a synonym for `conference`: identical shape and behavior, with the
+ * Voice-AI-friendly name. Prefer `room` in new applications; `conference` stays
+ * for backward compatibility (mirrors the `listen`/`stream` synonym pair).
+ */
+export interface RoomVerb extends Omit<ConferenceVerb, 'verb'> {
+  verb: 'room';
 }
 
 export interface EnqueueVerb {
@@ -799,6 +819,7 @@ export type Verb =
   | DialogflowVerb
   | AgentVerb
   | ConferenceVerb
+  | RoomVerb
   | TranscribeVerb
   | EnqueueVerb
   | DequeueVerb

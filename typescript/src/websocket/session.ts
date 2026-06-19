@@ -8,7 +8,7 @@ import { EventEmitter } from 'events';
 import type { WebSocket } from 'ws';
 import type { Logger } from '../types/common.js';
 import type { CallSession, WsMessage, WsResponse } from '../types/session.js';
-import type { LlmToolOutputData, Verb } from '../types/verbs.js';
+import type { LlmToolOutputData, SayVerb, Verb } from '../types/verbs.js';
 import { VerbBuilder, type VerbBuilderOptions } from '../verb-builder.js';
 
 interface QueueEntry {
@@ -292,6 +292,34 @@ export class Session extends EventEmitter {
   /** Pause or resume audio streaming (listen/stream). */
   injectListenStatus(status: 'pause' | 'resume', callSid?: string): void {
     this.injectCommand('listen:status', { listen_status: status }, callSid);
+  }
+
+  /**
+   * Speak one-shot TTS into the room (conference) this call is in, so EVERY
+   * member hears it. Mirrors the `say` verb; the room is inferred from the
+   * call's current conference. `say-start`/`say-done` events are delivered to
+   * the conference verb's `statusHook` when listed in its `statusEvents`
+   * (include 'say-start','say-done'); the optional `id` is echoed for
+   * correlation. (Streaming — `stream:true` — is not yet supported server-side.)
+   */
+  injectSay(
+    opts: { text: SayVerb['text']; synthesizer?: SayVerb['synthesizer']; loop?: number | string;
+            stream?: boolean; id?: string; replace?: boolean },
+    callSid?: string
+  ): void {
+    this.injectCommand('room:say', opts, callSid);
+  }
+
+  /**
+   * Play a file/tone into the room (conference) this call is in, heard by every
+   * member. `play-start`/`play-done` events go to the conference verb's
+   * `statusHook` when listed in its `statusEvents`.
+   */
+  injectPlay(
+    opts: { url: string; id?: string; replace?: boolean },
+    callSid?: string
+  ): void {
+    this.injectCommand('room:play', opts, callSid);
   }
 
   /** Control call recording. */
