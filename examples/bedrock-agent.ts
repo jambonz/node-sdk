@@ -25,6 +25,11 @@ const envVars = {
     description: 'ElevenLabs voice id',
     default: 'hpp4J3VqNfWAUOO0d1Us',
   },
+  TAVILY_API_KEY: {
+    type: 'string' as const,
+    description: 'Tavily API key for the web_search tool',
+    obscure: true,
+  },
   SYSTEM_PROMPT: {
     type: 'string' as const,
     description: 'System prompt for the voice agent',
@@ -136,7 +141,7 @@ function handleSession(session: Session, opts: AgentOptions) {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            api_key: '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',
+            api_key: session.data.env_vars?.TAVILY_API_KEY,
             query,
             max_results: 3,
             search_depth: 'basic',
