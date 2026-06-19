@@ -527,17 +527,29 @@ export class Session extends EventEmitter {
       switch (type) {
         case 'verb:hook':
         case 'session:redirect':
-        case 'dial:confirm':
+        case 'dial:confirm': {
           this.msgid = msgid;
+          // Notification hooks (conference/status events — they carry `data.event`)
+          // are observational: emit them to the app and auto-ack, so an app that
+          // merely watches statusHook events doesn't have to reply() to each one
+          // (which otherwise times out far-end). Action hooks (no `data.event`)
+          // still await the app's reply, which may carry verbs.
+          const isNotification =
+            type === 'verb:hook' &&
+            !!data && typeof data === 'object' &&
+            typeof (data as { event?: unknown }).event === 'string';
           if (hook && this.listenerCount(hook) > 0) {
             this.emit(hook, data);
+            if (isNotification) this.reply();
           } else if (type === 'verb:hook' && this.listenerCount('verb:hook') > 0) {
             this.emit('verb:hook', hook, data);
+            if (isNotification) this.reply();
           } else {
             // Auto-reply with empty verb array if no listener
             this.reply();
           }
           break;
+        }
 
         case 'llm:event':
         case 'llm:tool-call':
