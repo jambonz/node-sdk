@@ -721,7 +721,7 @@ Complete working examples are in the `examples/` directory:
 - **queue-with-hold** — Call queue with hold music and agent dequeue (webhook + WebSocket)
 - **call-recording** — Mid-call recording control via REST API and inject commands (webhook + WebSocket)
 - **realtime-translator** — Bridges two parties with real-time speech translation using STT, Google Translate, and TTS dub tracks. Multi-file example with `src/routes/` structure (WebSocket)
-- **room-with-listen-stream** — A Room with a nested bidirectional audio stream forked to a WebSocket (WebSocket)
+- **room-with-stream** — A Room with a nested bidirectional audio stream forked to a WebSocket (WebSocket)
 - **stream-then-room** — 1:1 stream, then move the caller + stream into a Room mid-call (WebSocket)
 - **s2s-move-to-room** — Ultravox s2s, then move the caller + agent into a Room mid-call (WebSocket)
 - **room-say** — injectSay a one-shot TTS announcement heard by the whole Room (WebSocket)

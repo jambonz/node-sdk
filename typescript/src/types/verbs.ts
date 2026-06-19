@@ -534,7 +534,9 @@ export interface ConferenceVerb {
   enterHook?: ActionHook;
   /** Conference recording config. */
   record?: Record<string, unknown>;
-  /** Audio streaming config. */
+  /** Fork the room's mixed audio to a WebSocket. Prefer `stream`; `listen` is a synonym. */
+  stream?: Omit<StreamVerb, 'verb'>;
+  /** Audio streaming config (synonym for `stream`). */
   listen?: Omit<ListenVerb, 'verb'>;
   /** Distribute DTMF to all participants. */
   distributeDtmf?: boolean;

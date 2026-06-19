@@ -436,7 +436,7 @@ See the [examples/](examples/) directory:
 | [llm-streaming](examples/llm-streaming/) | WebSocket | Anthropic LLM with TTS streaming and barge-in |
 | [queue-with-hold](examples/queue-with-hold/) | Webhook + WS | Call queue with hold music |
 | [call-recording](examples/call-recording/) | Webhook + WS | Mid-call recording control |
-| [room-with-listen-stream](examples/room-with-listen-stream/) | WebSocket | A Room with a nested bidirectional audio stream |
+| [room-with-stream](examples/room-with-stream/) | WebSocket | A Room with a nested bidirectional audio stream |
 | [stream-then-room](examples/stream-then-room/) | WebSocket | 1:1 stream, then move caller + stream into a Room |
 | [s2s-move-to-room](examples/s2s-move-to-room/) | WebSocket | Ultravox s2s, then move caller + agent into a Room |
 | [room-say](examples/room-say/) | WebSocket | injectSay a one-shot announcement heard by the whole Room |
