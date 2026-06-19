@@ -25,6 +25,7 @@ import type {
   PauseVerb,
   PlayVerb,
   RedirectVerb,
+  RoomVerb,
   S2sVerb,
   SayVerb,
   SipDeclineVerb,
@@ -152,6 +153,11 @@ export class VerbBuilder {
   /** Join or create a multi-party conference room. */
   conference(opts: Omit<ConferenceVerb, 'verb'>): this {
     return this.addVerb({ verb: 'conference', ...opts });
+  }
+
+  /** `room` is a synonym for `conference` — prefer it in new applications. */
+  room(opts: Omit<RoomVerb, 'verb'>): this {
+    return this.addVerb({ verb: 'room', ...opts });
   }
 
   /** Place the caller into a named queue. */
