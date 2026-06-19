@@ -188,7 +188,9 @@ console.log('Speech echo WebSocket app listening on port 3000');
 
 Both `WebhookResponse` and `Session` support the same chainable verb methods:
 
-`.say(opts)` `.play(opts)` `.gather(opts)` `.dial(opts)` `.llm(opts)` `.s2s(opts)` `.openai_s2s(opts)` `.google_s2s(opts)` `.elevenlabs_s2s(opts)` `.deepgram_s2s(opts)` `.ultravox_s2s(opts)` `.dialogflow(opts)` `.conference(opts)` `.enqueue(opts)` `.dequeue(opts)` `.hangup()` `.pause(opts)` `.redirect(opts)` `.config(opts)` `.tag(opts)` `.dtmf(opts)` `.listen(opts)` `.transcribe(opts)` `.message(opts)` `.stream(opts)` `.agent(opts)` `.dub(opts)` `.alert(opts)` `.answer(opts)` `.leave()` `.sipDecline(opts)` `.sipRefer(opts)` `.sipRequest(opts)`
+`.say(opts)` `.play(opts)` `.gather(opts)` `.dial(opts)` `.llm(opts)` `.s2s(opts)` `.openai_s2s(opts)` `.google_s2s(opts)` `.elevenlabs_s2s(opts)` `.deepgram_s2s(opts)` `.ultravox_s2s(opts)` `.dialogflow(opts)` `.room(opts)` `.enqueue(opts)` `.dequeue(opts)` `.hangup()` `.pause(opts)` `.redirect(opts)` `.config(opts)` `.tag(opts)` `.dtmf(opts)` `.stream(opts)` `.transcribe(opts)` `.message(opts)` `.agent(opts)` `.dub(opts)` `.alert(opts)` `.answer(opts)` `.leave()` `.sipDecline(opts)` `.sipRefer(opts)` `.sipRequest(opts)`
+
+Prefer `.room(opts)` and `.stream(opts)`. `.conference(opts)` and `.listen(opts)` remain as backward-compatible synonyms (same options), but new apps should use `room`/`stream`.
 
 All methods accept the same options as the corresponding verb JSON Schema. Methods are chainable — they return `this`.
 
@@ -415,9 +417,9 @@ session.on('close', (code, reason) => { /* connection closed */ });
 session.on('error', (err) => { /* error */ });
 ```
 
-## Audio WebSocket (Listen/Stream)
+## Audio WebSocket (Stream/Listen)
 
-The `listen` and `stream` verbs open a separate WebSocket connection from jambonz to your application, carrying raw audio. This is independent of the control WebSocket (`ws.jambonz.org`) — it uses the `audio.drachtio.org` subprotocol.
+The `stream` verb (and its backward-compatible synonym `listen`) opens a separate WebSocket connection from jambonz to your application, carrying raw audio. This is independent of the control WebSocket (`ws.jambonz.org`) — it uses the `audio.drachtio.org` subprotocol.
 
 ### Receiving Audio in the Same Application
 
@@ -433,14 +435,14 @@ const makeService = createEndpoint({ server, port: 3000 });
 // Control pipe — handles call sessions
 const svc = makeService({ path: '/' });
 
-// Audio pipe — receives listen/stream audio
+// Audio pipe — receives stream audio
 const audioSvc = makeService.audio({ path: '/audio-stream' });
 
 svc.on('session:new', (session) => {
   session
     .answer()
     .say({ text: 'Recording your audio.' })
-    .listen({
+    .stream({
       url: '/audio-stream',           // relative path — jambonz connects back to same server
       sampleRate: 16000,
       mixType: 'mono',
@@ -472,7 +474,7 @@ The `stream` object in the `connection` event is an `AudioStream` instance:
 
 **Events**:
 - `audio` — L16 PCM binary frame (`Buffer`)
-- `dtmf` — `{digit, duration}` (only if `passDtmf: true` on listen verb)
+- `dtmf` — `{digit, duration}` (only if `passDtmf: true` on stream verb)
 - `playDone` — `{id}` (after non-streaming playAudio completes)
 - `mark` — `{name, event}` where event is `'playout'` or `'cleared'`
 - `close` — `(code, reason)`
@@ -480,7 +482,7 @@ The `stream` object in the `connection` event is an `AudioStream` instance:
 
 ### Sending Audio Back (Bidirectional)
 
-The listen verb supports bidirectional audio. There are two modes, controlled by the `bidirectionalAudio.streaming` option on the listen verb.
+The stream verb supports bidirectional audio. There are two modes, controlled by the `bidirectionalAudio.streaming` option on the stream verb.
 
 **Non-streaming mode** (`streaming: false`, the default) — send complete audio clips as base64:
 
@@ -502,7 +504,7 @@ Up to 10 playAudio commands can be queued simultaneously.
 **Streaming mode** (`streaming: true`) — send raw binary PCM frames directly:
 
 ```typescript
-// In the listen verb config:
+// In the stream verb config:
 // bidirectionalAudio: { enabled: true, streaming: true, sampleRate: 16000 }
 
 stream.on('audio', (pcm) => {
@@ -513,16 +515,16 @@ stream.on('audio', (pcm) => {
 
 ### Marks (Synchronization Markers)
 
-Marks let you track when streamed audio has been played out to the caller. They work **only with bidirectional streaming mode** — you must enable `bidirectionalAudio: { enabled: true, streaming: true }` on the listen verb.
+Marks let you track when streamed audio has been played out to the caller. They work **only with bidirectional streaming mode** — you must enable `bidirectionalAudio: { enabled: true, streaming: true }` on the stream verb.
 
 The pattern is: stream audio via `sendAudio()`, then send a mark. When all the audio sent before the mark finishes playing out, jambonz sends back a mark event with `event: 'playout'`. This is how you know the caller has heard a specific chunk of audio.
 
 ```typescript
-// Listen verb must enable bidirectional streaming for marks to work
+// Stream verb must enable bidirectional streaming for marks to work
 session
-  .listen({
+  .stream({
     url: '/audio',
-    actionHook: '/listen-done',
+    actionHook: '/stream-done',
     bidirectionalAudio: {
       enabled: true,
       streaming: true,
@@ -557,7 +559,7 @@ audioSvc.on('connection', (stream) => {
 
 ```typescript
 stream.killAudio();           // Stop playback, flush buffer
-stream.disconnect();          // Close connection, end listen verb
+stream.disconnect();          // Close connection, end stream verb
 stream.sendMark('sync-pt');   // Insert synchronization marker
 stream.clearMarks();          // Clear all pending markers
 stream.close();               // Close the WebSocket
@@ -710,7 +712,7 @@ Complete working examples are in the `examples/` directory:
 - **echo** — Speech echo using gather with actionHook pattern (webhook + WebSocket). The canonical example for understanding actionHook event handling.
 - **ivr-menu** — Interactive menu with speech and DTMF input (webhook)
 - **dial** — Simple outbound dial to a phone number (webhook)
-- **listen-record** — Record audio using the listen verb to stream to a WebSocket (webhook)
+- **stream-record** — Record audio using the stream verb to stream to a WebSocket (webhook)
 - **voice-agent** — LLM-powered conversational AI with tool calls (webhook + WebSocket)
 - **openai-realtime** — OpenAI Realtime API voice agent with function calling (WebSocket)
 - **deepgram-voice-agent** — Deepgram Voice Agent API with function calling (WebSocket)
@@ -719,3 +721,8 @@ Complete working examples are in the `examples/` directory:
 - **queue-with-hold** — Call queue with hold music and agent dequeue (webhook + WebSocket)
 - **call-recording** — Mid-call recording control via REST API and inject commands (webhook + WebSocket)
 - **realtime-translator** — Bridges two parties with real-time speech translation using STT, Google Translate, and TTS dub tracks. Multi-file example with `src/routes/` structure (WebSocket)
+- **room-with-stream** — A Room with a nested bidirectional audio stream forked to a WebSocket (WebSocket)
+- **stream-then-room** — 1:1 stream, then move the caller + stream into a Room mid-call (WebSocket)
+- **s2s-move-to-room** — Ultravox s2s, then move the caller + agent into a Room mid-call (WebSocket)
+- **room-say** — injectSay a one-shot TTS announcement heard by the whole Room (WebSocket)
+- **room-play-tone** — injectPlay a tone heard by the whole Room (WebSocket)

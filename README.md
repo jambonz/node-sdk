@@ -90,7 +90,7 @@ const audioSvc = makeService.audio({ path: '/audio-stream' });
 svc.on('session:new', (session) => {
   session
     .say({ text: 'Listening...' })
-    .listen({
+    .stream({
       url: '/audio-stream',  // relative path — jambonz connects back to same server
       sampleRate: 8000,
       bidirectionalAudio: {
@@ -369,7 +369,9 @@ import { JambonzClient } from '@jambonz/sdk/client';
 
 Both `WebhookResponse` and WebSocket `Session` support the same chainable verb methods:
 
-`.say()` `.play()` `.gather()` `.dial()` `.llm()` `.conference()` `.enqueue()` `.dequeue()` `.hangup()` `.pause()` `.redirect()` `.config()` `.tag()` `.dtmf()` `.listen()` `.transcribe()` `.message()` `.stream()` `.agent()` `.dub()` `.alert()` `.answer()` `.leave()` `.sipDecline()` `.sipRefer()` `.sipRequest()`
+`.say()` `.play()` `.gather()` `.dial()` `.llm()` `.room()` `.enqueue()` `.dequeue()` `.hangup()` `.pause()` `.redirect()` `.config()` `.tag()` `.dtmf()` `.stream()` `.transcribe()` `.message()` `.agent()` `.dub()` `.alert()` `.answer()` `.leave()` `.sipDecline()` `.sipRefer()` `.sipRequest()`
+
+> Prefer `.room()` and `.stream()`. `.conference()` and `.listen()` are still supported as synonyms for backward compatibility.
 
 All methods accept the same options as the corresponding [verb JSON schemas](schema/verbs/) and are chainable.
 
@@ -427,13 +429,18 @@ See the [examples/](examples/) directory:
 | [echo](examples/echo/) | Webhook + WS | Speech echo using gather with actionHook |
 | [ivr-menu](examples/ivr-menu/) | Webhook | Interactive menu with speech and DTMF |
 | [dial](examples/dial/) | Webhook | Outbound dial to a phone number |
-| [listen-record](examples/listen-record/) | Webhook | Record audio via WebSocket stream |
+| [stream-record](examples/stream-record/) | Webhook | Record audio via WebSocket stream |
 | [voice-agent](examples/voice-agent/) | Webhook + WS | LLM-powered conversational AI with tool calls |
 | [openai-realtime](examples/openai-realtime/) | WebSocket | OpenAI Realtime API voice agent |
 | [deepgram-voice-agent](examples/deepgram-voice-agent/) | WebSocket | Deepgram Voice Agent API |
 | [llm-streaming](examples/llm-streaming/) | WebSocket | Anthropic LLM with TTS streaming and barge-in |
 | [queue-with-hold](examples/queue-with-hold/) | Webhook + WS | Call queue with hold music |
 | [call-recording](examples/call-recording/) | Webhook + WS | Mid-call recording control |
+| [room-with-stream](examples/room-with-stream/) | WebSocket | A Room with a nested bidirectional audio stream |
+| [stream-then-room](examples/stream-then-room/) | WebSocket | 1:1 stream, then move caller + stream into a Room |
+| [s2s-move-to-room](examples/s2s-move-to-room/) | WebSocket | Ultravox s2s, then move caller + agent into a Room |
+| [room-say](examples/room-say/) | WebSocket | injectSay a one-shot announcement heard by the whole Room |
+| [room-play-tone](examples/room-play-tone/) | WebSocket | injectPlay a tone heard by the whole Room |
 
 ## Publishing to npm
 
