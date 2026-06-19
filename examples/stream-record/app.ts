@@ -14,9 +14,9 @@ app.post('/record', (_req, res) => {
     .say({
       text: 'Hi there. Please leave a message, and we will get back to you shortly.',
     })
-    .listen({ url: wsUrl });
+    .stream({ url: wsUrl });
 
   res.json(jambonz);
 });
 
-app.listen(3000, () => console.log('Listen-record webhook app listening on port 3000'));
+app.listen(3000, () => console.log('Stream-record webhook app listening on port 3000'));
