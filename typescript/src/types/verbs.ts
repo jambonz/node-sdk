@@ -199,6 +199,8 @@ export interface LlmBaseOptions {
   toolHook?: ActionHook;
   /** Event types to receive via eventHook. */
   events?: string[];
+  /** Declarative transfer-to-human: injects a transfer tool and runs the packaged transfer when the model calls it. */
+  handoff?: Handoff;
 }
 
 export interface LlmVerb extends LlmBaseOptions {
@@ -312,6 +314,8 @@ export interface AgentVerb {
   eventHook?: ActionHook;
   /** Webhook when the LLM requests a tool/function call. */
   toolHook?: ActionHook;
+  /** Declarative transfer-to-human: injects a transfer tool and runs the packaged transfer when the model calls it. */
+  handoff?: Handoff;
   /** Configuration for playing filler audio while tool calls are in progress. Prevents silence during long-running tool executions. */
   toolFiller?: false | {
     /** Filler mode. 'audio' plays a looping audio file. 'backchannel' uses TTS to speak short phrases. */
@@ -652,6 +656,91 @@ export interface SipReferVerb {
   eventHook?: ActionHook;
 }
 
+/** Per-outcome fallback actions when a transfer does not complete normally. */
+export interface TransferDisposition {
+  /** Action when the destination does not answer within timeout. Default: 'return'. */
+  onNoAnswer?: 'return' | 'voicemail' | 'hangup';
+  /** Action when the destination is busy. Default: 'return'. */
+  onBusy?: 'return' | 'voicemail' | 'hangup';
+  /** Action when the destination declines (confirm gate failed, AMD machine, or rejection). Default: 'return'. */
+  onDecline?: 'return' | 'voicemail' | 'hangup';
+  /** Action when a protocol-level error occurs on the destination leg. Default: 'return'. */
+  onFailure?: 'return' | 'voicemail' | 'hangup';
+  /** SIP URI or HTTP URL for voicemail. Required when any disposition value is 'voicemail'. */
+  voicemailUrl?: string;
+}
+
+/** Human-side acceptance gate: the destination must press a digit to accept. */
+export interface TransferConfirm {
+  /** Text or URL of the prompt played to the destination. */
+  prompt: string;
+  /** Single DTMF digit the destination must press to accept. */
+  digit: string;
+}
+
+/**
+ * Shared configuration for blind and warm transfer choreography. Reused by the
+ * `transfer` verb and the `handoff` block on conversational verbs.
+ */
+export interface TransferOptions {
+  /** 'blind' hands off immediately; 'warm' lets the agent brief the destination first. */
+  mode: 'blind' | 'warm';
+  /** blind only: 'refer' sends a SIP REFER; 'dial' places a bridged outbound call. Default: 'refer'. */
+  blindMethod?: 'refer' | 'dial';
+  /** warm only: true = caller joins a three-way conference and hears the brief; false = caller is parked. Default: false. */
+  callerPresent?: boolean;
+  /** One or more destinations. All are rung simultaneously; first to answer wins. */
+  target: Target[];
+  /** Caller ID presented to the destination. */
+  callerId?: string;
+  /** warm/parked only: verbs for the parked caller while the agent briefs the destination. */
+  onHoldHook?: ActionHook;
+  /** Seconds to wait for the destination to answer before applying onNoAnswer. Default: 30. */
+  timeout?: number;
+  /** Optional human-side acceptance gate. */
+  confirm?: TransferConfirm;
+  /** warm only: optional answering-machine detection on the destination leg. */
+  amd?: Amd;
+  /** Per-outcome fallback actions. */
+  disposition?: TransferDisposition;
+  /** Fires when the transfer resolves (bridged, returned, voicemail, or failed). */
+  actionHook?: ActionHook;
+  /** Optional hook for in-progress transfer events (ringing, brief started). */
+  eventHook?: ActionHook;
+}
+
+/**
+ * Declarative transfer-to-human config for conversational verbs (`agent`, `llm`/`s2s`).
+ * The runtime injects a `transfer_to_human` tool and runs the packaged transfer
+ * choreography when the model calls it.
+ */
+export interface Handoff extends TransferOptions {
+  /** 'auto' = LLM writes the summary; 'none' = no spoken brief; {template} = guidance for the summary. Default: 'auto'. */
+  brief?: 'auto' | 'none' | { template: string };
+  /** Optional voice/vendor for the spoken brief. Defaults to the session synthesizer. */
+  briefSynthesizer?: Synthesizer;
+  /** Override the injected tool name. Default: 'transfer_to_human'. */
+  toolName?: string;
+  /** Override the injected tool description shown to the LLM. */
+  toolDescription?: string;
+}
+
+/**
+ * Packaged blind and warm (parked / three-way) transfer with built-in failure
+ * handling. Composes {@link TransferOptions} for the shared choreography.
+ */
+export interface TransferVerb extends TransferOptions {
+  verb: 'transfer';
+  id?: string;
+  /** warm only: the spoken summary delivered to the destination (human). */
+  brief?: {
+    /** The spoken briefing text. */
+    text: string;
+    /** Optional voice/vendor for the brief. Defaults to the session synthesizer. */
+    synthesizer?: Synthesizer;
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Utility
 // ---------------------------------------------------------------------------
@@ -835,7 +924,8 @@ export type Verb =
   | TagVerb
   | SipDeclineVerb
   | SipRequestVerb
-  | SipReferVerb;
+  | SipReferVerb
+  | TransferVerb;
 
 /** A jambonz application — an array of verbs executed sequentially. */
 export type JambonzApp = Verb[];

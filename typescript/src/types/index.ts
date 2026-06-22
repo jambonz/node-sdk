@@ -33,6 +33,7 @@ export type {
   DubVerb,
   EnqueueVerb,
   GatherVerb,
+  Handoff,
   HangupVerb,
   JambonzApp,
   LeaveVerb,
@@ -54,6 +55,10 @@ export type {
   StreamVerb,
   TagVerb,
   TranscribeVerb,
+  TransferConfirm,
+  TransferDisposition,
+  TransferOptions,
+  TransferVerb,
   Verb,
   VerbName,
 } from './verbs.js';

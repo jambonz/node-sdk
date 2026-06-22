@@ -152,6 +152,11 @@ export class CallsResource {
     return this.update(callSid, { agent_update: data });
   }
 
+  /** Redirect the in-progress call to a packaged transfer (blind or warm). */
+  async transfer(callSid: string, opts: NonNullable<UpdateCallRequest['transfer']>): Promise<void> {
+    return this.update(callSid, { transfer: opts });
+  }
+
   /** Enable or disable server-side noise isolation. */
   async noiseIsolation(
     callSid: string,
