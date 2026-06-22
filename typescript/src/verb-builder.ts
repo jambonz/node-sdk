@@ -34,6 +34,7 @@ import type {
   StreamVerb,
   TagVerb,
   TranscribeVerb,
+  TransferVerb,
   Verb,
 } from './types/verbs.js';
 import { JambonzValidator } from './validator.js';
@@ -205,6 +206,11 @@ export class VerbBuilder {
   /** Transfer the call via SIP REFER. */
   sipRefer(opts: Omit<SipReferVerb, 'verb'>): this {
     return this.addVerb({ verb: 'sip:refer', ...opts });
+  }
+
+  /** Transfer the caller to a destination (blind, or warm parked/three-way) with built-in failure handling. */
+  transfer(opts: Omit<TransferVerb, 'verb'>): this {
+    return this.addVerb({ verb: 'transfer', ...opts });
   }
 
   // --- Utility ---

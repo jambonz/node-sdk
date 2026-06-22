@@ -3,7 +3,7 @@
  */
 
 import type { ActionHook } from './components.js';
-import type { SayVerb, Verb } from './verbs.js';
+import type { SayVerb, TransferVerb, Verb } from './verbs.js';
 
 export interface CreateCallRequest {
   /** Application SID to handle the call. */
@@ -114,6 +114,8 @@ export interface UpdateCallRequest {
   };
   /** Send DTMF digits. */
   dtmf?: { digit: string; duration?: number };
+  /** Redirect the in-progress call to a packaged transfer (blind or warm). */
+  transfer?: Omit<TransferVerb, 'verb'>;
   /** Tag metadata. */
   tag?: Record<string, unknown>;
   /** Mid-conversation agent update. */

@@ -158,6 +158,8 @@ export class Session extends EventEmitter {
   sipRequest(opts: Parameters<VerbBuilder['sipRequest']>[0]): this { this.builder.sipRequest(opts); return this; }
   /** Transfer the call via SIP REFER. */
   sipRefer(opts: Parameters<VerbBuilder['sipRefer']>[0]): this { this.builder.sipRefer(opts); return this; }
+  /** Transfer the caller to a destination (blind, or warm parked/three-way) with built-in failure handling. */
+  transfer(opts: Parameters<VerbBuilder['transfer']>[0]): this { this.builder.transfer(opts); return this; }
   /** Set session-level defaults (TTS vendor/voice, STT vendor, VAD, etc.). */
   config(opts: Parameters<VerbBuilder['config']>[0]): this { this.builder.config(opts); return this; }
   /** Explicitly answer the call (sends a 200 OK). */
