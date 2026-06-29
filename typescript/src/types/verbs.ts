@@ -201,6 +201,14 @@ export interface LlmBaseOptions {
   events?: string[];
   /** Declarative transfer-to-human: injects a transfer tool and runs the packaged transfer when the model calls it. */
   handoff?: Handoff;
+  /** Enable the built-in hangup tool for s2s verbs. When present, the runtime injects a 'hangup' tool; when the model calls it the call ends with the reason placed in an X-Reason SIP header (LLM-supplied reason wins, falling back to hangup.reason). */
+  hangup?: { reason?: string };
+  /** Opt-in per-response stall watchdog (ms) for s2s vendors that support app-driven turn-taking. Omit or set to 0 to disable (the default). */
+  responseTimeoutMs?: number;
+  /** When a response stall is detected (see responseTimeoutMs), cancel the in-progress server-side response. Has no effect unless responseTimeoutMs is set. */
+  cancelOnResponseTimeout?: boolean;
+  /** On caller barge-in, cancel the in-progress server-side response (app-driven turn-taking configurations). */
+  cancelOnBargeIn?: boolean;
 }
 
 export interface LlmVerb extends LlmBaseOptions {
@@ -316,6 +324,8 @@ export interface AgentVerb {
   toolHook?: ActionHook;
   /** Declarative transfer-to-human: injects a transfer tool and runs the packaged transfer when the model calls it. */
   handoff?: Handoff;
+  /** Enable the built-in hangup tool. When present, the runtime injects a 'hangup' tool; when the model calls it the call ends with the reason placed in an X-Reason SIP header (LLM-supplied reason wins, falling back to hangup.reason). */
+  hangup?: { reason?: string };
   /** Configuration for playing filler audio while tool calls are in progress. Prevents silence during long-running tool executions. */
   toolFiller?: false | {
     /** Filler mode. 'audio' plays a looping audio file. 'backchannel' uses TTS to speak short phrases. */
