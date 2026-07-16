@@ -16,7 +16,14 @@ import type {
   Target,
   Vad,
 } from './components.js';
-import type { LlmVendor } from './llm-vendors.generated.js';
+
+/**
+ * LLM vendor id for the agent verb's `llm.vendor`. Free-form by design: the
+ * schema deliberately has no vendor enum so new LLMs can be added without a
+ * schema release; the server validates the vendor against its registered
+ * `@jambonz/llm` adapters at runtime.
+ */
+export type LlmVendor = string;
 
 // ---------------------------------------------------------------------------
 // Audio & Speech
@@ -162,9 +169,10 @@ export interface AgentLlmOptions {
 
 /** `llm` block on the agent verb. */
 export interface AgentLlm {
-  /** LLM vendor. Derived from the @jambonz/schema agent verb enum — see llm-vendors.generated.ts. */
-  vendor: LlmVendor;
-  model: string;
+  /** LLM vendor. Optional: falls back to the application's default LLM vendor when omitted. */
+  vendor?: LlmVendor;
+  /** Model id. Optional: falls back to the application's default LLM model when omitted. */
+  model?: string;
   label?: string;
   auth?: { apiKey?: string; [key: string]: unknown };
   connectOptions?: {
@@ -314,8 +322,8 @@ export interface AgentVerb {
     minSpeechDuration?: number;
     sticky?: boolean;
   };
-  /** LLM configuration. */
-  llm: AgentLlm;
+  /** LLM configuration. Optional: when omitted, the agent uses the application's default LLM (like stt/tts). */
+  llm?: AgentLlm;
   /** Webhook when agent ends. */
   actionHook?: ActionHook;
   /** Webhook for agent events. */
@@ -476,6 +484,8 @@ export interface DialVerb {
   referHook?: ActionHook;
   /** Audio URL for ringback tone replacement. */
   dialMusic?: string;
+  /** Request SRTP (encrypted media) on the outbound call. 'sdes' negotiates keys via SDES crypto attributes (used with sips:/TLS targets); 'dtls' via DTLS-SRTP. Applies to SIP URI targets. */
+  srtpEncryption?: 'sdes' | 'dtls';
   /** DTMF capture patterns during bridged call. */
   dtmfCapture?: Record<string, unknown>;
   /** Webhook for captured DTMF patterns. */
