@@ -63,9 +63,8 @@ export type {
   VerbName,
 } from './verbs.js';
 
-// LLM vendors (derived from @jambonz/schema)
-export type { LlmVendor } from './llm-vendors.generated.js';
-export { LLM_VENDORS } from './llm-vendors.generated.js';
+// LLM vendor id (free-form string; the schema has no vendor enum by design)
+export type { LlmVendor } from './verbs.js';
 
 // Session
 export type {

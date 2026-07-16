@@ -141,6 +141,7 @@ export interface Recognizer {
   assemblyAiOptions?: Record<string, unknown>;
   speechmaticsOptions?: Record<string, unknown>;
   openaiOptions?: Record<string, unknown>;
+  xaiOptions?: Record<string, unknown>;
   houndifyOptions?: Record<string, unknown>;
   gladiaOptions?: Record<string, unknown>;
   elevenlabsOptions?: Record<string, unknown>;
