@@ -249,6 +249,23 @@ export interface UltravoxS2sVerb extends LlmBaseOptions {
   verb: 'ultravox_s2s';
 }
 
+export interface QwenS2sVerb extends LlmBaseOptions {
+  verb: 'qwen_s2s';
+  /** DashScope authentication. Keys are region-bound: key and host must
+   *  belong to the same region. */
+  auth?: {
+    /** DashScope API key (sk-...). May be omitted when the account has a
+     *  stored credential for the qwen vendor. */
+    apiKey?: string;
+    /** DashScope endpoint host. Default: 'dashscope-intl.aliyuncs.com'
+     *  (international). Use a workspace-scoped host
+     *  ('ws-<workspaceId>.<region>.maas.aliyuncs.com', Alibaba-recommended)
+     *  or 'dashscope.aliyuncs.com' for the China (Beijing) region. */
+    host?: string;
+    [key: string]: unknown;
+  };
+}
+
 export interface DialogflowVerb {
   verb: 'dialogflow';
   id?: string;
@@ -927,6 +944,7 @@ export type Verb =
   | ElevenlabsS2sVerb
   | DeepgramS2sVerb
   | UltravoxS2sVerb
+  | QwenS2sVerb
   | DialogflowVerb
   | AgentVerb
   | ConferenceVerb
