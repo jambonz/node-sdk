@@ -118,6 +118,7 @@ export class Session extends EventEmitter {
   s2s(opts: Parameters<VerbBuilder['s2s']>[0]): this { this.builder.s2s(opts); return this; }
   /** Shortcut for s2s with vendor='openai'. */
   openai_s2s(opts: Parameters<VerbBuilder['openai_s2s']>[0]): this { this.builder.openai_s2s(opts); return this; }
+  qwen_s2s(opts: Parameters<VerbBuilder['qwen_s2s']>[0]): this { this.builder.qwen_s2s(opts); return this; }
   /** Shortcut for s2s with vendor='google'. */
   google_s2s(opts: Parameters<VerbBuilder['google_s2s']>[0]): this { this.builder.google_s2s(opts); return this; }
   /** Shortcut for s2s with vendor='elevenlabs'. */

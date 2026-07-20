@@ -99,6 +99,10 @@ export class VerbBuilder {
     return this.addVerb({ verb: 'openai_s2s', ...opts });
   }
 
+  qwen_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'qwen_s2s', ...opts });
+  }
+
   /** Shortcut for s2s with vendor='google'. */
   google_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
     return this.addVerb({ verb: 'google_s2s', ...opts });
