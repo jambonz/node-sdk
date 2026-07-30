@@ -287,6 +287,9 @@ export interface DialogflowVerb {
   actionHook?: ActionHook;
   /** Webhook for Dialogflow events. */
   eventHook?: ActionHook;
+  /** Webhook invoked when the agent requests a client-side tool call (CX).
+   *  Respond with {outputParameters} (or {error}) to resume the conversation. */
+  toolHook?: ActionHook;
   /** Event types to receive via eventHook. */
   events?: string[];
   /** Event to trigger at conversation start. */
