@@ -146,6 +146,10 @@ export interface Recognizer {
   gladiaOptions?: Record<string, unknown>;
   elevenlabsOptions?: Record<string, unknown>;
   verbioOptions?: Record<string, unknown>;
+  gradiumOptions?: Record<string, unknown>;
+  mistralOptions?: Record<string, unknown>;
+  modulateOptions?: Record<string, unknown>;
+  zoomOptions?: Record<string, unknown>;
   customOptions?: Record<string, unknown>;
 }
 

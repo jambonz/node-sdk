@@ -103,6 +103,18 @@ export class VerbBuilder {
     return this.addVerb({ verb: 'qwen_s2s', ...opts });
   }
 
+  gptlive_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'gptlive_s2s', ...opts });
+  }
+
+  nova_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'nova_s2s', ...opts });
+  }
+
+  voicelive_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'voicelive_s2s', ...opts });
+  }
+
   /** Shortcut for s2s with vendor='google'. */
   google_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
     return this.addVerb({ verb: 'google_s2s', ...opts });

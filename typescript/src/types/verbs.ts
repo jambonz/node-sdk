@@ -266,8 +266,24 @@ export interface QwenS2sVerb extends LlmBaseOptions {
   };
 }
 
+export interface GptliveS2sVerb extends LlmBaseOptions {
+  verb: 'gptlive_s2s';
+}
+
+export interface NovaS2sVerb extends LlmBaseOptions {
+  verb: 'nova_s2s';
+}
+
+export interface VoiceliveS2sVerb extends LlmBaseOptions {
+  verb: 'voicelive_s2s';
+}
+
 export interface DialogflowVerb {
   verb: 'dialogflow';
+  /** The deployment to use (CES). Omit to use the app's default. */
+  deployment?: string;
+  /** Names the conversation on the Dialogflow side; reuse it on a later dialogflow verb in the same call to resume the same conversation. */
+  sessionId?: string;
   id?: string;
   /** Google service account credentials as JSON object or stringified JSON. */
   credentials: Record<string, unknown> | string;
@@ -371,6 +387,10 @@ export interface AgentVerb {
   greeting?: boolean;
   /** Speculatively prompt the LLM on final transcript before Krisp end-of-turn. Default: false. */
   earlyGeneration?: boolean;
+  /** false: the agent's text is never sent to TTS (e.g. an agent that drives a DTMF-only phone menu with tools). Text is still kept in history and llm_response events; toolFiller and earlyGeneration are turned off. Default: true. */
+  speak?: boolean;
+  /** Keep stage-direction-only paragraphs ('(silence)', '[No response needed]', '*pauses*') and <think>/<thinking>/<reasoning> blocks out of TTS. History and events keep the raw text. Default: true. */
+  speechCleanup?: boolean;
   /** Enable server-side noise isolation to reduce background noise on call audio. Defaults to inbound (caller) audio; set direction to 'write' for outbound. */
   noiseIsolation?: 'krisp' | 'rnnoise' | {
     mode: string;
@@ -380,8 +400,10 @@ export interface AgentVerb {
   };
   /** External MCP servers that provide tools to the LLM. */
   mcpServers?: McpServerConfig[];
-  /** Seconds to wait after assistant finishes speaking before prompting user to respond. 0 disables. Default: 0. */
+  /** Seconds to wait after assistant finishes speaking before prompting user to respond. 0 disables. Default: 12. */
   noResponseTimeout?: number;
+  /** End the agent after this many unanswered no-response prompts in a row (actionHook completionReason 'no_response'). Resets when the user speaks. 0 or unset: no limit. */
+  noResponseMaxPrompts?: number;
   /** Auto-adjust STT/TTS based on detected language. true=lock on first, 'always'=adapt every turn. */
   autoLockLanguage?: boolean | 'always';
   /** Per-language TTS overrides. Keys are BCP-47 codes (e.g., 'es', 'fr'). */
@@ -538,6 +560,8 @@ export interface DialVerb {
   tag?: Record<string, unknown>;
   /** Forward P-Asserted-Identity header. */
   forwardPAI?: boolean;
+  /** Codec names, in preference order, to offer on the outbound INVITE (e.g. ['G722', 'PCMU']). */
+  codecs?: string[];
 }
 
 export interface ConferenceVerb {
@@ -948,6 +972,9 @@ export type Verb =
   | DeepgramS2sVerb
   | UltravoxS2sVerb
   | QwenS2sVerb
+  | GptliveS2sVerb
+  | NovaS2sVerb
+  | VoiceliveS2sVerb
   | DialogflowVerb
   | AgentVerb
   | ConferenceVerb

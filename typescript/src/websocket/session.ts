@@ -119,6 +119,9 @@ export class Session extends EventEmitter {
   /** Shortcut for s2s with vendor='openai'. */
   openai_s2s(opts: Parameters<VerbBuilder['openai_s2s']>[0]): this { this.builder.openai_s2s(opts); return this; }
   qwen_s2s(opts: Parameters<VerbBuilder['qwen_s2s']>[0]): this { this.builder.qwen_s2s(opts); return this; }
+  gptlive_s2s(opts: Parameters<VerbBuilder['gptlive_s2s']>[0]): this { this.builder.gptlive_s2s(opts); return this; }
+  nova_s2s(opts: Parameters<VerbBuilder['nova_s2s']>[0]): this { this.builder.nova_s2s(opts); return this; }
+  voicelive_s2s(opts: Parameters<VerbBuilder['voicelive_s2s']>[0]): this { this.builder.voicelive_s2s(opts); return this; }
   /** Shortcut for s2s with vendor='google'. */
   google_s2s(opts: Parameters<VerbBuilder['google_s2s']>[0]): this { this.builder.google_s2s(opts); return this; }
   /** Shortcut for s2s with vendor='elevenlabs'. */
