@@ -147,6 +147,7 @@ export interface Recognizer {
   elevenlabsOptions?: Record<string, unknown>;
   verbioOptions?: Record<string, unknown>;
   gradiumOptions?: Record<string, unknown>;
+  giggyOptions?: Record<string, unknown>;
   mistralOptions?: Record<string, unknown>;
   modulateOptions?: Record<string, unknown>;
   zoomOptions?: Record<string, unknown>;

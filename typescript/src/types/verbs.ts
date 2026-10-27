@@ -163,6 +163,19 @@ export interface AgentLlmOptions {
   maxTokens?: number;
   /** Sampling temperature. */
   temperature?: number;
+  /**
+   * @deprecated Has no effect. Set the vendor's own thinking parameter in
+   * `vendorParams` instead, e.g. `{ reasoning_effort: 'none' }` for openai.
+   */
+  reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high';
+  /**
+   * Vendor-specific request parameters, passed to the vendor as-is, e.g.
+   * `{ provider: { sort: 'latency' } }` for openrouter. Added to the request
+   * body (OpenAI-compatible vendors) or generation config (google,
+   * vertex-gemini); never overrides a field jambonz sets. Ignored by
+   * anthropic and bedrock.
+   */
+  vendorParams?: Record<string, unknown>;
   /** Tools / functions the model may call. */
   tools?: (LlmTool | LlmToolOpenAIWrapped)[];
 }
