@@ -2,12 +2,12 @@
 
 Build voice applications on [jambonz](https://jambonz.org) with AI-assisted development.
 
-This monorepo contains two packages and an Agent Skill:
+This repo contains the SDK and an Agent Skill; the MCP server lives in its own repo:
 
 | Package | Description |
 |---------|-------------|
 | [`@jambonz/sdk`](typescript/) | TypeScript SDK for building jambonz webhook and WebSocket voice applications |
-| [`@jambonz/mcp-schema-server`](mcp-server/) | MCP server that gives AI coding assistants deep knowledge of jambonz APIs |
+| [`@jambonz/mcp-schema-server`](https://github.com/jambonz/mcp-server) | MCP server that gives AI coding assistants deep knowledge of jambonz APIs |
 | [`jambonz` skill](jambonz/) | [Agent Skill](https://agentskills.io) that teaches AI agents how to build jambonz voice applications |
 
 ## Quick Start
@@ -444,42 +444,27 @@ See the [examples/](examples/) directory:
 
 ## Publishing to npm
 
-The two packages are versioned and published independently. Each has its own GitHub Actions workflow triggered by a specific tag pattern.
-
-### Publishing `@jambonz/sdk`
+`@jambonz/sdk` is published by pushing a `v*` tag, which runs `.github/workflows/publish-sdk.yml` (`npm ci`, `npm test`, then `npm publish` from `typescript/`). Cut a release from an up-to-date `main` with:
 
 ```bash
-./scripts/publish-sdk.sh          # patch bump (default)
-./scripts/publish-sdk.sh minor    # minor bump
-./scripts/publish-sdk.sh major    # major bump
+./publish-tags.sh            # patch bump (default)
+./publish-tags.sh minor      # minor bump
+./publish-tags.sh major      # major bump
+./publish-tags.sh 0.12.0     # explicit version
 ```
 
-The script bumps the version, commits, tags with `v{version}`, and pushes. The `v*` tag triggers `.github/workflows/publish-sdk.yml`.
-
-### Publishing `@jambonz/mcp-schema-server`
-
-```bash
-./scripts/publish-mcp.sh          # patch bump (default)
-./scripts/publish-mcp.sh minor    # minor bump
-./scripts/publish-mcp.sh major    # major bump
-```
-
-The script bumps the version, commits, tags with `mcp-v{version}`, and pushes. The `mcp-v*` tag triggers `.github/workflows/publish-mcp.yml`.
+The script bumps `typescript/package.json`, commits only the version files, tags `v{version}` at the repo root, and pushes `main` and that one tag. The MCP server is published from [jambonz/mcp-server](https://github.com/jambonz/mcp-server).
 
 ## Repository Structure
 
 ```
 agent-toolkit/
 ├── typescript/          # @jambonz/sdk — the TypeScript SDK
-├── mcp-server/          # @jambonz/mcp-schema-server — MCP server for AI assistants
 ├── jambonz/             # Agent Skill — procedural knowledge for AI coding agents
 │   ├── SKILL.md         # Main skill file (decision trees, patterns, gotchas)
 │   └── references/      # On-demand reference files (voice AI, IVR, call control, env vars)
-├── schema/
-│   ├── verbs/           # JSON Schema for each jambonz verb
-│   ├── components/      # JSON Schema for shared types (recognizer, synthesizer, etc.)
-│   └── callbacks/       # JSON Schema for actionHook callback payloads
 ├── examples/            # Working example applications
+├── publish-tags.sh      # Cuts an @jambonz/sdk release (see Publishing to npm)
 └── AGENTS.md            # Developer guide (served by the MCP server)
 ```
 
