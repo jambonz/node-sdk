@@ -61,3 +61,12 @@ describe('Session verb:hook ack behavior', () => {
     expect(acksFor(sent, 'evt-3')).toHaveLength(1);
   });
 });
+
+describe('Session.updateDialogflow', () => {
+  it('sends a dialogflow:update command', () => {
+    const { session, sent } = makeSession();
+    session.updateDialogflow({ event: 'start-over' });
+    const cmd = sent.find((m) => m.command === 'dialogflow:update');
+    expect(cmd).toMatchObject({ type: 'command', data: { event: 'start-over' } });
+  });
+});

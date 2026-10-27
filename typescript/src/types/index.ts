@@ -92,6 +92,7 @@ export type {
   CallCount,
   CallInfo,
   CreateCallRequest,
+  DialogflowUpdate,
   ListCallsFilter,
   QueueInfo,
   UpdateCallRequest,

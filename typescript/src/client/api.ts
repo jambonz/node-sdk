@@ -10,6 +10,7 @@ import type {
   UpdateCallRequest,
   ListCallsFilter,
   QueueInfo,
+  DialogflowUpdate,
 } from '../types/rest.js';
 import type { ActionHook } from '../types/components.js';
 import type { Verb } from '../types/verbs.js';
@@ -150,6 +151,11 @@ export class CallsResource {
   /** Send a mid-conversation update to an active agent verb. */
   async updateAgent(callSid: string, data: NonNullable<UpdateCallRequest['agent_update']>): Promise<void> {
     return this.update(callSid, { agent_update: data });
+  }
+
+  /** Send input into a running Dialogflow CES session. */
+  async updateDialogflow(callSid: string, data: DialogflowUpdate): Promise<void> {
+    return this.update(callSid, { dialogflow_update: data });
   }
 
   /** Redirect the in-progress call to a packaged transfer (blind or warm). */

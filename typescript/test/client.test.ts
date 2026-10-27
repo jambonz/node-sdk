@@ -204,6 +204,16 @@ describe('CallsResource', () => {
       expect(body.mute_status).toBe('unmute');
     });
 
+    it('updateDialogflow sends dialogflow_update in update', async () => {
+      const mock = mockFetch(200, {});
+      globalThis.fetch = mock as unknown as typeof fetch;
+      const client = createClient();
+
+      await client.calls.updateDialogflow('call-1', { text: 'hello', variables: { a: 1 } });
+      const body = JSON.parse(mock.mock.calls[0][1].body);
+      expect(body.dialogflow_update).toEqual({ text: 'hello', variables: { a: 1 } });
+    });
+
     it('noiseIsolation sends noise_isolation_status in update', async () => {
       const mock = mockFetch(200, {});
       globalThis.fetch = mock as unknown as typeof fetch;

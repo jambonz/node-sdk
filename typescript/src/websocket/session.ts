@@ -8,6 +8,7 @@ import { EventEmitter } from 'events';
 import type { WebSocket } from 'ws';
 import type { Logger } from '../types/common.js';
 import type { CallSession, WsMessage, WsResponse } from '../types/session.js';
+import type { DialogflowUpdate } from '../types/rest.js';
 import type { LlmToolOutputData, SayVerb, Verb } from '../types/verbs.js';
 import { VerbBuilder, type VerbBuilderOptions } from '../verb-builder.js';
 
@@ -390,6 +391,20 @@ export class Session extends EventEmitter {
     this.wsSend({
       type: 'command',
       command: 'agent:update',
+      data,
+    });
+  }
+
+  /**
+   * Send input into a running Dialogflow CES session mid-call.
+   * CES only. Variables and dtmf go at once; an event or text is held by
+   * jambonz until the agent's current turn ends, because CES drops one sent
+   * mid-reply.
+   */
+  updateDialogflow(data: DialogflowUpdate): void {
+    this.wsSend({
+      type: 'command',
+      command: 'dialogflow:update',
       data,
     });
   }

@@ -118,6 +118,8 @@ export interface UpdateCallRequest {
   transfer?: Omit<TransferVerb, 'verb'>;
   /** Tag metadata. */
   tag?: Record<string, unknown>;
+  /** Send input into a running Dialogflow CES session. */
+  dialogflow_update?: DialogflowUpdate;
   /** Mid-conversation agent update. */
   agent_update?: {
     type: 'update_instructions' | 'inject_context' | 'update_tools' | 'generate_reply';
@@ -128,6 +130,20 @@ export interface UpdateCallRequest {
     interrupt?: boolean;
   };
 }
+
+/**
+ * Input for a running Dialogflow CES session (`dialogflow:update` command /
+ * `dialogflow_update` call-update key). At most one of `event`, `text`, `dtmf`,
+ * plus optional `variables`; at least one field is required.
+ */
+export type DialogflowUpdate = {
+  variables?: Record<string, unknown>;
+} & (
+  | { event: string; text?: never; dtmf?: never }
+  | { text: string; event?: never; dtmf?: never }
+  | { dtmf: string; event?: never; text?: never }
+  | { variables: Record<string, unknown>; event?: never; text?: never; dtmf?: never }
+);
 
 export interface ListCallsFilter {
   /** Filter by call direction. */
