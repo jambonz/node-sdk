@@ -7,6 +7,7 @@ export default defineConfig({
     'websocket/index': 'src/websocket/index.ts',
     'client/index': 'src/client/index.ts',
     'types/index': 'src/types/index.ts',
+    'harness/index': 'src/harness/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: true,

@@ -68,6 +68,62 @@ svc.on('session:new', (session) => {
 });
 ```
 
+### Custom harness (`@jambonz/sdk/harness`)
+
+A **harness** is your own service that takes the "think" step of a jambonz `agent` verb (`llm.vendor: "harness"`),
+while jambonz keeps telephony, STT, turn-taking, barge-in and TTS. jambonz opens one WebSocket per call to the harness
+(subprotocol `harness.jambonz.org`) and sends turns, events and results on it; the harness streams replies and sends
+tool calls and call-control commands back.
+
+`createHarness()` implements that whole protocol and works unchanged as a pass-through: it sends the conversation to an
+OpenAI-compatible model and streams the reply. You write only the hooks you need.
+
+```typescript
+import { createHarness } from '@jambonz/sdk/harness';
+
+createHarness({
+  apiKey: process.env.HARNESS_API_KEY,           // jambonz must send Authorization: Bearer <apiKey>
+  model: 'gpt-4.1-mini',                         // OpenAI-compatible; client: { apiKey, baseURL } (default OPENAI_API_KEY / OPENAI_BASE_URL)
+  instructions: 'You answer calls for Acme.',
+  async beforeModel(turn, ctx) {                 // routing, retrieval, gating, prompt assembly
+    if (/hours/i.test(turn.text)) return { reply: 'We are open nine to five.', route: 'faq' };
+    return { route: 'chat' };
+  },
+  tools: {                                       // your own tools; the agent's Studio tools are offered too
+    lookup_outage: { description: 'Find outages on a street', parameters, run: (args, ctx) => outages.find(args) },
+  },
+  checkSentence: (s) => !/\d{6,}/.test(s),       // before each sentence is spoken: true | false (stop) | replacement
+  afterTurn: (turn, ctx) => ctx.record('note', 'anything for the turn record'),
+  onEvent: { dtmf: (e, ctx) => ctx.state.set('pin', e.digits) },
+}).listen(8080);
+```
+
+| Hook | Called | Returns |
+|---|---|---|
+| `onSessionStart(session, ctx)` | once, when the call connects | nothing; set up `ctx.state` |
+| `beforeModel(turn, ctx)` | each turn, before the model | any of `instructions`, `messages` (replaces the whole list), `tools` (names to offer), `model`, `route`, `interruptible`; or `reply` to answer without a model |
+| `tools` | when the model calls one | the tool's result (`run(args, ctx)`) |
+| `checkSentence(sentence, ctx)` | before each sentence goes to TTS | `true` speak it, `false` stop the reply, a string to speak instead |
+| `afterTurn(turn, ctx)` | when the turn's reply is done | nothing; add to the turn record with `ctx.record()` |
+| `onEvent.<name>(event, ctx)` | `dtmf`, `silence`, `external`, `transfer`, `user_interruption`, `application_update`, ... | nothing |
+| `onSessionEnd(end, ctx)` | when the call ends | nothing |
+
+`ctx` has `state` (a per-call `Map`), `history` (user/assistant/tool messages; the system prompt is built from
+`instructions` per call), `session` (the `session:start` message), `say(text, {interrupt, interruptible})` for an
+unprompted reply, `command(name, args)` for call control (`hangup`, `transfer`, `play`, `record`, `barge_in`,
+`listen`; resolves with the `command:result`), `callTool(name, args)` to run one of the agent's tools from code,
+`record(field, value)` and `log` (a pino child bound to the `call_sid`).
+
+Built in: conversation history; streaming chunks to jambonz as they arrive (sentence by sentence when `checkSentence`
+is set); cancelling the model stream on `turn:cancel`; trimming history to what the caller actually heard on barge-in;
+the tool loop for your tools and the agent's Studio tools (`tool:call` / `tool:result`); the greeting turn (`greeting`
+option for fixed text, else the model greets); a silence policy (ask once if the caller is still there, then say
+goodbye and hang up; override with `onEvent.silence`); a turn record on every `reply:done` (route, steps with timings,
+model calls with tokens, own tools, plus your `ctx.record` fields); resuming a call when jambonz reconnects
+(`session:start {resumed: true}`); and `GET /health`. All protocol message types are exported for anyone handling
+the protocol directly. See [examples/harness](examples/harness/) for a runnable harness and how to point a jambonz
+Harness credential at it.
+
 ### Handling audio streams (listen/stream verb)
 
 When you use a [`listen`](https://docs.jambonz.org/verbs/verbs/listen) or [`stream`](https://docs.jambonz.org/verbs/verbs/stream) verb, jambonz opens a separate WebSocket connection to deliver real-time call audio. The audio WebSocket URL can point anywhere — a separate server, a different process, or a third-party service.
@@ -348,7 +404,7 @@ To generate a coverage report:
 npx vitest run --coverage
 ```
 
-Tests live in `typescript/test/` and cover the webhook response builder, signature verification, environment variable middleware, REST API client, JSON schema validation, and schema drift detection.
+Tests live in `typescript/test/` and cover the webhook response builder, signature verification, environment variable middleware, REST API client, JSON schema validation, schema drift detection, and the harness server (against a fake jambonz client and a fake OpenAI-compatible streaming server).
 
 ## SDK Reference
 
@@ -363,6 +419,9 @@ import { createEndpoint } from '@jambonz/sdk/websocket';
 
 // REST API client (mid-call control, outbound calls)
 import { JambonzClient } from '@jambonz/sdk/client';
+
+// Custom harness for the agent verb (llm.vendor: "harness")
+import { createHarness } from '@jambonz/sdk/harness';
 ```
 
 ### Verb methods
@@ -441,6 +500,7 @@ See the [examples/](examples/) directory:
 | [s2s-move-to-room](examples/s2s-move-to-room/) | WebSocket | Ultravox s2s, then move caller + agent into a Room |
 | [room-say](examples/room-say/) | WebSocket | injectSay a one-shot announcement heard by the whole Room |
 | [room-play-tone](examples/room-play-tone/) | WebSocket | injectPlay a tone heard by the whole Room |
+| [harness](examples/harness/) | Harness WS | A custom harness for the agent verb: routing, own tool, sentence check |
 
 ## Publishing to npm
 
