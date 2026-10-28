@@ -206,6 +206,8 @@ export interface LlmBaseOptions {
   model?: string;
   /** LLM vendor authentication. */
   auth?: { apiKey?: string; [key: string]: unknown };
+  /** With no auth: the label of the account's speech-to-speech credential to use (e.g. openai_s2s); omit for the unlabelled one. */
+  label?: string;
   /** Additional connection options (e.g. custom base URLs). */
   connectOptions?: Record<string, unknown>;
   /** LLM configuration including messages, temperature, tools. */
