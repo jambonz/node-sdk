@@ -39,27 +39,30 @@ npm start
 
 `GET /health` returns `{"ok":true,"calls":N}` for a load balancer or container health check.
 
-> Until `@jambonz/sdk` with the `harness` subpath is published, build the SDK and install it from the repo:
-> `(cd ../../typescript && npm ci && npm run build) && npm install ../../typescript`
+> Starting a new harness of your own? `npm create @jambonz/agent-harness@latest my-agent` scaffolds a project with
+> its own README, a test and a Dockerfile.
 
 ## Point jambonz at it
 
-1. Expose the harness where feature-server can reach it. In production put it behind TLS (a load balancer or a
-   reverse proxy such as nginx/Caddy that passes WebSocket upgrades), so the URL is `wss://`.
-2. In the jambonz portal (or Agent Studio), add an LLM credential with vendor **Harness**:
-   - **URL**: `wss://harness.example.com` (or `ws://10.0.0.5:8080` on a private network)
-   - **API key**: the value of `HARNESS_API_KEY`
-3. Use it from an `agent` verb:
+1. Expose the harness where jambonz can reach it. In production put it behind TLS (a load balancer or a reverse
+   proxy such as nginx/Caddy that passes WebSocket upgrades), so the URL is `wss://`; `ws://` is accepted only for a
+   private address. To try it from your laptop, a tunnel works: `ngrok http 8080`.
+2. **From Agent Studio:** create a **Custom harness** agent, enter the URL as the **Harness URL**, and if you set
+   `HARNESS_API_KEY`, enter the same value as the **Secret** and press **Save**.
+3. **From your own application:** use the `agent` verb with the URL on the verb:
 
 ```json
 {
   "verb": "agent",
   "stt": { "vendor": "deepgram", "language": "en-US" },
   "tts": { "vendor": "cartesia", "voice": "..." },
-  "llm": { "vendor": "harness", "label": "my-harness", "harness": { "metadata": { "tenant": "acme" } } },
+  "llm": { "vendor": "harness", "harness": { "url": "wss://harness.example.com", "metadata": { "tenant": "acme" } } },
   "bargeIn": { "enable": true }
 }
 ```
+
+   With a key, add an LLM credential with vendor **Harness** to the account through the jambonz API and name it with
+   `"label"` on the verb; jambonz then sends `Authorization: Bearer <key>`.
 
 Each call logs `session started` with its `call_sid`; every log line for the call carries it, and every turn's
 `reply:done` carries a turn record (route, steps with timings, model calls with tokens, own tools) that jambonz stores
