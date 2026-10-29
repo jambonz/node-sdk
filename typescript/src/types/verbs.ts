@@ -289,6 +289,10 @@ export interface NovaS2sVerb extends LlmBaseOptions {
   verb: 'nova_s2s';
 }
 
+export interface RimeS2sVerb extends LlmBaseOptions {
+  verb: 'rime_s2s';
+}
+
 export interface VoiceliveS2sVerb extends LlmBaseOptions {
   verb: 'voicelive_s2s';
 }
@@ -989,6 +993,7 @@ export type Verb =
   | QwenS2sVerb
   | GptliveS2sVerb
   | NovaS2sVerb
+  | RimeS2sVerb
   | VoiceliveS2sVerb
   | DialogflowVerb
   | AgentVerb
