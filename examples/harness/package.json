@@ -1,0 +1,21 @@
+{
+  "name": "jambonz-harness-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A minimal jambonz custom harness built with @jambonz/sdk/harness",
+  "type": "module",
+  "scripts": {
+    "start": "tsx harness.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jambonz/sdk": "^0.13.0",
+    "pino": "^9.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

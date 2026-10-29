@@ -151,6 +151,8 @@ export interface Recognizer {
   mistralOptions?: Record<string, unknown>;
   modulateOptions?: Record<string, unknown>;
   zoomOptions?: Record<string, unknown>;
+  /** Paxa Labs options; only when the recognizer vendor is 'paxa'. */
+  paxaOptions?: Record<string, unknown>;
   customOptions?: Record<string, unknown>;
 }
 

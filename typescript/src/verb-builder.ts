@@ -111,6 +111,10 @@ export class VerbBuilder {
     return this.addVerb({ verb: 'nova_s2s', ...opts });
   }
 
+  rime_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
+    return this.addVerb({ verb: 'rime_s2s', ...opts });
+  }
+
   voicelive_s2s(opts: Omit<LlmBaseOptions, 'vendor'>): this {
     return this.addVerb({ verb: 'voicelive_s2s', ...opts });
   }

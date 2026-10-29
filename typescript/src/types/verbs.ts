@@ -206,6 +206,8 @@ export interface LlmBaseOptions {
   model?: string;
   /** LLM vendor authentication. */
   auth?: { apiKey?: string; [key: string]: unknown };
+  /** With no auth: the label of the account's speech-to-speech credential to use (e.g. openai_s2s); omit for the unlabelled one. */
+  label?: string;
   /** Additional connection options (e.g. custom base URLs). */
   connectOptions?: Record<string, unknown>;
   /** LLM configuration including messages, temperature, tools. */
@@ -285,6 +287,10 @@ export interface GptliveS2sVerb extends LlmBaseOptions {
 
 export interface NovaS2sVerb extends LlmBaseOptions {
   verb: 'nova_s2s';
+}
+
+export interface RimeS2sVerb extends LlmBaseOptions {
+  verb: 'rime_s2s';
 }
 
 export interface VoiceliveS2sVerb extends LlmBaseOptions {
@@ -987,6 +993,7 @@ export type Verb =
   | QwenS2sVerb
   | GptliveS2sVerb
   | NovaS2sVerb
+  | RimeS2sVerb
   | VoiceliveS2sVerb
   | DialogflowVerb
   | AgentVerb
