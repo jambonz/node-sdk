@@ -241,7 +241,8 @@ export interface ToolCallMessage {
 /** Call-control commands (A.8). */
 export interface HarnessCommandArgs {
   hangup: { reason?: string };
-  transfer: { to: string; trunk?: string; headers?: Record<string, string>; announce?: string; transcribe?: boolean };
+  /** Without `to`, jambonz uses the agent's own transfer destination. */
+  transfer: { to?: string; trunk?: string; headers?: Record<string, string>; announce?: string; transcribe?: boolean };
   play: { url: string; interruptible?: boolean };
   record: { action: 'start' | 'stop' | 'pause' | 'resume' };
   barge_in: { enabled: boolean };
