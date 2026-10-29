@@ -364,6 +364,17 @@ describe('harness: events, commands, silence', () => {
     expect(results).toEqual([{ ok: false, error: 'busy' }]);
   });
 
+  it('an application_update reaches its handler with the update type jambonz sends', async () => {
+    const seen: unknown[] = [];
+    const port = await setup(() => [], {
+      onEvent: { application_update: (e) => { seen.push([e.update_type, e.data]); } },
+    });
+    const c = await call(port);
+    c.send('event', { name: 'application_update', update_type: 'inject_context', data: { text: 'VIP caller' } });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(seen).toEqual([['inject_context', { text: 'VIP caller' }]]);
+  });
+
   it('default silence: asks once, then says goodbye and hangs up after it has been spoken', async () => {
     const port = await setup(() => []);
     const c = await call(port);
