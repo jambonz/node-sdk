@@ -138,7 +138,7 @@ export interface ToolResultMessage extends FromJambonz {
 
 export interface SessionEndMessage extends FromJambonz {
   type: 'session:end';
-  reason: 'caller_hangup' | 'harness_hangup' | 'application_hangup' | 'application_redirect' | 'error' | string;
+  reason: 'caller_hangup' | 'harness_hangup' | 'application_hangup' | 'application_redirect' | 'transferred' | 'error' | string;
   duration_ms?: number;
 }
 
@@ -154,7 +154,8 @@ export interface TransferEvent { name: 'transfer'; command_id: string; outcome: 
 export interface PlaybackEvent { name: 'playback'; command_id: string; outcome: string }
 export interface RecordingEvent { name: 'recording'; command_id?: string; state: string; by: 'harness' | 'application' }
 export interface ListenEvent { name: 'listen'; language?: string; hints?: string[]; by: string }
-export interface ApplicationUpdateEvent { name: 'application_update'; type: string; data?: unknown }
+/** `update_type` is the application's `agent:update` type (the message's own `type` is already `event`). */
+export interface ApplicationUpdateEvent { name: 'application_update'; update_type: string; data?: unknown }
 export interface ErrorEvent { name: 'error'; code: string; message: string; ref?: unknown }
 
 export type HarnessEvent =
@@ -240,7 +241,8 @@ export interface ToolCallMessage {
 /** Call-control commands (A.8). */
 export interface HarnessCommandArgs {
   hangup: { reason?: string };
-  transfer: { to: string; trunk?: string; headers?: Record<string, string>; announce?: string; transcribe?: boolean };
+  /** Without `to`, jambonz uses the agent's own transfer destination. */
+  transfer: { to?: string; trunk?: string; headers?: Record<string, string>; announce?: string; transcribe?: boolean };
   play: { url: string; interruptible?: boolean };
   record: { action: 'start' | 'stop' | 'pause' | 'resume' };
   barge_in: { enabled: boolean };
