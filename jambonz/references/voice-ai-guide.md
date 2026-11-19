@@ -30,7 +30,8 @@ The agent verb has three main configuration blocks: `recognizer` (STT), `llm` (t
 
 ### OpenAI (`openai_s2s`)
 
-- Supports `model` (e.g. `gpt-4o-realtime-preview`) and `llmOptions.messages` for system prompt
+- Supports `model` (default `gpt-realtime-2.1`; also `gpt-realtime-2.1-mini`). `llmOptions` carries `session_update` (persona `instructions`, tools, audio) and `response_create` (the first response)
+- `gpt-realtime` and `gpt-realtime-mini` shut down on 2027-01-20; the `gpt-4o-realtime-preview*` models are already gone
 - Function calling via `toolHook`
 - Events via `eventHook`
 - Look up full schema: `get_jambonz_schema('openai_s2s')`
@@ -96,9 +97,10 @@ session.on('/tool-call', (evt) => {
 
 session
   .openai_s2s({
-    model: 'gpt-4o-realtime-preview',
+    model: 'gpt-realtime-2.1',
     llmOptions: {
-      messages: [{ role: 'system', content: 'You are a helpful assistant.' }],
+      session_update: { type: 'realtime', instructions: 'You are a helpful assistant.' },
+      response_create: {},
     },
     toolHook: '/tool-call',
     actionHook: '/s2s-done',
@@ -157,9 +159,10 @@ session.on('tts:user_interrupt', () => {
 ```typescript
 session
   .openai_s2s({
-    model: 'gpt-4o-realtime-preview',
+    model: 'gpt-realtime-2.1',
     llmOptions: {
-      messages: [{ role: 'system', content: 'You are a friendly customer support agent.' }],
+      session_update: { type: 'realtime', instructions: 'You are a friendly customer support agent.' },
+      response_create: {},
     },
     actionHook: '/done',
   })
