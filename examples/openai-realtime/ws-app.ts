@@ -30,7 +30,7 @@ svc.on('session:new', (session) => {
 
   session
     .on('/event', (_evt: Record<string, any>) => {
-      // OpenAI Realtime events (conversation.item.*, response.audio_transcript.done, etc.)
+      // OpenAI Realtime events (conversation.item.*, response.output_audio_transcript.done, etc.)
     })
     .on('/toolCall', async (evt: Record<string, any>) => {
       const { name, args, tool_call_id } = evt;
@@ -78,26 +78,25 @@ svc.on('session:new', (session) => {
     .answer()
     .pause({ length: 1 })
     .openai_s2s({
-      model: 'gpt-4o-realtime-preview-2024-12-17',
+      model: 'gpt-realtime-2.1',
       auth: { apiKey },
       actionHook: '/final',
       eventHook: '/event',
       toolHook: '/toolCall',
       events: [
         'conversation.item.*',
-        'response.audio_transcript.done',
+        'response.output_audio_transcript.done',
         'input_audio_buffer.committed',
       ],
       llmOptions: {
         response_create: {
-          modalities: ['text', 'audio'],
-          instructions: 'Please assist the user with their request.',
-          voice: 'alloy',
-          output_audio_format: 'pcm16',
-          temperature: 0.8,
+          output_modalities: ['audio'],
+          instructions: 'Greet the caller and ask how you can help.',
           max_output_tokens: 4096,
         },
         session_update: {
+          type: 'realtime',
+          instructions: 'Please assist the user with their request.',
           tools: [
             {
               name: 'get_weather',
@@ -114,12 +113,17 @@ svc.on('session:new', (session) => {
             },
           ],
           tool_choice: 'auto',
-          input_audio_transcription: { model: 'whisper-1' },
-          turn_detection: {
-            type: 'server_vad',
-            threshold: 0.8,
-            prefix_padding_ms: 300,
-            silence_duration_ms: 500,
+          audio: {
+            input: {
+              transcription: { model: 'gpt-live-transcribe' },
+              turn_detection: {
+                type: 'server_vad',
+                threshold: 0.8,
+                prefix_padding_ms: 300,
+                silence_duration_ms: 500,
+              },
+            },
+            output: { voice: 'alloy' },
           },
         },
       },
