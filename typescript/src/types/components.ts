@@ -151,6 +151,14 @@ export interface Recognizer {
   mistralOptions?: Record<string, unknown>;
   modulateOptions?: Record<string, unknown>;
   zoomOptions?: Record<string, unknown>;
+  azureopenaiOptions?: Record<string, unknown>;
+  gnaniOptions?: Record<string, unknown>;
+  inworldOptions?: Record<string, unknown>;
+  kugelaudioOptions?: Record<string, unknown>;
+  metaOptions?: Record<string, unknown>;
+  saidwireOptions?: Record<string, unknown>;
+  sarvamOptions?: Record<string, unknown>;
+  smallestaiOptions?: Record<string, unknown>;
   /** Paxa Labs options; only when the recognizer vendor is 'paxa'. */
   paxaOptions?: Record<string, unknown>;
   customOptions?: Record<string, unknown>;
