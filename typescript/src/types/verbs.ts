@@ -297,6 +297,10 @@ export interface VoiceliveS2sVerb extends LlmBaseOptions {
   verb: 'voicelive_s2s';
 }
 
+export interface PhonicS2sVerb extends LlmBaseOptions {
+  verb: 'phonic_s2s';
+}
+
 export interface DialogflowVerb {
   verb: 'dialogflow';
   /** The deployment to use (CES). Omit to use the app's default. */
@@ -352,6 +356,9 @@ export interface DialogflowVerb {
   };
 }
 
+/** Voice styles the agent verb's emotion option can use. */
+export type AgentEmotion = 'neutral' | 'happy' | 'excited' | 'calm' | 'empathetic' | 'sad' | 'serious' | 'surprised' | 'curious' | 'angry';
+
 export interface AgentVerb {
   verb: 'agent';
   id?: string;
@@ -359,10 +366,12 @@ export interface AgentVerb {
   stt?: Recognizer;
   /** TTS configuration. Optional — can be set at the application level. */
   tts?: Synthesizer;
-  /** Turn detection strategy. String shorthand ('stt' or 'krisp') or object with tunable params. */
-  turnDetection?: 'stt' | 'krisp' | {
-    mode: 'krisp';
+  /** Turn detection strategy. String shorthand ('stt', 'krisp' or 'jambonz') or object with tunable params. 'jambonz' is the jambonz acoustic end-of-turn model; it runs in the media server and needs no vendor key. */
+  turnDetection?: 'stt' | 'krisp' | 'jambonz' | {
+    mode: 'krisp' | 'jambonz';
+    /** End-of-turn confidence threshold (0-1). Default: 0.5 for krisp; 0.9 for jambonz, where it is the starting value of a threshold that falls to 0 over 1.6 s of silence. */
     threshold?: number;
+    /** Krisp model name override (krisp only). */
     model?: string;
   };
   /** Barge-in configuration — controls user interruption of assistant speech. */
@@ -370,7 +379,7 @@ export interface AgentVerb {
     enable?: boolean;
     /** How interruptions are detected. 'vad' (default): speech onset tentatively interrupts the assistant and is confirmed after minSpeechDuration of sustained speech, otherwise the assistant resumes. 'interruptPrediction': an ML model scores whether caller speech is a genuine interruption attempt vs backchannel (e.g. 'uh-huh'), so the assistant is never tentatively paused and backchannel does not cut it off; requires a provisioned vendor API key. */
     strategy?: 'vad' | 'interruptPrediction';
-    /** Detection vendor for strategy 'interruptPrediction'; defaults to 'krisp' (currently the only option). Not used with strategy 'vad'. */
+    /** Detection vendor for strategy 'interruptPrediction'; 'krisp' (default) or 'jambonz'. It must match turnDetection when that is 'krisp' or 'jambonz' (they share one session). Not used with strategy 'vad'. */
     vendor?: string;
     /** Probability threshold for interruptPrediction (0-1). Higher values require stronger evidence before interrupting the assistant. Default: 0.5. */
     threshold?: number;
@@ -410,11 +419,32 @@ export interface AgentVerb {
   speak?: boolean;
   /** Keep stage-direction-only paragraphs ('(silence)', '[No response needed]', '*pauses*') and <think>/<thinking>/<reasoning> blocks out of TTS. History and events keep the raw text. Default: true. */
   speechCleanup?: boolean;
+  /** Emotion-aware voice: the caller's tone is passed to the LLM, and the LLM may change the voice style with <voice/> directives that are rendered as the TTS vendor's own style tags. Omit to leave the agent unchanged. */
+  emotion?: {
+    /** Where the caller's tone comes from: the STT vendor's label, the LLM's reading of the words, or both ('auto'). Default: 'auto'. */
+    listen?: 'auto' | 'stt' | 'llm' | 'off';
+    /** Let the LLM change the voice style. Ignored when the TTS model has no style control. Default: true. */
+    speak?: boolean;
+    /** Allow-list of emotions the LLM may use. Default: every emotion the TTS model supports. */
+    emotions?: AgentEmotion[];
+    /** Allow non-speech sounds (e.g. laugh), all or a list. Default: false. */
+    sounds?: boolean | Array<'laugh' | 'sigh' | 'breath' | 'pause'>;
+    /** Drop STT emotion labels whose confidence is below this. Default: 0.5. */
+    minConfidence?: number;
+    /** The style every reply starts in. Default: 'neutral'. */
+    default?: AgentEmotion;
+  };
   /** Enable server-side noise isolation to reduce background noise on call audio. Defaults to inbound (caller) audio; set direction to 'write' for outbound. */
-  noiseIsolation?: 'krisp' | 'rnnoise' | {
+  noiseIsolation?: 'krisp' | 'rnnoise' | 'kugelaudio' | 'aicoustics' | {
+    /** Vendor: 'krisp', 'rnnoise', 'kugelaudio' or 'aicoustics'. */
     mode: string;
+    /** Label of the speech credential to use, for vendors that need one (kugelaudio). */
+    label?: string;
+    /** Inline credentials for vendors that need them (kugelaudio). When omitted, the speech credential is looked up by vendor and label. */
+    auth?: { apiKey?: string; apiUri?: string };
     level?: number;
     direction?: 'read' | 'write';
+    /** Model name override. For aicoustics, a model file name in the media server's model directory. */
     model?: string;
   };
   /** External MCP servers that provide tools to the LLM. */
@@ -995,6 +1025,7 @@ export type Verb =
   | NovaS2sVerb
   | RimeS2sVerb
   | VoiceliveS2sVerb
+  | PhonicS2sVerb
   | DialogflowVerb
   | AgentVerb
   | ConferenceVerb
